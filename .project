@@ -30,17 +30,7 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>src/main/java/org/common/navbar.jsp</name>
-			<type>1</type>
-			<locationURI>PROJECT_LOC/src/main/webapp/navbar.jsp</locationURI>
-		</link>
-		<link>
-			<name>src/main/java/org/loginPage/login.jsp</name>
-			<type>1</type>
-			<locationURI>PROJECT_LOC/src/main/webapp/login.jsp</locationURI>
-		</link>
-		<link>
-			<name>src/main/java/org/loginPage/styles.css</name>
+			<name>src/main/webapp/loginPage/styles.css</name>
 			<type>1</type>
 			<locationURI>PROJECT_LOC/src/main/webapp/styles.css</locationURI>
 		</link>
