@@ -64,7 +64,7 @@ body {
 <body>
 
     <!-- Purple Navbar -->
-    <%@ include file="navbar.jsp" %>
+    <%@ include file="../common/navbar.jsp" %>
 
     <!-- Full width, split login section -->
     <div class="container-fluid g-0 full-height">
