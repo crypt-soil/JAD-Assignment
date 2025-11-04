@@ -8,7 +8,7 @@ public class DBConnection {
     // Keep credentials private so they can’t be accessed directly
     private static final String URL = "jdbc:mysql://localhost:3306/silvercare";
     private static final String USER = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "root1234";
 
     public static Connection getConnection() {
         Connection conn = null;
