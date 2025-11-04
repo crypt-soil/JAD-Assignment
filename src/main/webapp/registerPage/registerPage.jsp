@@ -74,8 +74,12 @@ body {
 
             <!-- Right Form -->
             <div class="col-md-6 form-side">
-                <h2>Register with us</h2>
-                <form action="verifyLogin.jsp" method="post">
+                <h2>Register with us!</h2>
+                <form action="verifyRegister.jsp" method="post">
+                		<div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" name="username" required>
+                    </div>
                     <div class="mb-3">
                         <label class="form-label">Email</label>
                         <input type="text" class="form-control" name="email" required>
