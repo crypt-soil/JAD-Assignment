@@ -86,7 +86,7 @@ body {
                     </div>
                     <button type="submit" class="btn btn-purple">LOG IN</button>
                     <p class="form-text mt-3 text-center">
-                        No Account yet? <a href="signup.jsp">SIGN UP</a>
+                        No Account yet? <a href="../registerPage/registerPage.jsp">SIGN UP</a>
                     </p>
                 </form>
             </div>

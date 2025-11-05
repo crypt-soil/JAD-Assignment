@@ -4,8 +4,8 @@
     <div class="fw-semibold">Silver Care</div>
     <div>
         <a href="#">Service Category</a>
-        <a href="signup.jsp" class="btn btn-signup">Sign Up</a>
-        <a href="login.jsp" class="btn btn-login">Login</a>
+        <a href="../registerPage/registerPage.jsp" class="btn btn-signup">Sign Up</a>
+        <a href="../loginPage/login.jsp" class="btn btn-login">Login</a>
     </div>
 </nav>
 
