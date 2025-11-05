@@ -28,11 +28,4 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>src/main/webapp/loginPage/styles.css</name>
-			<type>1</type>
-			<locationURI>PROJECT_LOC/src/main/webapp/styles.css</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>

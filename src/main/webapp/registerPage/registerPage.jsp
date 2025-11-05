@@ -1,13 +1,10 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" %>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Silver Care Register Page</title>
-
+<title>Register</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 body {
@@ -60,63 +57,97 @@ body {
 }
 </style>
 </head>
+<body class="bg-light p-5">
+<%@ include file="../common/navbar.jsp" %>
 
-<body>
 
-    <!-- Purple Navbar -->
-    <%@ include file="../common/navbar.jsp" %>
+<div class="container-fluid g-0 full-height">
 
-    <!-- Full width, split login section -->
-    <div class="container-fluid g-0 full-height">
-        <div class="row g-0 full-height">
-            <!-- Left Image -->
-            <div class="col-md-6 login-image"></div>
 
-            <!-- Right Form -->
-            <div class="col-md-6 form-side">
-                <h2>Register with us!</h2>
-                <form action="verifyRegister.jsp" method="post">
-                		<div class="mb-3">
-                        <label class="form-label">Username</label>
-                        <input type="text" class="form-control" name="username" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="text" class="form-control" name="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Full Name</label>
-                        <input type="text" class="form-control" name="fullName" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Phone Number</label>
-                        <input type="tel" class="form-control" name="phoneNumber" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Address</label>
-                        <input type="text" class="form-control" name="address" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Zipcode</label>
-                        <input type="text" class="form-control" name="zipcode" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input type="password" class="form-control" name="password" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control" name="password2" required>
-                    </div>
-                        <button type="submit" class="btn btn-purple">SIGN UP</button>            
-                    <p class="form-text mt-3 text-center">
-                        Already have an account? <a href="../loginPage/login.jsp">LOG IN</a>
-                    </p>
-                </form>
-            </div>
+<%
+String message = request.getParameter("message");
+String reason = request.getParameter("reason");
+if (message != null) {
+if (message.equals("success")) {
+%>
+<div class="alert alert-success text-center">
+Registration successful! You can now <a href="../loginPage/login.jsp">log in</a>.
+</div>
+<%
+} else {
+%>
+<div class="alert alert-danger text-center fw-bold fs-4">
+    <%= message + ": " + reason %>
+</div>
+
+<%
+}
+}
+%>
+<div class="row g-0 full-height">
+<div class="col-md-6 login-image"></div>
+<div class="col-md-6 form-side">
+    <h2>Register with us!</h2>
+
+  <!-- ✅ show success/error messages -->
+<%
+
+    if ("success".equals(message)) {
+%>
+        <div class="alert alert-success text-center">Registration Successful!</div>
+<%
+    } else if ("error".equals(message)) {
+%>
+        <div class="alert alert-danger text-center">
+            Registration Failed: <%= (reason != null ? reason : "Unknown error") %>
         </div>
-    </div>
+<%
+    }
+%>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- ✅ Updated form action -->
+    <form action="${pageContext.request.contextPath}/VerifyRegister" method="POST">
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input type="text" class="form-control" name="username" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="text" class="form-control" name="email" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" name="fullName" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" class="form-control" name="phoneNumber" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Address</label>
+            <input type="text" class="form-control" name="address" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Zipcode</label>
+            <input type="text" class="form-control" name="zipcode" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" name="password" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Confirm Password</label>
+            <input type="password" class="form-control" name="password2" required>
+        </div>
+        <button type="submit" class="btn btn-purple">SIGN UP</button>            
+        <p class="form-text mt-3 text-center">
+            Already have an account? <a href="../loginPage/login.jsp">LOG IN</a>
+        </p>
+    </form>
+</div>
+</div>
+</div>
+
+
 </body>
 </html>
