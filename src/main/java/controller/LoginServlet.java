@@ -45,13 +45,14 @@ public class LoginServlet extends HttpServlet {
 		if (isValid) {
 			HttpSession session = request.getSession();
 			session.setAttribute("username", username);
+			session.setAttribute("loginMessage", "Login successful!");
 			//Redirect to landing page 
-			response.sendRedirect("user");
+			response.sendRedirect(request.getContextPath() + "/homePage/homePage.jsp");
 		} else {
 			request.setAttribute("errorMsg", "Invalid username or password.");
-			request.getRequestDispatcher("user/login.jsp").forward(request, response);
+			request.getRequestDispatcher("/loginPage/login.jsp").forward(request, response);
 		}
-		doGet(request, response);
+//		doGet(request, response);
 	}
 
 }

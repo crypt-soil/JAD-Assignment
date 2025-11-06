@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import org.DBConnection;
+//import model.DBConnection;
 
 public class registerModel {
 
@@ -40,7 +40,7 @@ public class registerModel {
     }
 
     // 🔒 Password hashing method
-    private String hashPassword(String password) {
+    public String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hashedBytes = md.digest(password.getBytes());
