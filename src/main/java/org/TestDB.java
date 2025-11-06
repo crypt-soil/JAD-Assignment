@@ -1,5 +1,5 @@
 package org;
-
+import model.DBConnection;
 import java.sql.Connection;
 
 public class TestDB {
