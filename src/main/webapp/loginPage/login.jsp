@@ -72,10 +72,20 @@ body {
             <!-- Left Image -->
             <div class="col-md-6 login-image"></div>
 
-            <!-- Right Form -->
+
             <div class="col-md-6 form-side">
                 <h2>Welcome back!</h2>
-                <form action="verifyLogin.jsp" method="post">
+                <!-- show error from loginServlet if login fails -->
+                <%
+                    String errorMsg = (String) request.getAttribute("errorMsg");
+                    if (errorMsg != null) {
+                %>
+                    <div class="alert alert-danger text-center" role="alert">
+                        <%= errorMsg %>
+                    </div>
+                <% } %>
+                <!--  Send login data to the servlet -->
+                <form action="${pageContext.request.contextPath}/LoginServlet" method="post">
                     <div class="mb-3">
                         <label class="form-label">Email or Username</label>
                         <input type="text" class="form-control" name="username" required>
