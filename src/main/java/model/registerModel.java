@@ -39,7 +39,7 @@ public class registerModel {
     }
 
     // 🔒 Password hashing method
-    private String hashPassword(String password) {
+    public String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hashedBytes = md.digest(password.getBytes());
