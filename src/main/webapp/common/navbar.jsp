@@ -1,18 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-
-<%
-    String role = (String) session.getAttribute("role");
-    if (role == null) role = "public";
-
-    String username = (String) session.getAttribute("username");
-%>
-
 <!-- Sticky Purple Navbar -->
 <nav class="navbar navbar-custom d-flex justify-content-between align-items-center sticky-top">
     <div class="fw-semibold">Silver Care</div>
-
     <div>
-
         <a href="<%= request.getContextPath() %>/homePage/homePage.jsp">Service Category</a>
 
         <%-- ===========================
@@ -48,16 +38,17 @@
         <%
             }
         %>
-
+        <a href="../registerPage/registerPage.jsp" class="btn btn-signup">Sign Up</a>
+        <a href="../loginPage/login.jsp" class="btn btn-login">Login</a>
     </div>
 </nav>
 
 <style>
     .navbar-custom {
         background-color: #c5b2e6;
-        padding: 30px 70px 30px 70px;
+        padding: 30px 70px 30px 70px; /* extra bottom padding */
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        z-index: 1030;
+        z-index: 1030; /* ensures navbar appears above content */
     }
 
     .navbar-custom a {
