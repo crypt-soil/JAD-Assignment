@@ -33,7 +33,7 @@
             <a href="../profilePage/profile.jsp" class="btn btn-signup">
                 Profile
             </a>
-            <a href="../LogoutServlet" class="btn btn-login">Logout</a>
+            <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-login">Logout</a>
 
         <%-- ===========================
              ADMIN
@@ -44,7 +44,7 @@
             <a href="../adminPage/managementOverview.jsp" class="btn btn-signup">
                 Management Overview
             </a>
-            <a href="../LogoutServlet" class="btn btn-login">Logout</a>
+            <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-login">Logout</a>
         <%
             }
         %>

@@ -24,7 +24,7 @@ public class LogoutServlet extends HttpServlet {
         }
 
         // Redirect user back to home page
-        response.sendRedirect("homePage/homePage.jsp");
+        response.sendRedirect(request.getContextPath() + "/categories");
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
