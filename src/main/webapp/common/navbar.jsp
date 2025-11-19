@@ -14,40 +14,8 @@
     <div>
 
         <a href="#">Service Category</a>
-
-        <%-- ===========================
-             PUBLIC (not logged in)
-        ============================ --%>
-        <%
-            if (role.equals("public")) {
-        %>
-            <a href="../registerPage/registerPage.jsp" class="btn btn-signup">Sign Up</a>
-            <a href="../loginPage/login.jsp" class="btn btn-login">Login</a>
-
-        <%-- ===========================
-             MEMBER
-        ============================ --%>
-        <%
-            } else if (role.equals("member")) {
-        %>
-            <a href="../profilePage/profile.jsp" class="btn btn-signup">
-                Profile
-            </a>
-            <a href="../LogoutServlet" class="btn btn-login">Logout</a>
-
-        <%-- ===========================
-             ADMIN
-        ============================ --%>
-        <%
-            } else if (role.equals("admin")) {
-        %>
-            <a href="../adminPage/managementOverview.jsp" class="btn btn-signup">
-                Management Overview
-            </a>
-            <a href="../LogoutServlet" class="btn btn-login">Logout</a>
-        <%
-            }
-        %>
+        <a href="<%= request.getContextPath() %>/registerPage/registerPage.jsp" class="btn btn-outline-light">Sign Up</a>
+        <a href="<%= request.getContextPath() %>/loginPage/login.jsp" class="btn btn-primary">Login</a>
 
     </div>
 </nav>
