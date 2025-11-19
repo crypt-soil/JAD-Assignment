@@ -12,8 +12,8 @@
 
 <%
     // Retrieve session attributes
-    String role = (String) session.getAttribute("role");
-    String username = (String) session.getAttribute("username");
+    // String role = (String) session.getAttribute("role");
+    // String username = (String) session.getAttribute("username");
     
 
     if (role == null) {
