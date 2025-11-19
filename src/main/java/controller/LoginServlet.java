@@ -22,8 +22,16 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         UserDAO userRepo = new UserDAO();
-
-        // 👇 1. Check Member table
+        
+        if (userRepo.validateAdmin(username, password)) {
+            HttpSession session = request.getSession();
+            session.setAttribute("username", username);
+            session.setAttribute("role", "admin");
+            session.setAttribute("loginMessage", "Welcome back, Admin!");
+            response.sendRedirect(request.getContextPath() + "/homePage/homePage.jsp");
+            return;
+        }
+        
         if (userRepo.validateMember(username, password)) {
             HttpSession session = request.getSession();
             session.setAttribute("username", username);
@@ -33,17 +41,8 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // 👇 2. Check Admin table
-        if (userRepo.validateAdmin(username, password)) {
-            HttpSession session = request.getSession();
-            session.setAttribute("username", username);
-            session.setAttribute("role", "admin");
-            session.setAttribute("loginMessage", "Welcome back, Admin!");
-            response.sendRedirect(request.getContextPath() + "/homePage/homePage.jsp");
-            return;
-        }
 
-        // 👇 3. Invalid login
+
         request.setAttribute("errorMsg", "Invalid username or password.");
         request.getRequestDispatcher("/loginPage/login.jsp").forward(request, response);
     }

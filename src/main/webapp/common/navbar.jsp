@@ -13,7 +13,7 @@
 
     <div>
 
-        <a href="#">Service Category</a>
+        <a href="<%= request.getContextPath() %>/homePage/homePage.jsp">Service Category</a>
 
         <%-- ===========================
              PUBLIC (not logged in)

@@ -197,7 +197,7 @@ CREATE TABLE admin_user (
 ) ENGINE=InnoDB;
 
 -- insert admin user
--- original password for admin: admin
+-- original password for admin: admin123
 INSERT INTO admin_user (username, email, password)
 VALUES (
     'admin',

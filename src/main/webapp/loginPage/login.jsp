@@ -86,8 +86,8 @@ body {
                 <% } %>
                 <!--  Send login data to the servlet -->
                 <form action="${pageContext.request.contextPath}/LoginServlet" method="post">
-                    <div class="mb-3">
-                        <label class="form-label">Email or Username</label>
+				<div class="mb-3">
+				<label class="form-label">Email or Username</label>
                         <input type="text" class="form-control" name="username" required>
                     </div>
                     <div class="mb-3">
