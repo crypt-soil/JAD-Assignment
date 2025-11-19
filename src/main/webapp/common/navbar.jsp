@@ -4,6 +4,7 @@
     <div class="fw-semibold">Silver Care</div>
     <div>
         <a href="#">Service Category</a>
+<<<<<<< HEAD
 
         <%-- ===========================
              PUBLIC (not logged in)
@@ -39,6 +40,10 @@
             }
         %>
 
+=======
+        <a href="../registerPage/registerPage.jsp" class="btn btn-signup">Sign Up</a>
+        <a href="../loginPage/login.jsp" class="btn btn-login">Login</a>
+>>>>>>> parent of 753c738 (adding category part in home page, retrieving data from the db to insert)
     </div>
 </nav>
 
