@@ -28,7 +28,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("username", username);
             session.setAttribute("role", "admin");
             session.setAttribute("loginMessage", "Welcome back, Admin!");
-            response.sendRedirect(request.getContextPath() + "/homePage/homePage.jsp");
+            response.sendRedirect(request.getContextPath() + "/categories");
             return;
         }
         
@@ -37,7 +37,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("username", username);
             session.setAttribute("role", "member");
             session.setAttribute("loginMessage", "Login successful!");
-            response.sendRedirect(request.getContextPath() + "/homePage/homePage.jsp");
+            response.sendRedirect(request.getContextPath() + "/categories");
             return;
         }
 
