@@ -70,7 +70,8 @@
 						compassionate care services and find the support that best fits
 						your family’s needs.
 					</p>
-					<a href="<%=request.getContextPath()%>/registerPage/registerPage.jsp"
+					<a
+						href="<%=request.getContextPath()%>/registerPage/registerPage.jsp"
 						class="btn btn-primary mt-2">Book Now</a>
 				</div>
 
@@ -80,6 +81,14 @@
 
 		<h3 class="mt-5">Service Categories</h3>
 		<hr>
+
+		<form class="d-flex mb-4" method="get"
+			action="<%=request.getContextPath()%>/categories">
+			<input type="text" class="form-control me-2" name="search"
+				placeholder="Search category or service..."
+				value="<%=request.getParameter("search") != null ? request.getParameter("search") : ""%>">
+			<button class="btn btn-primary" type="submit">Search</button>
+		</form>
 
 		<div class="row mt-3 g-4">
 			<%
@@ -99,9 +108,45 @@
 					%>
 
 					<div class="card-body">
-						<h5 class="card-title"><%=c.getName()%></h5>
-						<p class="card-text"><%=c.getDescription()%></p>
+						<h5 class="card-title fw-bold mb-1"><%=c.getName()%></h5>
+
+						<p class="text-secondary" style="font-size: 0.9rem;">
+							<%=c.getDescription()%>
+						</p>
+
+						<p class="text-muted mb-1 fw-semibold">Type of services</p>
+
+						<ul style="margin-left: -20px;">
+							<%
+							if (c.getServices() != null && !c.getServices().isEmpty()) {
+								for (model.Service s : c.getServices()) {
+							%>
+							<%
+							if (s.isHighlighted()) {
+							%>
+							<li
+								style="font-weight: bold; background: #fff3cd; padding: 3px 6px; border-radius: 4px;">
+								<%=s.getName()%>
+							</li>
+							<%
+							} else {
+							%>
+							<li><%=s.getName()%></li>
+							<%
+							}
+							%>
+
+							<%
+							}
+							} else {
+							%>
+							<li style="color: #888;">No services available</li>
+							<%
+							}
+							%>
+						</ul>
 					</div>
+
 				</div>
 			</div>
 
@@ -155,6 +200,15 @@
 		<h3 id="categories" class="mt-5">Service Categories</h3>
 		<hr>
 
+		<form class="d-flex mb-4" method="get"
+			action="<%=request.getContextPath()%>/categories">
+			<input type="text" class="form-control me-2" name="search"
+				placeholder="Search category or service..."
+				value="<%=request.getParameter("search") != null ? request.getParameter("search") : ""%>">
+			<button class="btn btn-primary" type="submit">Search</button>
+		</form>
+
+
 		<div class="row mt-3 g-4">
 			<%
 			for (Category c : categories) {
@@ -173,9 +227,46 @@
 					%>
 
 					<div class="card-body">
-						<h5 class="card-title"><%=c.getName()%></h5>
-						<p class="card-text"><%=c.getDescription()%></p>
-						<a href="#" class="btn btn-dark btn-sm">View</a>
+
+						<h5 class="card-title fw-bold mb-1"><%=c.getName()%></h5>
+
+						<p class="text-secondary" style="font-size: 0.9rem;">
+							<%=c.getDescription()%>
+						</p>
+
+						<p class="text-muted mb-1 fw-semibold">Type of services</p>
+
+						<ul style="margin-left: -20px;">
+							<%
+							if (c.getServices() != null && !c.getServices().isEmpty()) {
+								for (model.Service s : c.getServices()) {
+							%>
+							<%
+							if (s.isHighlighted()) {
+							%>
+							<li
+								style="font-weight: bold; background: #fff3cd; padding: 3px 6px; border-radius: 4px;">
+								<%=s.getName()%>
+							</li>
+							<%
+							} else {
+							%>
+							<li><%=s.getName()%></li>
+							<%
+							}
+							%>
+
+							<%
+							}
+							} else {
+							%>
+							<li style="color: #888;">No services available</li>
+							<%
+							}
+							%>
+						</ul>
+
+						<a href="#" class="btn btn-primary btn-sm mt-2">View</a>
 					</div>
 
 				</div>
@@ -236,6 +327,13 @@
 		</div>
 		<hr>
 
+		<form class="d-flex mb-4" method="get"
+			action="<%=request.getContextPath()%>/categories">
+			<input type="text" class="form-control me-2" name="search"
+				placeholder="Search category or service..."
+				value="<%=request.getParameter("search") != null ? request.getParameter("search") : ""%>">
+			<button class="btn btn-primary" type="submit">Search</button>
+		</form>
 
 		<div class="row mt-3 g-4">
 			<%
@@ -255,14 +353,51 @@
 					%>
 
 					<div class="card-body">
-						<h5 class="card-title"><%=c.getName()%></h5>
-						<p class="card-text"><%=c.getDescription()%></p>
+
+						<h5 class="card-title fw-bold mb-1"><%=c.getName()%></h5>
+
+						<p class="text-secondary" style="font-size: 0.9rem;">
+							<%=c.getDescription()%>
+						</p>
+
+						<p class="text-muted mb-1 fw-semibold">Type of services</p>
+
+						<ul style="margin-left: -20px;">
+							<%
+							if (c.getServices() != null && !c.getServices().isEmpty()) {
+								for (model.Service s : c.getServices()) {
+							%>
+							<%
+							if (s.isHighlighted()) {
+							%>
+							<li
+								style="font-weight: bold; background: #fff3cd; padding: 3px 6px; border-radius: 4px;">
+								<%=s.getName()%>
+							</li>
+							<%
+							} else {
+							%>
+							<li><%=s.getName()%></li>
+							<%
+							}
+							%>
+
+							<%
+							}
+							} else {
+							%>
+							<li style="color: #888;">No services available</li>
+							<%
+							}
+							%>
+						</ul>
 
 						<a
 							href="<%=request.getContextPath()%>/categories?action=edit&id=<%=c.getId()%>"
-							class="btn btn-dark btn-sm"> Edit </a> <a
+							class="btn btn-dark btn-sm">Edit</a> <a
 							href="<%=request.getContextPath()%>/categories?action=delete&id=<%=c.getId()%>"
-							class="btn btn-danger btn-sm"> Delete </a>
+							class="btn btn-danger btn-sm">Delete</a>
+
 					</div>
 
 
