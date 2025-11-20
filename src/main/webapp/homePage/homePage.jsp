@@ -18,10 +18,8 @@
 
 
 	<%
-	
 	if (role == null)
 		role = "public";
-
 
 	// Retrieve categories ONCE (for all roles)
 	@SuppressWarnings("unchecked")
@@ -72,7 +70,8 @@
 						compassionate care services and find the support that best fits
 						your family’s needs.
 					</p>
-					<a href="<%= request.getContextPath() %>/registerPage/register.jsp" class="btn btn-primary mt-2">Book Now</a>
+					<a href="<%=request.getContextPath()%>/registerPage/registerPage.jsp"
+						class="btn btn-primary mt-2">Book Now</a>
 				</div>
 
 			</div>
@@ -229,8 +228,14 @@
 		</div>
 
 
-		<h3 class="mt-5">Service Categories</h3>
+		<div class="d-flex justify-content-between align-items-center mt-5">
+			<h3 class="m-0">Service Categories</h3>
+			<a href="<%=request.getContextPath()%>/categories?action=add"
+				class="btn btn-primary btn-sm"> Add </a>
+
+		</div>
 		<hr>
+
 
 		<div class="row mt-3 g-4">
 			<%
@@ -253,9 +258,13 @@
 						<h5 class="card-title"><%=c.getName()%></h5>
 						<p class="card-text"><%=c.getDescription()%></p>
 
-						<a href="#" class="btn btn-dark btn-sm">Edit</a> <a href="#"
-							class="btn btn-danger btn-sm">Delete</a>
+						<a
+							href="<%=request.getContextPath()%>/categories?action=edit&id=<%=c.getId()%>"
+							class="btn btn-dark btn-sm"> Edit </a> <a
+							href="<%=request.getContextPath()%>/categories?action=delete&id=<%=c.getId()%>"
+							class="btn btn-danger btn-sm"> Delete </a>
 					</div>
+
 
 				</div>
 			</div>
