@@ -13,7 +13,7 @@
 
     <div>
 
-        <a href="<%= request.getContextPath() %>/homePage/homePage.jsp">Service Category</a>
+        <a href="<%= request.getContextPath() %>/categories">Service Category</a>
 
         <%-- ===========================
              PUBLIC (not logged in)
@@ -21,8 +21,8 @@
         <%
             if (role.equals("public")) {
         %>
-            <a href="../registerPage/registerPage.jsp" class="btn btn-signup">Sign Up</a>
-            <a href="../loginPage/login.jsp" class="btn btn-login">Login</a>
+            <a href="<%= request.getContextPath() %>/registerPage/registerPage.jsp" class="btn btn-signup">Sign Up</a>
+            <a href="<%= request.getContextPath() %>/loginPage/login.jsp" class="btn btn-login">Login</a>
 
         <%-- ===========================
              MEMBER
@@ -41,7 +41,7 @@
         <%
             } else if (role.equals("admin")) {
         %>
-            <a href="../adminPage/managementOverview.jsp" class="btn btn-signup">
+            <a href="<%= request.getContextPath() %>/adminPage/managementOverview.jsp" class="btn btn-signup">
                 Management Overview
             </a>
             <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-login">Logout</a>

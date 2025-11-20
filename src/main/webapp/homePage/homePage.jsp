@@ -72,7 +72,7 @@
 						compassionate care services and find the support that best fits
 						your family’s needs.
 					</p>
-					<a href="register.jsp" class="btn btn-primary mt-2">Book Now</a>
+					<a href="<%= request.getContextPath() %>/registerPage/register.jsp" class="btn btn-primary mt-2">Book Now</a>
 				</div>
 
 			</div>
