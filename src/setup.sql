@@ -263,5 +263,23 @@ END $$
 
 DELIMITER ;
 
-DESCRIBE customers;
+CREATE TABLE cart (
+    cart_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE cart_items (
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    cart_id INT NOT NULL,
+    service_id INT NOT NULL,
+    quantity INT DEFAULT 1,
+    FOREIGN KEY (cart_id) REFERENCES cart(cart_id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES service(service_id)
+        ON DELETE CASCADE
+);
+
 

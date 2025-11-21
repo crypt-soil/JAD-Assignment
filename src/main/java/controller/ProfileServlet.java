@@ -4,8 +4,11 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import java.io.IOException;
+import java.util.List;
 
 import model.ProfileDAO;
+import model.Booking;
+import model.BookingDAO;
 import model.Profile;
 
 @WebServlet("/profile")
@@ -19,19 +22,23 @@ public class ProfileServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         Integer customerId = (session != null) ? (Integer) session.getAttribute("customer_id") : null;
         System.out.println(customerId);
-        // If not logged in → redirect to home page
+        // redirect to home page if not logged in
         if (customerId == null) {
             response.sendRedirect(request.getContextPath() + "/categories");
             return;	
         }
         
-        // Fetch profile info from DB
+        // profile info
         ProfileDAO dao = new ProfileDAO();
         Profile profile = dao.getProfileById(customerId);
-
-        // Send profile data to JSP
+        
         request.setAttribute("profile", profile);
-
+        
+        // bookings info
+        BookingDAO bookingDAO = new BookingDAO();
+        List<Booking> bookings = bookingDAO.getBookingsByCustomerId(customerId);
+        request.setAttribute("bookings", bookings);
+        
         RequestDispatcher rd = request.getRequestDispatcher("/profilePage/profilePage.jsp");
         rd.forward(request, response);
     }

@@ -44,7 +44,7 @@ body {
 }
 
 /* Purple login button */
-.btn-purple {
+.btn-register {
 	background-color: #7b50c7;
 	color: white;
 	border: none;
@@ -55,13 +55,13 @@ body {
 	box-shadow: 0 3px 10px rgba(120, 90, 255, 0.3);
 }
 
-.btn-purple:hover {
+.btn-register:hover {
 	background-color: #693fb3;
 }
 </style>
 </head>
 <body class="bg-light p-5">
-	<%@ include file="../common/navbar.jsp"%>
+<%@ include file="../common/navbar.jsp"%>
 
 
 	<div class="container-fluid g-0 full-height">
@@ -93,7 +93,7 @@ body {
 			<div class="col-md-6 form-side">
 				<h2>Register with us!</h2>
 
-				<!-- ✅ show success/error messages -->
+				<!-- show success/error messages -->
 				<%
 				if ("success".equals(message)) {
 				%>
@@ -110,7 +110,7 @@ body {
 				}
 				%>
 
-				<!-- ✅ Updated form action -->
+				<!-- Updated form action -->
 				<form action="${pageContext.request.contextPath}/VerifyRegister"
 					method="POST">
 					<div class="mb-3">
@@ -145,7 +145,7 @@ body {
 						<label class="form-label">Confirm Password</label> <input
 							type="password" class="form-control" name="password2" required>
 					</div>
-					<button type="submit" class="btn btn-purple">SIGN UP</button>
+					<button type="submit" class="btn btn-register">SIGN UP</button>
 					<p class="form-text mt-3 text-center">
 						Already have an account? <a href="../loginPage/login.jsp">LOG
 							IN</a>

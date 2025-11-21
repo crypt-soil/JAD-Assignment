@@ -70,6 +70,18 @@ body {
 	margin-bottom: 10px;
 }
 
+.btn-soft-primary {
+	background: #efe9ff; /* soft purple background */
+	color: #6b4cd8; /* purple text */
+	border-color: #d1c2ff; /* light purple border */
+	font-weight: 600;
+}
+
+.btn-soft-primary:hover {
+	background: #e2d6ff; /* slightly darker on hover */
+	color: #5936cf;
+	border-color: #b9a1ff;
+}
 .btn-soft-warning {
 	background: #fff8e1;
 	color: #b8860b;
@@ -149,8 +161,14 @@ body {
 					<%
 					if ("member".equals(role)) {
 					%>
-					<button class="btn btn-soft-primary btn-sm me-2">Add to
-						Cart</button>
+					<form action="<%=request.getContextPath()%>/cartPage/addToCart.jsp" method="post" style="display:inline;">
+					    <input type="hidden" name="serviceId" value="<%=service.getId()%>">
+					    <input type="hidden" name="serviceName" value="<%=service.getName()%>">
+					    <input type="hidden" name="servicePrice" value="<%=service.getPrice()%>">
+					    <button type="submit" class="btn btn-soft-primary btn-sm me-2">
+					        Add to Cart
+					    </button>
+					</form>
 
 					<%
 					} else if ("admin".equals(role)) {
