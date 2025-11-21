@@ -30,7 +30,7 @@
         <%
             } else if (role.equals("member")) {
         %>
-            <a href="<%= request.getContextPath() %>/profile" class="btn btn-signup">
+            <a href="../profilePage/profile.jsp" class="btn btn-signup">
                 Profile
             </a>
             <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-login">Logout</a>
