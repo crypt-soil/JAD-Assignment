@@ -4,10 +4,10 @@ import java.sql.*;
 public class UserDAO {
 
     // Check customers table
-    public boolean validateMember(String username, String password) {
+    public Profile validateMember(String username, String password) {
     	System.out.println(username);
         boolean isValid = false;
-
+        Profile profile = null;
         try (Connection conn = DBConnection.getConnection()) {
             registerModel rm = new registerModel();
             String hashedPassword = rm.hashPassword(password);
@@ -22,6 +22,15 @@ public class UserDAO {
 
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
+            	profile = new Profile(
+                        rs.getInt("customer_id"),
+                        rs.getString("username"),
+                        rs.getString("full_name"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getString("address"),
+                        rs.getString("zipcode")
+                    );
                 isValid = true;
             }
 
@@ -29,7 +38,7 @@ public class UserDAO {
             e.printStackTrace();
         }
 
-        return isValid;
+        return profile; //null means invalid login
     }
 
     // Check admin table

@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
+import model.Profile;
 import model.UserDAO;
 
 import java.io.IOException;
@@ -32,15 +32,26 @@ public class LoginServlet extends HttpServlet {
             return;
         }
         
-        if (userRepo.validateMember(username, password)) {
+//        if (userRepo.validateMember(username, password)) {
+//            HttpSession session = request.getSession();
+//            session.setAttribute("username", username);
+//            session.setAttribute("role", "member");
+//            session.setAttribute("loginMessage", "Login successful!");
+//            response.sendRedirect(request.getContextPath() + "/categories");
+//            return;
+//        }
+        
+        Profile profile = userRepo.validateMember(username, password);
+
+        if (profile != null) {
             HttpSession session = request.getSession();
-            session.setAttribute("username", username);
+            session.setAttribute("username", profile.getUsername());
+            session.setAttribute("customer_id", profile.getCustomerId());   // optional
             session.setAttribute("role", "member");
-            session.setAttribute("loginMessage", "Login successful!");
+
             response.sendRedirect(request.getContextPath() + "/categories");
             return;
         }
-
 
 
         request.setAttribute("errorMsg", "Invalid username or password.");
