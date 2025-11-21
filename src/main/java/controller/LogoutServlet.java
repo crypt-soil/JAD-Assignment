@@ -20,6 +20,10 @@ public class LogoutServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
 
         if (session != null) {
+        	//remove all attributes 
+            session.removeAttribute("role");
+            session.removeAttribute("username");
+            session.removeAttribute("customer_id");
             session.invalidate();  // destroys session completely
         }
 

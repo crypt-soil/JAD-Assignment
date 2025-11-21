@@ -16,11 +16,11 @@ public class ProfileServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
         Integer customerId = (session != null) ? (Integer) session.getAttribute("customer_id") : null;
-
-        // If not logged in → redirect to login page
+        System.out.println(customerId);
+        // If not logged in → redirect to home page
         if (customerId == null) {
-            response.sendRedirect(request.getContextPath() + "/loginPage/login.jsp");
-            return;
+            response.sendRedirect(request.getContextPath() + "/categories");
+            return;	
         }
         
         // Fetch profile info from DB
