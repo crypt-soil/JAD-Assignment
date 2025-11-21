@@ -1,15 +1,16 @@
-<%@ page language="java"%>
-<%@ page import="model.Category"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ page import="model.Service"%>
 
 <%
-Category c = (Category) request.getAttribute("category");
+Service s = (Service) request.getAttribute("service");
 %>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Delete Category - <%=c.getName()%></title>
+<title>Delete Service - <%=s.getName()%></title>
 
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -38,19 +39,41 @@ body {
 	font-weight: 700;
 	font-size: 1.6rem;
 	color: #c62828;
-	margin-bottom: 10px;
 }
 
-.category-name {
+.icon-warning {
+	font-size: 55px;
+	color: #e53935;
+	margin-bottom: 12px;
+}
+
+.service-name {
 	font-size: 1.3rem;
 	font-weight: 600;
 	color: #4b37b8;
 }
 
-.category-desc {
+.service-desc {
 	color: #555;
 	font-size: 0.95rem;
-	margin: 10px 0 25px;
+	margin-top: 8px;
+}
+
+.service-price {
+	font-weight: bold;
+	margin: 8px 0;
+	color: #333;
+}
+
+.preview-img {
+	width: 100%;
+	max-width: 280px;
+	height: 160px;
+	object-fit: cover;
+	border-radius: 10px;
+	margin: 12px auto;
+	display: block;
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 .btn-danger-custom {
@@ -80,12 +103,6 @@ body {
 	color: #333;
 	border-color: #c2c2c2;
 }
-
-.icon-warning {
-	font-size: 55px;
-	color: #e53935;
-	margin-bottom: 12px;
-}
 </style>
 </head>
 
@@ -96,27 +113,35 @@ body {
 	<div class="wrapper">
 		<div class="confirm-card">
 
-
-			<h2 class="title">Confirm Delete</h2>
+			<h2 class="title mb-2">Delete Service</h2>
 			<p class="text-muted mb-3">You are about to permanently remove
-				this category.</p>
+				this service.</p>
 
-			<!-- CATEGORY DETAILS -->
-			<div class="category-name"><%=c.getName()%></div>
-			<p class="category-desc"><%=c.getDescription()%></p>
+			<!-- SERVICE DETAILS -->
+			<div class="service-name"><%=s.getName()%></div>
+			<p class="service-desc"><%=s.getDescription()%></p>
+
+			<p class="service-price">
+				$<%=String.format("%.2f", s.getPrice())%></p>
+
+			<img
+				src="<%=(s.getImageUrl() != null && !s.getImageUrl().isEmpty()) ? s.getImageUrl()
+		: "https://via.placeholder.com/300x180?text=No+Image"%>"
+				class="preview-img">
 
 			<!-- FORM -->
-			<form action="<%=request.getContextPath()%>/categories" method="post"
+			<form action="<%=request.getContextPath()%>/service" method="post"
 				class="mt-3">
+
 				<input type="hidden" name="action" value="delete"> <input
-					type="hidden" name="id" value="<%=c.getId()%>"> <input
-					type="hidden" name="redirectUrl"
-					value="<%=request.getHeader("referer")%>">
+					type="hidden" name="id" value="<%=s.getId()%>"> <input
+					type="hidden" name="catId" value="<%=s.getCategoryId()%>">
 
 				<button type="submit" class="btn btn-danger-custom me-2">
 					Yes, Delete</button>
 
-				<a href="<%=request.getHeader("referer")%>"
+				<a
+					href="<%=request.getContextPath()%>/productDetail?id=<%=s.getCategoryId()%>"
 					class="btn btn-soft-cancel btn-sm ms-2"> Cancel </a>
 
 			</form>

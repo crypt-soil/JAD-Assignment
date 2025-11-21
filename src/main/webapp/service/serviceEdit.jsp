@@ -1,11 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ page import="model.Service"%>
+
+<%
+Service s = (Service) request.getAttribute("service");
+%>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Add Category</title>
+<title>Edit Service - <%=s.getName()%></title>
 
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -63,8 +68,8 @@ body {
 	color: #555; /* medium grey text */
 	border: 1px solid #d6d6d6; /* subtle grey border */
 	font-weight: 600;
-	border-radius: 10px;
-	padding: 10px 22px;
+	text-decoration: none;   /* 🔥 removes underline */
+    display: inline-block;
 }
 
 .btn-soft-cancel:hover {
@@ -73,7 +78,6 @@ body {
 	border-color: #c2c2c2;
 }
 </style>
-
 </head>
 
 <body>
@@ -83,41 +87,51 @@ body {
 	<div class="wrapper">
 		<div class="form-card">
 
-			<h2 class="page-title mb-3">Add New Service Category</h2>
-			<p class="text-muted mb-4">Fill in the details to create a new
-				category.</p>
+			<h2 class="page-title mb-3">Edit Service</h2>
+			<p class="text-muted mb-4">
+				You are editing the service: <strong><%=s.getName()%></strong>
+			</p>
 
-			<form action="<%=request.getContextPath()%>/categories" method="post">
+			<form action="<%=request.getContextPath()%>/service" method="post">
 
-				<input type="hidden" name="action" value="create"> <input
-					type="hidden" name="redirectUrl"
-					value="<%=request.getHeader("referer")%>">
+				<input type="hidden" name="action" value="update"> <input
+					type="hidden" name="id" value="<%=s.getId()%>"> <input
+					type="hidden" name="catId" value="<%=s.getCategoryId()%>">
 
-				<!-- CATEGORY NAME -->
+				<!-- SERVICE NAME -->
 				<div class="mb-3">
-					<label class="form-label label-text">Category Name</label> <input
-						type="text" name="name" class="form-control" required>
+					<label class="form-label label-text">Service Name</label> <input
+						type="text" name="name" class="form-control"
+						value="<%=s.getName()%>" required>
 				</div>
 
 				<!-- DESCRIPTION -->
 				<div class="mb-3">
 					<label class="form-label label-text">Description</label>
-					<textarea name="description" class="form-control" rows="4" required></textarea>
+					<textarea name="description" class="form-control" rows="3" required><%=s.getDescription()%></textarea>
+				</div>
+
+				<!-- PRICE -->
+				<div class="mb-3">
+					<label class="form-label label-text">Price ($)</label> <input
+						type="number" step="0.01" name="price" class="form-control"
+						value="<%=s.getPrice()%>" required>
 				</div>
 
 				<!-- IMAGE URL -->
 				<div class="mb-3">
 					<label class="form-label label-text">Image URL</label> <input
-						type="text" name="imageUrl" class="form-control">
+						type="text" name="imageUrl" class="form-control"
+						value="<%=s.getImageUrl()%>">
 				</div>
 
+				<!-- BUTTONS -->
 				<div class="mt-4">
 					<button type="submit" class="btn btn-soft-primary btn-sm me-2">Save
-						Category</button>
-
-					<a href="<%=request.getHeader("referer")%>"
-						class="btn btn-soft-cancel btn-sm ms-2">Cancel</a>
-
+						Changes</button>
+					<a
+						href="<%=request.getContextPath()%>/productDetail?id=<%=s.getCategoryId()%>"
+						class="btn btn-soft-cancel btn-sm ms-2"> Cancel </a>
 				</div>
 
 			</form>
