@@ -12,113 +12,118 @@ import model.Service;
 
 @WebServlet("/categories")
 public class CategoryServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private CategoryDAO dao = new CategoryDAO();
+	private CategoryDAO dao = new CategoryDAO();
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        String action = request.getParameter("action");
+		String action = request.getParameter("action");
 
-        if ("add".equals(action)) {
-            RequestDispatcher rd = request.getRequestDispatcher("homePage/addCategory.jsp");
-            rd.forward(request, response);
-            return;
-        }
+		if ("add".equals(action)) {
+			RequestDispatcher rd = request.getRequestDispatcher("homePage/addCategory.jsp");
+			rd.forward(request, response);
+			return;
+		}
 
-        if ("edit".equals(action)) {
-            int id = Integer.parseInt(request.getParameter("id"));
-            Category category = dao.getCategoryById(id);
+		if ("edit".equals(action)) {
+			int id = Integer.parseInt(request.getParameter("id"));
+			Category category = dao.getCategoryById(id);
 
-            request.setAttribute("category", category);
+			request.setAttribute("category", category);
 
-            RequestDispatcher rd = request.getRequestDispatcher("homePage/editCategory.jsp");
-            rd.forward(request, response);
-            return;
-        }
+			RequestDispatcher rd = request.getRequestDispatcher("homePage/editCategory.jsp");
+			rd.forward(request, response);
+			return;
+		}
 
-        if ("delete".equals(action)) {
-            int id = Integer.parseInt(request.getParameter("id"));
-            Category category = dao.getCategoryById(id);
+		if ("delete".equals(action)) {
+			int id = Integer.parseInt(request.getParameter("id"));
+			Category category = dao.getCategoryById(id);
 
-            request.setAttribute("category", category);
+			request.setAttribute("category", category);
 
-            RequestDispatcher rd = request.getRequestDispatcher("homePage/deleteCategory.jsp");
-            rd.forward(request, response);
-            return;
-        }
+			RequestDispatcher rd = request.getRequestDispatcher("homePage/deleteCategory.jsp");
+			rd.forward(request, response);
+			return;
+		}
 
-        // ===============================
-        // DEFAULT — LIST ALL
-        // ===============================
-        List<Category> categories = dao.getAllCategories();
+		// ===============================
+		// DEFAULT — LIST ALL
+		// ===============================
+		List<Category> categories = dao.getAllCategories();
 
-        // Load services
-        ServiceDAO serviceDao = new ServiceDAO();
-        for (Category c : categories) {
-            c.setServices(serviceDao.getServicesByCategory(c.getId()));
-        }
+		// Load services
+		ServiceDAO serviceDao = new ServiceDAO();
+		for (Category c : categories) {
+			c.setServices(serviceDao.getServicesByCategory(c.getId()));
+		}
 
-        // ===============================
-        // ⭐ SEARCH FEATURE
-        // ===============================
-        String search = request.getParameter("search");
+		// ===============================
+		// ⭐ SEARCH FEATURE
+		// ===============================
+		String search = request.getParameter("search");
 
-        if (search != null && !search.trim().isEmpty()) {
-            String term = search.toLowerCase();
+		if (search != null && !search.trim().isEmpty()) {
+			String term = search.toLowerCase();
 
-            // 1️⃣ Filter categories if searching by CATEGORY NAME
-            categories.removeIf(c ->
-                !c.getName().toLowerCase().contains(term) &&
-                c.getServices().stream().noneMatch(s -> s.getName().toLowerCase().contains(term))
-            );
+			// 1️⃣ Filter categories if searching by CATEGORY NAME
+			categories.removeIf(c -> !c.getName().toLowerCase().contains(term)
+					&& c.getServices().stream().noneMatch(s -> s.getName().toLowerCase().contains(term)));
 
-            // 2️⃣ Highlight matched SERVICES
-            for (Category c : categories) {
-                for (Service s : c.getServices()) {
-                    if (s.getName().toLowerCase().contains(term)) {
-                        s.setHighlighted(true);
-                    }
-                }
-            }
-        }
+			// 2️⃣ Highlight matched SERVICES
+			for (Category c : categories) {
+				for (Service s : c.getServices()) {
+					if (s.getName().toLowerCase().contains(term)) {
+						s.setHighlighted(true);
+					}
+				}
+			}
+		}
 
-        request.setAttribute("categories", categories);
+		request.setAttribute("categories", categories);
 
-        RequestDispatcher rd = request.getRequestDispatcher("homePage/homePage.jsp");
-        rd.forward(request, response);
-    }
+		RequestDispatcher rd = request.getRequestDispatcher("homePage/homePage.jsp");
+		rd.forward(request, response);
+	}
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        String action = request.getParameter("action");
+		String action = request.getParameter("action");
+		String redirectUrl = request.getParameter("redirectUrl");
 
-        if ("create".equals(action)) {
-            Category c = new Category();
-            c.setName(request.getParameter("name"));
-            c.setDescription(request.getParameter("description"));
-            c.setImageUrl(request.getParameter("imageUrl"));
+		if ("create".equals(action)) {
+			Category c = new Category();
+			c.setName(request.getParameter("name"));
+			c.setDescription(request.getParameter("description"));
+			c.setImageUrl(request.getParameter("imageUrl"));
 
-            dao.insertCategory(c);
-        }
+			dao.insertCategory(c);
+		}
 
-        if ("update".equals(action)) {
-            Category c = new Category();
-            c.setId(Integer.parseInt(request.getParameter("id")));
-            c.setName(request.getParameter("name"));
-            c.setDescription(request.getParameter("description"));
-            c.setImageUrl(request.getParameter("imageUrl"));
+		if ("update".equals(action)) {
+			Category c = new Category();
+			c.setId(Integer.parseInt(request.getParameter("id")));
+			c.setName(request.getParameter("name"));
+			c.setDescription(request.getParameter("description"));
+			c.setImageUrl(request.getParameter("imageUrl"));
 
-            dao.updateCategory(c);
-        }
+			dao.updateCategory(c);
+		}
 
-        if ("delete".equals(action)) {
-            int id = Integer.parseInt(request.getParameter("id"));
-            dao.deleteCategory(id);
-        }
+		if ("delete".equals(action)) {
+			int id = Integer.parseInt(request.getParameter("id"));
+			dao.deleteCategory(id);
+		}
 
-        response.sendRedirect(request.getContextPath() + "/categories");
-    }
+		// SMART REDIRECT
+		if (redirectUrl != null && !redirectUrl.isEmpty()) {
+			response.sendRedirect(redirectUrl);
+		} else {
+			response.sendRedirect(request.getContextPath() + "/categories");
+		}
+	}
+
 }
