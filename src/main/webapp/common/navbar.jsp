@@ -1,10 +1,23 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%> 
 
-<% Integer customerId = (Integer) session.getAttribute("customer_id"); 
-
+<% 
+	Integer customerId = (Integer) session.getAttribute("customer_id"); 
 	String role = (String) session.getAttribute("role"); 
 	if (role == null) role = "public"; 
-	String username = (String) session.getAttribute("username"); %> 
+	String username = (String) session.getAttribute("username"); 
+	
+%>
+ 
+<%
+    String timedOut = request.getParameter("timeout");
+%>
+
+<% if ("true".equals(timedOut)) { %>
+    <div class="alert alert-warning text-center m-0">
+        Your session has expired. Please log in again.
+    </div>
+<% } %>
+
 
 <!-- Sticky Purple Navbar --> 
 	<nav class="navbar navbar-custom d-flex justify-content-between align-items-center sticky-top"> 
@@ -12,26 +25,26 @@
 	<div> 
 		<a href="<%= request.getContextPath() %>/categories">Service Category</a> 
 		
-		<%-- public= --%> 
-		<% if (customerId == null) { %> 
-				<a href="<%= request.getContextPath() %>/registerPage/registerPage.jsp" class="btn btn-white">Sign Up</a> 
-				<a href="<%= request.getContextPath() %>/loginPage/login.jsp" class="btn btn-purple">Login</a> 
-		<%-- member --%> <% 
-			} else if (
-					customerId != null && role.equals("member")) { 
-		%> 
-			<a href="<%= request.getContextPath() %>/profile" class="btn btn-white"> Profile </a> 
-			 <a href="<%= request.getContextPath() %>/cartPage/cartPage.jsp" class="btn btn-white">Cart</a>
-			<a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-purple">Logout</a> 
-			
-		<%-- admin --%> 
-		
-		<% } else if (role.equals("admin")) {
-			
-		%> 
-		<a href="<%= request.getContextPath() %>/adminPage/managementOverview.jsp" class="btn btn-white"> Management Overview </a> 
-		<a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-purple">Logout</a> 
-		<% } %> 
+		 <%-- admin --%>
+        <% if ("admin".equals(role)) { %>
+
+            <a href="<%= request.getContextPath() %>/adminPage/managementOverview.jsp" class="btn btn-white">Management Overview</a>
+            <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-purple">Logout</a>
+
+        <%-- member --%>
+        <% } else if (customerId != null && "member".equals(role)) { %>
+
+            <a href="<%= request.getContextPath() %>/profile" class="btn btn-white">Profile</a>
+            <a href="<%= request.getContextPath() %>/cartPage/cartPage.jsp" class="btn btn-white">Cart</a>
+            <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-purple">Logout</a>
+
+        <%-- public --%>
+        <% } else { %>
+
+            <a href="<%= request.getContextPath() %>/registerPage/registerPage.jsp" class="btn btn-white">Sign Up</a>
+            <a href="<%= request.getContextPath() %>/loginPage/login.jsp" class="btn btn-purple">Login</a>
+
+        <% } %>
 	</div> 
 	</nav> 
 	<style> 
