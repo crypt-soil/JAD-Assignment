@@ -205,6 +205,27 @@ VALUES (
     '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9'
 );
 
+CREATE TABLE cart (
+    cart_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE cart_items (
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    cart_id INT NOT NULL,
+    service_id INT NOT NULL,
+    quantity INT DEFAULT 1,
+    start_time DATETIME NULL,
+    end_time DATETIME NULL,
+    FOREIGN KEY (cart_id) REFERENCES cart(cart_id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES service(service_id)
+        ON DELETE CASCADE
+);
+
 -- drop existing procedures and function if any
 DROP PROCEDURE IF EXISTS sp_total_users;
 DROP PROCEDURE IF EXISTS sp_popular_service;
@@ -263,23 +284,6 @@ END $$
 
 DELIMITER ;
 
-CREATE TABLE cart (
-    cart_id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_id INT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
-        ON DELETE CASCADE
-);
 
-CREATE TABLE cart_items (
-    item_id INT AUTO_INCREMENT PRIMARY KEY,
-    cart_id INT NOT NULL,
-    service_id INT NOT NULL,
-    quantity INT DEFAULT 1,
-    FOREIGN KEY (cart_id) REFERENCES cart(cart_id)
-        ON DELETE CASCADE,
-    FOREIGN KEY (service_id) REFERENCES service(service_id)
-        ON DELETE CASCADE
-);
 
 

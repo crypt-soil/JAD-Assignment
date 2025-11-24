@@ -57,45 +57,28 @@
                 cartId = rs.getInt(1);
             }
         }
+        
+        rs.close();
+        ps.close();
+        
+        // insert new cart_items row
+        int itemId = 0;
 
-        //close before reusing
-        if (rs != null) { rs.close(); }
-        if (ps != null) { ps.close(); }
-
-        //check if this service already exists in cart_items
-        String checkItemSql = "SELECT quantity FROM cart_items WHERE cart_id = ? AND service_id = ?";
-        ps = conn.prepareStatement(checkItemSql);
+        String insertItemSql = 
+            "INSERT INTO cart_items (cart_id, service_id, quantity) VALUES (?, ?, 1)";
+        ps = conn.prepareStatement(insertItemSql, Statement.RETURN_GENERATED_KEYS);
         ps.setInt(1, cartId);
         ps.setInt(2, serviceId);
-        rs = ps.executeQuery();
+        ps.executeUpdate();
 
-        if (rs.next()) {
-            int currentQty = rs.getInt("quantity");
-            rs.close();
-            ps.close();
-
-            String updateQtySql = "UPDATE cart_items SET quantity = ? WHERE cart_id = ? AND service_id = ?";
-            ps = conn.prepareStatement(updateQtySql);
-            ps.setInt(1, currentQty + 1);
-            ps.setInt(2, cartId);
-            ps.setInt(3, serviceId);
-            ps.executeUpdate();
-        } else {
-            rs.close();
-            ps.close();
-
-            String insertItemSql = "INSERT INTO cart_items (cart_id, service_id, quantity) VALUES (?, ?, ?)";
-            ps = conn.prepareStatement(insertItemSql);
-            ps.setInt(1, cartId);
-            ps.setInt(2, serviceId);
-            ps.setInt(3, 1);
-            ps.executeUpdate();
-        }
+        rs = ps.getGeneratedKeys();
+        if (rs.next()) 
+            itemId = rs.getInt(1);  // get new item_id
 
 %>
     <script>
-        alert("Service added to cart successfully!");
-        window.location.href = "<%=request.getContextPath()%>/cartPage/cartPage.jsp";
+    	//redirect to cart details selection page 
+    	window.location.href = "setItemDetails.jsp?item_id=<%=itemId%>";
     </script>
 <%
     } catch (Exception e) {

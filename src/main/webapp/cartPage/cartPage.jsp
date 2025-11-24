@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.*, java.sql.*" %>
 
 <!DOCTYPE html>
@@ -33,21 +32,6 @@ body {
     font-size: 1.7rem;
     color: #4b37b8;
 }
-
-.qty-box a {
-    padding: 4px 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    background-color: #fafafa;
-    text-decoration: none;
-    color: #333;
-    font-weight: 600;
-}
-
-.qty-box a:hover {
-    background-color: #eee;
-}
-
 </style>
 </head>
 <body>
@@ -58,7 +42,6 @@ body {
 <div class="cart-card">
 
 <%
-
     if (customerId == null) {
 %>
         <h2 class="cart-title mb-4">Your Cart</h2>
@@ -82,7 +65,7 @@ body {
             );
 
             String sql =
-                "SELECT ci.item_id, s.service_id, s.name, s.price, ci.quantity " +
+                "SELECT ci.item_id, s.name, s.price, ci.quantity, ci.start_time, ci.end_time " +
                 "FROM cart c " +
                 "JOIN cart_items ci ON c.cart_id = ci.cart_id " +
                 "JOIN service s ON ci.service_id = s.service_id " +
@@ -92,36 +75,39 @@ body {
             ps.setInt(1, customerId);
             rs = ps.executeQuery();
 
-            List<Map<String,Object>> cartItems = new ArrayList<>();
+            List<Map<String,Object>> items = new ArrayList<>();
 
             while (rs.next()) {
-                Map<String,Object> item = new HashMap<>();
-                item.put("serviceId", rs.getInt("service_id"));
-                item.put("name", rs.getString("name"));
-                item.put("price", rs.getDouble("price"));
-                item.put("qty", rs.getInt("quantity"));
-                cartItems.add(item);
+                Map<String,Object> m = new HashMap<>();
+                m.put("itemId", rs.getInt("item_id"));
+                m.put("name", rs.getString("name"));
+                m.put("price", rs.getDouble("price"));
+                m.put("qty", rs.getInt("quantity"));
+                m.put("start", rs.getTimestamp("start_time"));
+                m.put("end", rs.getTimestamp("end_time"));
+                items.add(m);
             }
 
-            itemCount = cartItems.size();
+            itemCount = items.size();
 %>
 
-        <h2 class="cart-title mb-4">Your Cart (<%=itemCount%> items)</h2>
+<h2 class="cart-title mb-4">Your Cart (<%= itemCount %> items)</h2>
 
 <%
             if (itemCount == 0) {
 %>
-        <p>Your cart is empty. Browse <a href="<%=request.getContextPath()%>/categories">services</a>.</p>
+                <p>Your cart is empty. Browse <a href="<%=request.getContextPath()%>/categories">services</a>.</p>
 <%
             } else {
 %>
 
-<table class="table align-middle">
-<thead>
+<table class="table table-borderless align-middle">
+<thead class="fw-semibold">
 <tr>
     <th>Service</th>
+    <th>Date & Time</th>
+    <th>Quantity</th>
     <th>Price</th>
-    <th style="width: 180px;">Quantity</th>
     <th>Total</th>
     <th></th>
 </tr>
@@ -130,41 +116,53 @@ body {
 <tbody>
 
 <%
-    for (Map<String,Object> item : cartItems) {
-        int serviceId = (int) item.get("serviceId");
+    for (Map<String,Object> item : items) {
+
+        int itemId = (int) item.get("itemId");
         String name = (String) item.get("name");
         double price = (double) item.get("price");
         int qty = (int) item.get("qty");
+        Timestamp start = (Timestamp) item.get("start");
+        Timestamp end = (Timestamp) item.get("end");
+
         double total = price * qty;
         grandTotal += total;
+
+        String startFmt = (start != null) ? start.toString().replace(".0","") : "Not set";
+        String endFmt   = (end != null) ? end.toString().replace(".0","") : "Not set";
 %>
 
 <tr>
-    <td><%=name%></td>
-    <td>$<%=String.format("%.2f", price)%></td>
+    <!-- Name -->
+    <td><strong><%= name %></strong></td>
 
-    <td>
-        <div class="qty-box d-flex align-items-center gap-2">
-
-            <a href="<%=request.getContextPath()%>/cartPage/updateCart.jsp?action=dec&id=<%=serviceId%>">-</a>
-
-            <span><%=qty%></span>
-
-            <a href="<%=request.getContextPath()%>/cartPage/updateCart.jsp?action=inc&id=<%=serviceId%>">+</a>
-
-        </div>
+    <!-- Datetimes -->
+    <td style="min-width:220px;">
+        <div><strong>Start:</strong> <%= startFmt %></div>
+        <div><strong>End:</strong> <%= endFmt %></div>
     </td>
 
-    <td>$<%=String.format("%.2f", total)%></td>
+    <!-- Quantity -->
+    <td><%= qty %></td>
 
+    <!-- Price -->
+    <td>S$ <%= String.format("%.2f", price) %></td>
+
+    <!-- Total -->
+    <td><strong>S$ <%= String.format("%.2f", total) %></strong></td>
+
+    <!-- Actions -->
     <td>
-        <a href="<%=request.getContextPath()%>/cartPage/deleteCartItem.jsp?id=<%=serviceId%>"
-           class="btn btn-sm btn-outline-danger">x</a>
+        <a href="setItemDetails.jsp?item_id=<%= itemId %>"
+           class="btn btn-sm btn-outline-primary me-2">Edit</a>
+
+        <a href="deleteCartItem.jsp?item_id=<%= itemId %>"
+           class="btn btn-sm btn-outline-danger">Remove</a>
     </td>
 </tr>
 
 <%
-    } // end loop
+    }
 %>
 
 </tbody>
@@ -173,15 +171,15 @@ body {
 <hr>
 
 <div class="text-end">
-    <h4>Grand Total: <strong>$<%=String.format("%.2f", grandTotal)%></strong></h4>
+    <h4>Grand Total: <strong>S$ <%= String.format("%.2f", grandTotal) %></strong></h4>
     <a href="#" class="btn btn-dark mt-3">Checkout</a>
 </div>
 
 <%
-            } // end if items
+            } 
         } catch (Exception e) {
 %>
-    <p class="text-danger">Error loading cart: <%=e.getMessage()%></p>
+    <p class="text-danger">Error loading cart: <%= e.getMessage() %></p>
 <%
         } finally {
             try { if (rs != null) rs.close(); } catch (Exception ignore) {}
