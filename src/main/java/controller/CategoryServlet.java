@@ -20,28 +20,17 @@ public class CategoryServlet extends HttpServlet {
 			throws ServletException, IOException {
 		
 		HttpSession session = request.getSession(false);
-		// no session at all, timeout
-		if (session == null) {
-		    response.sendRedirect(request.getContextPath() + "/loginPage/login.jsp?timeout=true");
-		    return;
+		
+		String role = "public"; // initalise role as public
+		Integer customerId = null;
+
+		if (session != null) { //if there is an available session, retrieve role and customerId
+		    String r = (String) session.getAttribute("role");
+		    if (r != null) role = r;
+
+		    customerId = (Integer) session.getAttribute("customer_id");
 		}
 		
-		String role = (String) session.getAttribute("role");
-		Integer customerId = (Integer) session.getAttribute("customer_id");
-		
-		// admin allowed (admins have no customerId)
-		if ("admin".equals(role)) {
-		    // allow through
-		}
-		// member allowed only if customerId exists
-		else if ("member".equals(role) && customerId != null) {
-		    // allow through
-		}
-		// anyone else = public user or timed-out user
-		else {
-		    response.sendRedirect(request.getContextPath() + "/loginPage/login.jsp?timeout=true");
-		    return;
-		}
 		String action = request.getParameter("action");
 
 		if ("add".equals(action)) {
