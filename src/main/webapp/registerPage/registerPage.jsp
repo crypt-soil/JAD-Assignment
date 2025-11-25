@@ -59,8 +59,9 @@ body {
 	background-color: #693fb3;
 }
 </style>
+
 </head>
-<body class="bg-light p-5">
+<body>
 <%@ include file="../common/navbar.jsp"%>
 
 
