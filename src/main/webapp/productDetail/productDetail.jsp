@@ -146,15 +146,14 @@ body {
 }
 
 .btn-soft-warning:hover {
-	background: #ffefb0;   /* slightly darker yellow on hover */
-	color: #8a6c00;       /* deeper gold text */
+	background: #ffefb0; /* slightly darker yellow on hover */
+	color: #8a6c00; /* deeper gold text */
 	border-color: #ffd35c;
 }
 
-
 .btn-soft-danger:hover {
-	background: #ffd4d4;   /* slightly darker soft red */
-	color: #9f1f1f;       /* deeper red text */
+	background: #ffd4d4; /* slightly darker soft red */
+	color: #9f1f1f; /* deeper red text */
 	border-color: #ff9b9b;
 }
 </style>
@@ -268,8 +267,21 @@ body {
 								if ("member".equals(role)) {
 								%>
 								<!-- Member: Add to cart only -->
-								<button class="btn btn-soft-primary btn-sm me-2">Add to
-									cart</button>
+								<form
+									action="<%=request.getContextPath()%>/cartPage/addToCart.jsp"
+									method="post" onClick="event.stopPropagation();"
+									style="display: inline;">
+
+									<input type="hidden" name="serviceId" value="<%=s.getId()%>">
+									<input type="hidden" name="serviceName"
+										value="<%=s.getName()%>"> <input type="hidden"
+										name="servicePrice" value="<%=s.getPrice()%>">
+
+									<button type="submit" class="btn btn-soft-primary btn-sm me-2">
+										Add to Cart</button>
+								</form>
+
+
 								<%
 								} else if ("admin".equals(role)) {
 								%>
