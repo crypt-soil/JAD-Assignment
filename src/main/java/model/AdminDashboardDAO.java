@@ -8,9 +8,7 @@ public class AdminDashboardDAO {
     private String username = "root";
     private String password = "root1234";
 
-    // ===============================
-    // 1. Get Total Users
-    // ===============================
+    // get total number of users using my stored procedure
     public int getTotalUsers() {
         int total = 0;
 

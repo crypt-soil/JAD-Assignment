@@ -27,8 +27,8 @@
 		
 		 <%-- admin --%>
         <% if ("admin".equals(role)) { %>
-
-            <a href="<%= request.getContextPath() %>/adminPage/managementOverview.jsp" class="btn btn-white">Management Overview</a>
+			<a href="<%= request.getContextPath() %>/admin/management" class="btn btn-white">Management Overview</a>
+            <a href="<%= request.getContextPath() %>/adminPage/analyticsDashboard.jsp" class="btn btn-white">Analytics Dashboard</a>
             <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-purple">Logout</a>
 
         <%-- member --%>
