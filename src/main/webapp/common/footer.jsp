@@ -4,11 +4,6 @@
         <h5 class="footer-title">Silver Care</h5>
         <p class="footer-subtitle">Compassion  Dignity  Support</p>
 
-        <div class="footer-links mt-2">
-            <a href="<%=request.getContextPath()%>/categories">Home</a>
-            <a href="<%=request.getContextPath()%>/registerPage/registerPage.jsp">Register</a>
-            <a href="<%=request.getContextPath()%>/loginPage/login.jsp">Login</a>
-        </div>
 
         <p class="footer-copy mt-3"> 2025 Silver Care Bringing comfort to every home</p>
     </div>
