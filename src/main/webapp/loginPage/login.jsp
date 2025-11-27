@@ -23,7 +23,6 @@ body {
 
 /* Left image side */
 .login-image {
-    background-image: url('https://source.unsplash.com/900x900/?elderly,care,community');
     background-size: cover;
     background-position: center;
     min-height: 100vh;
@@ -75,7 +74,7 @@ body {
 
             <div class="col-md-6 form-side">
                 <h2>Welcome back!</h2>
-                <!-- show error from loginServlet if login fails -->
+                <!-- Show error from loginServlet if login fails -->
                 <%
                     String errorMsg = (String) request.getAttribute("errorMsg");
                     if (errorMsg != null) {
@@ -95,8 +94,8 @@ body {
                         <input type="password" class="form-control" name="password" required>
                     </div>
                     <button type="submit" class="btn btn-login">LOG IN</button>
-                    <p class="form-text mt-3 text-center">
-                        No Account yet? <a href="http://localhost:8080/ST0510-JAD-Assignment1/registerPage/registerPage.jsp">SIGN UP</a>
+                    <p class="form-text mt-3 text-center">  <!-- link to register page -->
+                        No Account yet? <a href="${pageContext.request.contextPath}/registerPage/registerPage.jsp">SIGN UP</a>
                     </p>
                 </form>
             </div>

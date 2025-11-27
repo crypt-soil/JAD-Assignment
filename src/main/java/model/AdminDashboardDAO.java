@@ -4,17 +4,12 @@ import java.sql.*;
 
 public class AdminDashboardDAO {
 
-    private String url = "jdbc:mysql://localhost:3306/silvercare?useSSL=false&serverTimezone=UTC";
-    private String username = "root";
-    private String password = "root1234";
-
     // get total number of users using my stored procedure
     public int getTotalUsers() {
         int total = 0;
 
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(url, username, password);
+            Connection conn = DBConnection.getConnection();
 
             CallableStatement cs = conn.prepareCall("{CALL sp_total_users()}");
             ResultSet rs = cs.executeQuery();
@@ -32,16 +27,12 @@ public class AdminDashboardDAO {
         return total;
     }
 
-    // ===============================
-    // 2. Get Most Popular Service
-    // ===============================
+    // get most popular service
     public String getPopularService() {
         String service = "No data";
 
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(url, username, password);
-
+        	Connection conn = DBConnection.getConnection();
             CallableStatement cs = conn.prepareCall("{CALL sp_popular_service()}");
             ResultSet rs = cs.executeQuery();
 
@@ -58,15 +49,12 @@ public class AdminDashboardDAO {
         return service;
     }
 
-    // ===============================
-    // 3. Get Revenue for Current Month
-    // ===============================
+    // get revenue for range
     public double getRevenue(String range) {
         double revenue = 0;
 
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(url, username, password);
+            Connection conn = DBConnection.getConnection();
 
             CallableStatement cs = conn.prepareCall("SELECT fn_revenue(?) AS revenue");
             cs.setString(1, range);

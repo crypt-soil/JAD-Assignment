@@ -5,7 +5,9 @@
 
 <%
     Profile p = (Profile) request.getAttribute("profile");
+	//check for sucess updated sucessfully 
     String success = request.getParameter("success");
+	//get booking list
     List<Booking> bookings = (List<Booking>) request.getAttribute("bookings");
 %>
 
@@ -109,23 +111,29 @@
 <%@ include file="../common/navbar.jsp" %>
 
 <div class="profile-wrapper">
-
-    <% if (success != null) { %>
+	
+    <% 	
+    	// if ?success=updated is in URL, show green success message
+    	if (success != null) { 
+    %>
         <div class="alert alert-success text-center"><%= success %></div>
     <% } %>
 
     <div class="profile-card">
 
-        <!-- HEADER -->
+        <!-- header -->
         <div class="profile-header">
             <img src="https://via.placeholder.com/90" alt="Profile">
             <div>
+            	<!-- Prevents NullPointerException -->
+            	<!-- if user has full name, show full name, if not show username -->
                 <h4 class="mb-0"><%= p.getFullName() != null && !p.getFullName().isEmpty() ? p.getFullName() : p.getUsername() %></h4>
+                <!-- if email is null, show empty string -->
                 <small class="text-muted"><%= p.getEmail() != null ? p.getEmail() : "" %></small>
             </div>
         </div>
 
-        <!-- TABS -->
+        <!-- tabs -->
         <ul class="nav nav-pills mb-3" id="profileTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="tab-profile-btn" data-bs-toggle="pill"
@@ -143,7 +151,7 @@
 
         <div class="tab-content mt-3">
 
-            <!-- PROFILE TAB -->
+            <!-- profile tab -->
             <div class="tab-pane fade show active" id="tab-profile" role="tabpanel">
                 <form action="<%= request.getContextPath() %>/UpdateProfileServlet" method="post" id="profileForm">
 
@@ -151,7 +159,7 @@
                         <!-- LEFT COLUMN -->
                         <div class="col-md-6">
 
-                            <!-- FULL NAME -->
+                            <!-- full name -->
                             <label class="info-label">Full Name</label>
                             <div class="d-flex mb-3 align-items-start">
                                 <% if (p.getFullName() != null && !p.getFullName().isEmpty()) { %>
@@ -167,7 +175,7 @@
                                 <% } %>
                             </div>
 
-                            <!-- PHONE -->
+                            <!-- phone -->
                             <label class="info-label">Phone Number</label>
                             <div class="d-flex mb-3 align-items-start">
                                 <% if (p.getPhone() != null && !p.getPhone().isEmpty()) { %>
@@ -185,10 +193,10 @@
 
                         </div>
 
-                        <!-- RIGHT COLUMN -->
+
                         <div class="col-md-6">
 
-                            <!-- ADDRESS -->
+                            <!-- address -->
                             <label class="info-label">Address</label>
                             <div class="d-flex mb-3 align-items-start">
                                 <% if (p.getAddress() != null && !p.getAddress().isEmpty()) { %>
@@ -204,7 +212,7 @@
                                 <% } %>
                             </div>
 
-                            <!-- ZIPCODE -->
+                            <!-- zipcode -->
                             <label class="info-label">Zip Code</label>
                             <div class="d-flex mb-3 align-items-start">
                                 <% if (p.getZipcode() != null && !p.getZipcode().isEmpty()) { %>
@@ -217,6 +225,7 @@
                                     <span class="add-btn" onclick="enableField('zipcode')">+ Add</span>
                                     <input type="text" class="form-control input-box d-none add-input"
                                            id="zipcode-input" name="zipcode" placeholder="Enter zipcode">
+                                           <!-- hidden field zipcode-input appears when +Add button is clicked on -->
                                 <% } %>
                             </div>
 
@@ -228,10 +237,10 @@
                 </form>
             </div>
 
-            <!-- BOOKINGS TAB -->
+            <!-- bookings tab -->
             <div class="tab-pane fade" id="tab-bookings" role="tabpanel">
                 <%
-                    if (bookings == null || bookings.isEmpty()) {
+                    if (bookings == null || bookings.isEmpty()) { //check for bookings	
                 %>
                     <p class="text-muted mt-2">You have no bookings yet.</p>
                 <%
@@ -239,7 +248,7 @@
                         for (Booking b : bookings) {
                             String statusLabel;
                             String statusClass;
-                            switch (b.getStatus()) {
+                            switch (b.getStatus()) { //show booking status based on the number 2, 3, 4
                                 case 2: statusLabel = "Confirmed"; statusClass = "bg-success text-white"; break;
                                 case 3: statusLabel = "Completed"; statusClass = "bg-primary text-white"; break;
                                 case 4: statusLabel = "Cancelled"; statusClass = "bg-secondary text-white"; break;
@@ -292,7 +301,7 @@
                 %>
             </div>
 
-        </div> <!-- /tab-content -->
+        </div> <!-- tab-content -->
 
     </div>
 </div>
@@ -308,6 +317,7 @@ document.getElementById("editBtn").onclick = function () {
 
 // Enable +Add field
 function enableField(field) {
+	//hidden field appears, eg #address-input
     document.getElementById(field + "-input").classList.remove("d-none");
     document.getElementById("saveBtn").classList.remove("d-none");
 }

@@ -9,12 +9,8 @@ public class Category {
     private String description;
     private String imageUrl;
 
-    // ⭐ New: store services under this category
     private List<Service> services;
 
-    // ======================
-    // Existing fields
-    // ======================
     public int getId() { 
         return id; 
     }
@@ -43,9 +39,6 @@ public class Category {
         this.imageUrl = imageUrl; 
     }
 
-    // ======================
-    // ⭐ New: services
-    // ======================
     public List<Service> getServices() { 
         return services; 
     }

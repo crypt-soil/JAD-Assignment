@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*" %>
+<%@ page import="java.sql.*, model.DBConnection" %>
 
 <%
     Integer customerId = (Integer) session.getAttribute("customer_id");
@@ -12,9 +12,9 @@
 <%
         return;
     }
-
-    // IMPORTANT — Parameter must match cart page
+	
     String itemParam = request.getParameter("item_id");
+    // check for no item_id 
     if (itemParam == null) {
 %>
 <script>
@@ -31,12 +31,7 @@
     PreparedStatement ps = null;
 
     try {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        conn = DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/silvercare",
-            "root",
-            "root1234"
-        );
+    	conn = DBConnection.getConnection();
 
         // Ensure the item belongs to this customer's cart
         String deleteSql =

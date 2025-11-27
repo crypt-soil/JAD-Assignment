@@ -21,7 +21,19 @@ public class BookingDAO {
 
             ps.setInt(1, customerId);
             ResultSet rs = ps.executeQuery();
-
+            /*
+             	itemsByBooking groups items by booking_id
+             	itemsByBooking = {
+				   101: [ BookingItem("Nursing",1,30.00),
+				          BookingItem("Home Care",2,50.00) ],
+				   102: [ BookingItem("Cooking",1,15.00) ]
+				}
+             	metaByBooking stores date + status per booking_id
+             	metaByBooking = {
+				    101: BookingMeta(date=2025-01-01 10:00, status=2),
+				    102: BookingMeta(date=2025-01-03 14:00, status=1)
+				}
+            */
             Map<Integer, List<BookingItem>> itemsByBooking = new LinkedHashMap<>();
             Map<Integer, BookingMeta> metaByBooking = new LinkedHashMap<>();
 
@@ -70,7 +82,6 @@ public class BookingDAO {
         return bookings;
     }
 
-    // small inner helper class (not exposed outside)
     private static class BookingMeta {
         private final Timestamp bookingDate;
         private final int status;

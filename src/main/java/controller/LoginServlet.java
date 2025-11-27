@@ -36,14 +36,14 @@ public class LoginServlet extends HttpServlet {
         if (userRepo.validateMember(username, password)) {
             HttpSession session = request.getSession();
             Integer customerId = userRepo.getCustomerId(username);
-            System.out.println("LOGIN customer_id = " + customerId);
+//            System.out.println("LOGIN customer_id = " + customerId);
             
             session.setAttribute("username", username);
             session.setAttribute("role", "member");
             session.setAttribute("customer_id", customerId);
             session.setAttribute("loginMessage", "Login successful!");
             
-            //set 5 minutes timeout 
+            //set 5 minutes timeout for member
             session.setMaxInactiveInterval(50*60);
             System.out.println("Member timeout set to: " + session.getMaxInactiveInterval());
             response.sendRedirect(request.getContextPath() + "/categories");
