@@ -70,51 +70,51 @@ VALUES
 ('Bathing & Grooming Assistance',
  'Helps seniors stay clean and maintain self-confidence. Caregivers assist with showering, sponging, oral hygiene, and dressing.',
  35.00,
- 'https://cdn.prod-carehubs.net/n1/802899ec472ea3d8/uploads/2022/11/AdobeStock_366108919-scaled.jpeg',
+ 'https://tse1.mm.bing.net/th/id/OIP.jBsQL9Bkk7m_w1zw9J03GwHaEq?pid=Api&P=0&h=180',
  1),
 ('Medication Reminder Support',
  'Ensures timely and accurate medication intake. Caregivers assist with labeling, preparing pill boxes, and reminders.',
  20.00,
- 'https://www.homecareassistancetracy.com/wp-content/uploads/2020/12/5-Medications-that-Help-Manage-Sleep-Disorders-in-Seniors-in-Stockton-CA.jpg',
+ 'https://www.elderly-homecare.com/wp-content/uploads/2019/08/Nurse-Helping-Senior-Man-To-Organize-Medication.jpg',
  1),
 ('Mobility & Walking Assistance',
  'Supports seniors who have difficulty walking or require supervision to move safely around the home.',
  30.00,
- 'https://www.arthritis.org/getmedia/2c9df4a3-45b0-4197-b300-71cca3bba93b/walking-fb-og.jpg',
+ 'https://blog.honestmed.com/wp-content/uploads/2023/08/Blog-Main-Image-Best-Mobility-Aids-Web-Optimized.png',
  1),
 
 -- ===== category 2: home support =====
 ('Light Housekeeping',
  'Basic cleaning tasks including sweeping, mopping, dusting, and keeping living spaces safe and tidy.',
  25.00,
- 'https://cdn.shopify.com/s/files/1/0273/4810/9812/articles/Summer_House_cleaning.jpg?v=1652752163',
+ 'https://fastmaidservice.com/wp-content/uploads/2022/01/Deep-Cleaning-and-Housekeeping-Services.jpg',
  2),
 ('Laundry & Ironing Assistance',
  'Caregivers help wash, fold, and iron clothes to support seniors who have difficulty managing laundry on their own.',
  22.00,
- 'https://www.thespruce.com/thmb/jLecWzMp0e0wiNmbPSrN91z0zQ8=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/washandfoldLaundry-GettyImages-612733926-5ad60a67875db900372c59a5.jpg',
+ 'https://www.aidby.com/_next/static/media/laundry_image3.520466cc.jpg',
  2),
 ('Meal Preparation',
  'Prepares nutritious meals suited to dietary needs. Includes planning, cooking, and cleaning up after meals.',
  35.00,
- 'https://www.eatright.org/-/media/eatrightimages/food/nutrition/agingwellwithnutrition/whatolderadultsneedtoknowaboutfoodandnutrition/olderadults_cooking_gettyimages-1056482120_600x450.jpg',
+ 'https://www.bayshore.ca/wp-content/uploads/2018/03/Services-Meal-Prep-1350x850.jpg',
  2),
 
 -- ===== category 3: social & wellness services =====
 ('Companionship Visits',
  'Provides emotional support through conversation, games, and social interaction to reduce loneliness.',
  40.00,
- 'https://cdn.carelinkathome.com/wp-content/uploads/2020/10/23123141/companionship.jpg',
+ 'https://uploads-ssl.webflow.com/5de31e9059d27b1b2e24e0d8/5e850bd24f3580899765a71c_Senior%20Visit%20in%20home.jpg',
  3),
 ('Outdoor & Medical Escort',
  'Caregivers accompany seniors to medical appointments, grocery trips, or casual outdoor walks for safety.',
  50.00,
- 'https://cdn.lovetoknow.com/images/opt/orig/268910-1600x1067-elderly-woman-wheelchair-assistance.jpg',
+ 'https://img.freepik.com/premium-photo/senior-woman-walker-nurse-outdoor-park-with-healthcare-elderly-exercise-walking-healthcare-professional-female-person-with-peace-physical-therapy-public-garden-with-carer_590464-279351.jpg?w=2000',
  3),
 ('Cognitive & Memory Activities',
  'Engaging activities such as puzzles, memory games, and mental exercises designed to improve cognitive health.',
  28.00,
- 'https://cdn.britannica.com/51/170751-050-45C44A53/Volunteer-nursing-home.jpg',
+ 'https://www.setxseniors.com/wp-content/uploads/2014/03/game-night-southeast-texas-senior-citizens-1024x664.jpg',
  3);
 
 -- table: bookings
@@ -205,6 +205,27 @@ VALUES (
     '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9'
 );
 
+CREATE TABLE cart (
+    cart_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE cart_items (
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    cart_id INT NOT NULL,
+    service_id INT NOT NULL,
+    quantity INT DEFAULT 1,
+    start_time DATETIME NULL,
+    end_time DATETIME NULL,
+    FOREIGN KEY (cart_id) REFERENCES cart(cart_id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES service(service_id)
+        ON DELETE CASCADE
+);
+
 -- drop existing procedures and function if any
 DROP PROCEDURE IF EXISTS sp_total_users;
 DROP PROCEDURE IF EXISTS sp_popular_service;
@@ -263,5 +284,6 @@ END $$
 
 DELIMITER ;
 
-DESCRIBE customers;
+
+
 

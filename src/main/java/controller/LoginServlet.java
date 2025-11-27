@@ -17,7 +17,7 @@ public class LoginServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+    	
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
@@ -28,15 +28,24 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("username", username);
             session.setAttribute("role", "admin");
             session.setAttribute("loginMessage", "Welcome back, Admin!");
+            
             response.sendRedirect(request.getContextPath() + "/categories");
             return;
         }
         
         if (userRepo.validateMember(username, password)) {
             HttpSession session = request.getSession();
+            Integer customerId = userRepo.getCustomerId(username);
+            System.out.println("LOGIN customer_id = " + customerId);
+            
             session.setAttribute("username", username);
             session.setAttribute("role", "member");
+            session.setAttribute("customer_id", customerId);
             session.setAttribute("loginMessage", "Login successful!");
+            
+            //set 5 minutes timeout 
+            session.setMaxInactiveInterval(50*60);
+            System.out.println("Member timeout set to: " + session.getMaxInactiveInterval());
             response.sendRedirect(request.getContextPath() + "/categories");
             return;
         }

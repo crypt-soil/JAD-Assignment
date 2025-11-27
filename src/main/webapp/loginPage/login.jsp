@@ -44,7 +44,7 @@ body {
 }
 
 /* Purple login button */
-.btn-purple {
+.btn-login {
     background-color: #7b50c7;
     color: white;
     border: none;
@@ -55,7 +55,7 @@ body {
     box-shadow: 0 3px 10px rgba(120, 90, 255, 0.3);
 }
 
-.btn-purple:hover {
+.btn-login:hover {
     background-color: #693fb3;
 }
 </style>
@@ -94,7 +94,7 @@ body {
                         <label class="form-label">Password</label>
                         <input type="password" class="form-control" name="password" required>
                     </div>
-                    <button type="submit" class="btn btn-purple">LOG IN</button>
+                    <button type="submit" class="btn btn-login">LOG IN</button>
                     <p class="form-text mt-3 text-center">
                         No Account yet? <a href="http://localhost:8080/ST0510-JAD-Assignment1/registerPage/registerPage.jsp">SIGN UP</a>
                     </p>

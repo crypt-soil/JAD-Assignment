@@ -58,4 +58,29 @@ public class UserDAO {
 
         return isValid;
     }
+    
+    // to get customer_id for profile page 
+    public Integer getCustomerId(String username) {
+        Integer id = null;
+
+        try (Connection conn = DBConnection.getConnection()) {
+            String sql = "SELECT customer_id FROM customers WHERE username = ? OR email = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setString(1, username);
+            stmt.setString(2, username);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                id = rs.getInt("customer_id");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return id;
+    }
+
 }
