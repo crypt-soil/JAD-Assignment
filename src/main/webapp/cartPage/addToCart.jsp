@@ -33,7 +33,7 @@
             "root1234"      
         );
 
-        //get or create cart for user
+        // ---- GET OR CREATE CART FOR USER ----
         int cartId = 0;
 
         String selectCartSql = "SELECT cart_id FROM cart WHERE customer_id = ?";
@@ -44,7 +44,6 @@
         if (rs.next()) {
             cartId = rs.getInt("cart_id");
         } else {
-            //if no cart yet, create one
             rs.close();
             ps.close();
 
@@ -61,7 +60,7 @@
         rs.close();
         ps.close();
         
-        // insert new cart_items row
+        // ---- INSERT NEW CART ITEM (CREATE MODE) ----
         int itemId = 0;
 
         String insertItemSql = 
@@ -77,8 +76,8 @@
 
 %>
     <script>
-    	//redirect to cart details selection page 
-    	window.location.href = "setItemDetails.jsp?item_id=<%=itemId%>";
+        // redirect to booking details page WITH mode=create
+        window.location.href = "setItemDetails.jsp?item_id=<%=itemId%>&mode=create";
     </script>
 <%
     } catch (Exception e) {

@@ -268,9 +268,10 @@ body {
 								%>
 								<!-- Member: Add to cart only -->
 								<form
-									action="<%=request.getContextPath()%>/cartPage/addToCart.jsp"
+									action="<%=request.getContextPath()%>/cartPage/addToCart.jsp?mode=create"
 									method="post" onClick="event.stopPropagation();"
 									style="display: inline;">
+
 
 									<input type="hidden" name="serviceId" value="<%=s.getId()%>">
 									<input type="hidden" name="serviceName"

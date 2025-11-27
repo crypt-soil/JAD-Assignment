@@ -2,7 +2,13 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.*, java.sql.*, java.text.*"%>
 
+
 <%
+//---- Detect create or edit mode ----
+String mode = request.getParameter("mode");
+if (mode == null) {
+	mode = "edit"; // default
+}
 // ---- AUTH CHECK ----
 Integer sCustomerId = (Integer) session.getAttribute("customer_id");
 if (sCustomerId == null) {
@@ -322,9 +328,46 @@ body {
 				<div class="d-flex gap-2">
 					<button type="submit" class="btn btn-primary-custom">Save
 						&amp; Go to Cart</button>
+					<%
+					if ("create".equals(mode)) {
+					%>
+
+					<!-- CREATE MODE: cancel deletes the temporary cart item -->
 					<a
 						href="<%=request.getContextPath()%>/cartPage/deleteCartItem.jsp?item_id=<%=itemId%>"
-						class="btn btn-outline-custom"> Cancel </a>
+						class="btn btn-outline-custom">Cancel</a>
+
+					<%
+					} else {
+					%>
+
+					<%
+					if ("create".equals(mode)) {
+					%>
+
+					<!-- CREATE MODE: Cancel deletes the temporary cart item -->
+					<a
+						href="<%=request.getContextPath()%>/cartPage/deleteCartItem.jsp?item_id=<%=itemId%>"
+						class="btn btn-outline-custom">Cancel</a>
+
+					<%
+					} else {
+					%>
+
+					<!-- EDIT MODE: Cancel should NOT delete -->
+					<a href="<%=request.getContextPath()%>/cartPage/cartPage.jsp"
+						class="btn btn-outline-custom">Cancel</a>
+
+					<%
+					}
+					%>
+
+
+					<%
+					}
+					%>
+
+
 
 				</div>
 			</form>
