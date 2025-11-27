@@ -11,7 +11,6 @@ public class Customer {
     private String address;
     private String zipcode;
 
-    // ===== Constructors =====
     public Customer() {}
 
     public Customer(int customer_id, String username, String password, String full_name,
@@ -25,8 +24,6 @@ public class Customer {
         this.address = address;
         this.zipcode = zipcode;
     }
-
-    // ===== Getters & Setters =====
 
     public int getCustomer_id() {
         return customer_id;

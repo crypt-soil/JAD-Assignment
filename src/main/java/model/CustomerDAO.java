@@ -4,14 +4,9 @@ import java.sql.*;
 import java.util.*;
 
 public class CustomerDAO {
-
-    private String url = "jdbc:mysql://localhost:3306/silvercare?useSSL=false&serverTimezone=UTC";
-    private String username = "root";
-    private String password = "root1234";
-
+	// get connection from DBConnection.java
     private Connection getConnection() throws Exception {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        return DriverManager.getConnection(url, username, password);
+        return DBConnection.getConnection();
     }
     
     //read all customers
@@ -45,7 +40,7 @@ public class CustomerDAO {
         return customers;
     }
 
-    // read by id 
+    // read customer by id 
     public Customer getCustomerById(int id) {
         String sql = "SELECT * FROM customers WHERE customer_id=?";
 

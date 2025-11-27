@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ page import="java.util.*, java.sql.*"%>
+<%@ page import="java.util.*, java.sql.*, model.DBConnection"%>
 
 <!DOCTYPE html>
 <html>
@@ -45,7 +45,7 @@ body {
 		<div class="cart-card">
 
 			<%
-			if (customerId == null) {
+			if (customerId == null) { //check for customerId 
 			%>
 			<h2 class="cart-title mb-4">Your Cart</h2>
 			<p>
@@ -54,7 +54,7 @@ body {
 			</p>
 			<%
 			} else {
-
+				
 			Connection conn = null;
 			PreparedStatement ps = null;
 			ResultSet rs = null;
@@ -63,8 +63,7 @@ body {
 			int itemCount = 0;
 
 			try {
-				Class.forName("com.mysql.cj.jdbc.Driver");
-				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/silvercare", "root", "root1234");
+				conn = DBConnection.getConnection();
 
 				String sql = "SELECT ci.item_id, s.name, s.price, ci.quantity, ci.start_time, ci.end_time " + "FROM cart c "
 				+ "JOIN cart_items ci ON c.cart_id = ci.cart_id " + "JOIN service s ON ci.service_id = s.service_id "
@@ -77,6 +76,7 @@ body {
 				List<Map<String, Object>> items = new ArrayList<>();
 
 				while (rs.next()) {
+					// create a hash map with each result row 
 					Map<String, Object> m = new HashMap<>();
 					m.put("itemId", rs.getInt("item_id"));
 					m.put("name", rs.getString("name"));
@@ -86,21 +86,20 @@ body {
 					m.put("end", rs.getTimestamp("end_time"));
 					items.add(m);
 				}
-
+				
 				itemCount = items.size();
 			%>
 
 			<h2 class="cart-title mb-4">
-				Your Cart (<%=itemCount%>
-				items)
+				<!-- get the number of items in the cart based on hash map size -->
+				Your Cart (<%=itemCount%> items)
 			</h2>
 
 			<%
 			if (itemCount == 0) {
 			%>
 			<p>
-				Your cart is empty. Browse <a
-					href="<%=request.getContextPath()%>/categories">services</a>.
+				Your cart is empty. Browse <a href="<%=request.getContextPath()%>/categories">services</a>.
 			</p>
 			<%
 			} else {
@@ -162,10 +161,8 @@ body {
 
 						<!-- Actions -->
 						<td><a
-							href="setItemDetails.jsp?item_id=<%=itemId%>&mode=edit"
-							class="btn btn-sm btn-outline-primary me-2">Edit</a> <a
-							href="deleteCartItem.jsp?item_id=<%=itemId%>"
-							class="btn btn-sm btn-outline-danger">Remove</a></td>
+							href="setItemDetails.jsp?item_id=<%=itemId%>&mode=edit"class="btn btn-sm btn-outline-primary me-2">Edit</a> 
+							<a href="deleteCartItem.jsp?item_id=<%=itemId%>" class="btn btn-sm btn-outline-danger">Remove</a></td>
 					</tr>
 
 					<%

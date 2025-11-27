@@ -33,7 +33,7 @@
             "root1234"      
         );
 
-        // ---- GET OR CREATE CART FOR USER ----
+        // get or create the cart for user
         int cartId = 0;
 
         String selectCartSql = "SELECT cart_id FROM cart WHERE customer_id = ?";
@@ -60,7 +60,7 @@
         rs.close();
         ps.close();
         
-        // ---- INSERT NEW CART ITEM (CREATE MODE) ----
+        // insert cart item
         int itemId = 0;
 
         String insertItemSql = 
