@@ -10,6 +10,19 @@ import model.Service;
 import model.CategoryDAO;
 import model.Category;
 
+/**
+ * Handles CRUD operations for Service objects.
+ *
+ * URL Mapping: /service
+ *
+ * Supported Actions: GET: action=add → Show add-service form action=edit → Show
+ * edit-service form action=confirmDelete → Show delete confirmation page
+ *
+ * POST: action=insert → Insert new service action=update → Update existing
+ * service action=delete → Delete existing service
+ *
+ * Default behavior redirects to homepage.
+ */
 @WebServlet("/service")
 public class ServiceServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -17,6 +30,9 @@ public class ServiceServlet extends HttpServlet {
 	private ServiceDAO serviceDAO = new ServiceDAO();
 	private CategoryDAO categoryDAO = new CategoryDAO();
 
+	// ============================================================
+	// GET HANDLER (SHOW FORMS)
+	// ============================================================
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -27,9 +43,9 @@ public class ServiceServlet extends HttpServlet {
 
 		switch (action) {
 
-		// ============================
-		// ADD SERVICE FORM
-		// ============================
+		// ------------------------------------------------------------
+		// SHOW ADD SERVICE FORM (requires category ID)
+		// ------------------------------------------------------------
 		case "add":
 			int catId = Integer.parseInt(request.getParameter("catId"));
 			Category category = categoryDAO.getCategoryById(catId);
@@ -38,9 +54,9 @@ public class ServiceServlet extends HttpServlet {
 			request.getRequestDispatcher("/service/serviceAdd.jsp").forward(request, response);
 			break;
 
-		// ============================
-		// EDIT SERVICE FORM
-		// ============================
+		// ------------------------------------------------------------
+		// SHOW EDIT SERVICE FORM
+		// ------------------------------------------------------------
 		case "edit":
 			int id = Integer.parseInt(request.getParameter("id"));
 			Service service = serviceDAO.getServiceById(id);
@@ -54,9 +70,9 @@ public class ServiceServlet extends HttpServlet {
 			request.getRequestDispatcher("/service/serviceEdit.jsp").forward(request, response);
 			break;
 
-		// ============================
-		// SHOW CONFIRM DELETE PAGE
-		// ============================
+		// ------------------------------------------------------------
+		// SHOW DELETE CONFIRMATION PAGE
+		// ------------------------------------------------------------
 		case "confirmDelete":
 			int deleteId = Integer.parseInt(request.getParameter("id"));
 			Service s = serviceDAO.getServiceById(deleteId);
@@ -70,14 +86,17 @@ public class ServiceServlet extends HttpServlet {
 			request.getRequestDispatcher("/service/serviceDelete.jsp").forward(request, response);
 			break;
 
-		// ============================
-		// DEFAULT
-		// ============================
+		// ------------------------------------------------------------
+		// DEFAULT → redirect home
+		// ------------------------------------------------------------
 		default:
 			response.sendRedirect("homePage/homePage.jsp");
 		}
 	}
 
+	// ============================================================
+	// POST HANDLER (CRUD OPERATIONS)
+	// ============================================================
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -86,23 +105,17 @@ public class ServiceServlet extends HttpServlet {
 
 		switch (action) {
 
-		// ============================
-		// INSERT SERVICE
-		// ============================
+		// INSERT NEW SERVICE
 		case "insert":
 			insertService(request, response);
 			break;
 
-		// ============================
-		// UPDATE SERVICE
-		// ============================
+		// UPDATE EXISTING SERVICE
 		case "update":
 			updateService(request, response);
 			break;
 
-		// ============================
 		// DELETE SERVICE
-		// ============================
 		case "delete":
 			performDelete(request, response);
 			break;
@@ -113,7 +126,7 @@ public class ServiceServlet extends HttpServlet {
 	}
 
 	// ============================================================
-	// INSERT
+	// INSERT SERVICE
 	// ============================================================
 	private void insertService(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -128,11 +141,12 @@ public class ServiceServlet extends HttpServlet {
 
 		serviceDAO.insertService(s);
 
+		// Redirect back to the parent category's detail page
 		response.sendRedirect(request.getContextPath() + "/productDetail?id=" + catId);
 	}
 
 	// ============================================================
-	// UPDATE
+	// UPDATE SERVICE
 	// ============================================================
 	private void updateService(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -153,7 +167,7 @@ public class ServiceServlet extends HttpServlet {
 	}
 
 	// ============================================================
-	// DELETE (after confirmation)
+	// DELETE SERVICE (AFTER CONFIRMATION)
 	// ============================================================
 	private void performDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -162,7 +176,10 @@ public class ServiceServlet extends HttpServlet {
 
 		if (s != null) {
 			int catId = s.getCategoryId();
+
 			serviceDAO.deleteService(id);
+
+			// Redirect to the category page the service belonged to
 			response.sendRedirect(request.getContextPath() + "/productDetail?id=" + catId);
 			return;
 		}

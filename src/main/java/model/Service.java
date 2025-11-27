@@ -1,42 +1,101 @@
 package model;
 
+/**
+ * Represents a single service offered under a category.
+ *
+ * Each service contains: - Basic info (name, description, image URL) - Pricing
+ * - A reference to its category (categoryId) - A UI-related "highlighted" flag
+ * used for search results
+ *
+ * This model is populated and returned by ServiceDAO and used by JSP pages such
+ * as service listings and product detail pages.
+ */
 public class Service {
-    private int id;
-    private String name;
-    private String description;
-    private double price;
-    private String imageUrl;
-    private int categoryId;
 
-    // ⭐ NEW: for search highlighting
-    private boolean highlighted;
+	/** Unique identifier for the service. */
+	private int id;
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+	/** Name of the service (e.g., "House Cleaning", "Physiotherapy"). */
+	private String name;
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+	/** Description of what the service provides. */
+	private String description;
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+	/** Price of the service. */
+	private double price;
 
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
+	/** URL to the service's display image. */
+	private String imageUrl;
 
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+	/** Category this service belongs to. */
+	private int categoryId;
 
-    public int getCategoryId() { return categoryId; }
-    public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
+	/**
+	 * Indicates whether this service should be highlighted in the UI (used during
+	 * search).
+	 */
+	private boolean highlighted;
 
-    // ==========================
-    // ⭐ GETTER + SETTER for highlight
-    // ==========================
-    public boolean isHighlighted() {
-        return highlighted;
-    }
+	// ============================================================
+	// GETTERS & SETTERS — Core Fields
+	// ============================================================
 
-    public void setHighlighted(boolean highlighted) {
-        this.highlighted = highlighted;
-    }
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public double getPrice() {
+		return price;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public int getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
+	}
+
+	// ============================================================
+	// GETTERS & SETTERS — Highlight Flag
+	// ============================================================
+	public boolean isHighlighted() {
+		return highlighted;
+	}
+
+	public void setHighlighted(boolean highlighted) {
+		this.highlighted = highlighted;
+	}
 }
