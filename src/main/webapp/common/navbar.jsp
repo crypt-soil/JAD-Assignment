@@ -20,16 +20,24 @@
 
 
 <!-- Sticky Purple Navbar --> 
-	<nav class="navbar navbar-custom d-flex justify-content-between align-items-center sticky-top"> 
-	<div class="fw-semibold">Silver Care</div> 
-	<div> 
-		<a href="<%= request.getContextPath() %>/categories">Service Category</a> 
-		
-		 <%-- admin --%>
+<nav class="navbar navbar-custom d-flex justify-content-between align-items-center sticky-top"> 
+    <div class="fw-semibold">Silver Care</div> 
+    <div> 
+        <a href="<%= request.getContextPath() %>/categories">Service Category</a> 
+        <a href="<%= request.getContextPath() %>/caregiverInfoPage/caregiver.jsp">Our Caregivers</a>
+
+        <%-- admin --%>
         <% if ("admin".equals(role)) { %>
-			<a href="<%= request.getContextPath() %>/admin/management" class="btn btn-white">Management Overview</a>
-            <a href="<%= request.getContextPath() %>/adminPage/analyticsDashboard.jsp" class="btn btn-white">Analytics Dashboard</a>
-            <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-purple">Logout</a>
+
+            <a href="<%= request.getContextPath() %>/admin/management" class="btn btn-white">
+                Management Overview
+            </a>
+            <a href="<%= request.getContextPath() %>/adminPage/analyticsDashboard.jsp" class="btn btn-white">
+                Analytics Dashboard
+            </a>
+            <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-purple">
+                Logout
+            </a>
 
         <%-- member --%>
         <% } else if (customerId != null && "member".equals(role)) { %>
@@ -41,12 +49,17 @@
         <%-- public --%>
         <% } else { %>
 
-            <a href="<%= request.getContextPath() %>/registerPage/registerPage.jsp" class="btn btn-white">Sign Up</a>
-            <a href="<%= request.getContextPath() %>/loginPage/login.jsp" class="btn btn-purple">Login</a>
+            <a href="<%= request.getContextPath() %>/registerPage/registerPage.jsp" class="btn btn-white">
+                Sign Up
+            </a>
+            <a href="<%= request.getContextPath() %>/loginPage/login.jsp" class="btn btn-purple">
+                Login
+            </a>
 
         <% } %>
-	</div> 
-	</nav> 
+    </div> 
+</nav> 
+
 	<style> 
 		.navbar-custom { 
 			background-color: #c5b2e6; 

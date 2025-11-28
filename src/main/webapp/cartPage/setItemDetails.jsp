@@ -38,6 +38,11 @@
     int quantity = 1;
     java.sql.Timestamp startTime = null;
     java.sql.Timestamp endTime = null;
+    String specialRequest = "";  
+    Integer existingCaregiverId = null;
+
+    // caregiver list
+    List<Map<String,Object>> caregivers = new ArrayList<>();
 
     String errorMsg = null;
 
@@ -50,7 +55,7 @@
 
         // load current cart item and service info
         String loadSql =
-            "SELECT ci.quantity, ci.start_time, ci.end_time, " +
+            "SELECT ci.quantity, ci.start_time, ci.end_time, ci.special_request, ci.caregiver_id, " +
             "       s.service_id, s.name, s.description, s.price " +
             "FROM cart_items ci " +
             "JOIN cart c ON ci.cart_id = c.cart_id " +
@@ -77,6 +82,28 @@
             serviceName = rs.getString("name");
             serviceDesc = rs.getString("description");
             unitPrice = rs.getDouble("price");
+            specialRequest = rs.getString("special_request");
+            existingCaregiverId = rs.getInt("caregiver_id"); 
+        }
+
+        rs.close();
+        ps.close();
+
+        // load caregivers for this service using bridge table (many to many relationship)
+        String cgSql = "SELECT c.caregiver_id, c.full_name, c.rating " +
+        	    "FROM caregiver c " +
+        	    "JOIN caregiver_service cs ON c.caregiver_id = cs.caregiver_id " +
+        	    "WHERE cs.service_id = ?";
+        ps = conn.prepareStatement(cgSql);
+        ps.setInt(1, serviceId);
+        rs = ps.executeQuery();
+
+        while (rs.next()) {
+            Map<String,Object> row = new HashMap<>();
+            row.put("id", rs.getInt("caregiver_id"));
+            row.put("name", rs.getString("full_name"));
+            row.put("rating", rs.getDouble("rating"));
+            caregivers.add(row);
         }
 
         rs.close();
@@ -88,6 +115,15 @@
             String qtyParam = request.getParameter("quantity");
             String startParam = request.getParameter("startDateTime");
             String endParam = request.getParameter("endDateTime");
+            String caregiverParam = request.getParameter("caregiver_id"); 
+            String specialParam = request.getParameter("special_request");
+
+            if (specialParam != null) specialRequest = specialParam;
+
+            Integer caregiverId = null;
+            if (caregiverParam != null && !caregiverParam.isEmpty()) {
+                caregiverId = Integer.parseInt(caregiverParam);
+            }
 
             try {
                 quantity = Integer.parseInt(qtyParam);
@@ -135,15 +171,21 @@
                         errorMsg = "You already have a booking for this service that overlaps this time. Please choose another time.";
 
                     } else {
-                        // update cart items
+
                         String updateSql =
-                            "UPDATE cart_items SET quantity = ?, start_time = ?, end_time = ? WHERE item_id = ?";
+                            "UPDATE cart_items SET quantity = ?, start_time = ?, end_time = ?, caregiver_id = ?, special_request = ? WHERE item_id = ?";
 
                         ps = conn.prepareStatement(updateSql);
                         ps.setInt(1, quantity);
                         ps.setTimestamp(2, newStart);
                         ps.setTimestamp(3, newEnd);
-                        ps.setInt(4, itemId);
+
+                        if (caregiverId != null) ps.setInt(4, caregiverId);
+                        else ps.setNull(4, java.sql.Types.INTEGER);
+
+                        ps.setString(5, specialRequest); 
+                        ps.setInt(6, itemId);
+
                         ps.executeUpdate();
                         ps.close();
 
@@ -252,6 +294,26 @@ body { background: #f6f4ff; font-family: "Poppins", sans-serif; }
                 <label for="endDateTime" class="label-text">End Date & Time</label>
                 <input type="datetime-local" class="form-control" id="endDateTime"
                        name="endDateTime" required value="<%= endValue %>">
+            </div>
+
+            <!-- NEW: Caregiver selection -->
+            <div class="mb-3">
+                <label class="label-text">Preferred Caregiver (Optional)</label>
+                <select name="caregiver_id" class="form-select">
+                    <option value="">No preference</option>
+                    <% for (Map<String,Object> cg : caregivers) { %>
+                        <option value="<%= cg.get("id") %>"
+                            <%= (existingCaregiverId != null && existingCaregiverId.equals(cg.get("id"))) ? "selected" : "" %>>
+                            <%= cg.get("name") %> (⭐ <%= cg.get("rating") %>)
+                        </option>
+                    <% } %>
+                </select>
+            </div>
+
+            <!-- NEW: Special request -->
+            <div class="mb-3">
+                <label class="label-text">Special Request (Optional)</label>
+                <textarea name="special_request" class="form-control" rows="3"><%= specialRequest == null ? "" : specialRequest %></textarea>
             </div>
 
             <div class="mb-4">

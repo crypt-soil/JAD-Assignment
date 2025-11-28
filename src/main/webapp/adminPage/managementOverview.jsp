@@ -140,7 +140,7 @@
                       method="post" class="m-0"
                       onsubmit="return confirm('Are you sure you want to delete this user?');">
                     <input type="hidden" name="id" value="<%= c.getCustomer_id() %>">
-                    <button type="submit" class="btn-delete-icon"></button>
+                    <button type="submit" class="btn-delete-icon">🗑️</button>
                 </form>
             </div>
         </div>

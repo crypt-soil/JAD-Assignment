@@ -1,4 +1,3 @@
-SELECT * FROM silvercare.admin_user;
 -- drop database and recreate
 DROP DATABASE IF EXISTS silvercare;
 CREATE DATABASE IF NOT EXISTS silvercare;
@@ -122,7 +121,7 @@ CREATE TABLE bookings (
     booking_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT,
     booking_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    status INT DEFAULT 1,                      --  1=pending, 2=confirmed, 3=completed, 4=cancelled
+    status INT DEFAULT 1,                      -- 1=pending, 2=confirmed, 3=completed, 4=cancelled
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
@@ -130,48 +129,104 @@ CREATE TABLE bookings (
 
 -- insert sample bookings for analytics
 INSERT INTO bookings (customer_id, booking_date, status) VALUES
-(1, NOW() - INTERVAL 2 DAY, 3),        -- this week
-(1, NOW() - INTERVAL 8 DAY, 3),        -- this month
-(1, NOW() - INTERVAL 30 DAY, 3),       -- this year
-(1, NOW() - INTERVAL 150 DAY, 3),      -- this year
-(1, NOW() - INTERVAL 380 DAY, 3);      -- last year (excluded from current year)
+(1, NOW() - INTERVAL 2 DAY, 3),
+(1, NOW() - INTERVAL 8 DAY, 3),
+(1, NOW() - INTERVAL 30 DAY, 3),
+(1, NOW() - INTERVAL 150 DAY, 3),
+(1, NOW() - INTERVAL 380 DAY, 3);
+
+-- table: caregiver
+CREATE TABLE caregiver (
+    caregiver_id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    gender VARCHAR(10),
+    years_experience INT DEFAULT 0,
+    rating DECIMAL(2,1) DEFAULT 4.5,
+    description VARCHAR(255),
+    photo_url VARCHAR(255)
+) ENGINE=InnoDB;
+
+-- insert caregivers
+INSERT INTO caregiver (full_name, gender, years_experience, rating, description, photo_url)
+VALUES
+('Alice Tan', 'Female', 5, 4.7,
+ 'Experienced in personal hygiene care and mobility support.',
+ 'https://randomuser.me/api/portraits/women/65.jpg'),
+('Benjamin Lee', 'Male', 7, 4.9,
+ 'Expert in medication management and senior care.',
+ 'https://randomuser.me/api/portraits/men/32.jpg'),
+('Clara Lim', 'Female', 4, 4.6,
+ 'Strong background in dementia care and patient communication.',
+ 'https://randomuser.me/api/portraits/women/44.jpg'),
+('David Wong', 'Male', 3, 4.3,
+ 'Friendly caregiver skilled in housekeeping and light chores.',
+ 'https://randomuser.me/api/portraits/men/52.jpg'),
+('Evelyn Koh', 'Female', 6, 4.8,
+ 'Specializes in meal prep tailored to dietary needs.',
+ 'https://randomuser.me/api/portraits/women/78.jpg'),
+('Farah Noor', 'Female', 8, 4.9,
+ 'Experienced escort caregiver for outings & medical appointments.',
+ 'https://randomuser.me/api/portraits/women/23.jpg');
+
+-- BRIDGE TABLE: caregiver_service (allows multi-service caregivers)
+CREATE TABLE caregiver_service (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    caregiver_id INT NOT NULL,
+    service_id INT NOT NULL,
+    FOREIGN KEY (caregiver_id) REFERENCES caregiver(caregiver_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES service(service_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- Assign multiple caregivers to multiple services
+INSERT INTO caregiver_service (caregiver_id, service_id) VALUES
+-- Personal Care (1,2,3)
+(1,1),(1,2),(1,3),
+(2,1),(2,3),
+(3,1),(3,2),(3,3),
+
+-- Home Support (4,5,6)
+(4,4),(4,5),
+(5,4),(5,6),
+(1,6),
+
+-- Social & Wellness (7,8,9)
+(6,7),(6,8),
+(3,7),
+(2,9);
 
 -- table: booking_details
 CREATE TABLE booking_details (
     detail_id INT AUTO_INCREMENT PRIMARY KEY,
     booking_id INT,
     service_id INT,
+    caregiver_id INT NULL,
     quantity INT DEFAULT 1,
     start_time DATETIME,
     end_time DATETIME,
     subtotal DECIMAL(10,2),
+    special_request VARCHAR(255) NULL,
     FOREIGN KEY (booking_id) REFERENCES bookings(booking_id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     FOREIGN KEY (service_id) REFERENCES service(service_id)
         ON DELETE SET NULL
+        ON UPDATE CASCADE,
+    FOREIGN KEY (caregiver_id) REFERENCES caregiver(caregiver_id)
+        ON DELETE SET NULL
         ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
--- insert booking details for revenue and popular service
-INSERT INTO booking_details (booking_id, service_id, quantity, subtotal) VALUES
--- this week (booking 1)
-(1, 1, 1, 35.00),   -- bathing assistance
-(1, 2, 1, 20.00),   -- medication reminder
-
--- this month (booking 2)
-(2, 6, 1, 35.00),   -- meal preparation
-(2, 4, 1, 25.00),   -- light housekeeping
-
--- this year (booking 3)
-(3, 8, 1, 50.00),   -- outdoor escort
-
--- this year (booking 4)
-(4, 7, 1, 40.00),   -- companionship visits
-(4, 9, 1, 28.00),   -- cognitive & memory activities
-
--- last year (booking 5)
-(5, 4, 1, 40.00);   -- light housekeeping (excluded from current year)
+-- insert booking details
+INSERT INTO booking_details (booking_id, service_id, caregiver_id, quantity, subtotal, special_request)
+VALUES
+(1, 1, 1, 1, 35.00, 'Wheelchair assistance needed'),
+(1, 2, 2, 1, 20.00, NULL),
+(2, 6, 5, 1, 35.00, 'Low salt meal preferred'),
+(3, 8, 6, 1, 50.00, NULL);
 
 -- table: feedback
 CREATE TABLE feedback (
@@ -205,6 +260,7 @@ VALUES (
     '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9'
 );
 
+-- cart
 CREATE TABLE cart (
     cart_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT NOT NULL,
@@ -213,17 +269,23 @@ CREATE TABLE cart (
         ON DELETE CASCADE
 );
 
+-- cart items
 CREATE TABLE cart_items (
     item_id INT AUTO_INCREMENT PRIMARY KEY,
     cart_id INT NOT NULL,
     service_id INT NOT NULL,
+    caregiver_id INT NULL,
     quantity INT DEFAULT 1,
     start_time DATETIME NULL,
     end_time DATETIME NULL,
+    special_request VARCHAR(255) NULL,
     FOREIGN KEY (cart_id) REFERENCES cart(cart_id)
         ON DELETE CASCADE,
     FOREIGN KEY (service_id) REFERENCES service(service_id)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY (caregiver_id) REFERENCES caregiver(caregiver_id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
 );
 
 -- drop existing procedures and function if any
@@ -231,7 +293,7 @@ DROP PROCEDURE IF EXISTS sp_total_users;
 DROP PROCEDURE IF EXISTS sp_popular_service;
 DROP FUNCTION IF EXISTS fn_revenue;
 
---stored procedures and function for analytics dashboard
+-- stored procedures and function for analytics dashboard
 DELIMITER $$
 
 CREATE PROCEDURE sp_total_users()
@@ -283,7 +345,3 @@ BEGIN
 END $$
 
 DELIMITER ;
-
-
-
-
