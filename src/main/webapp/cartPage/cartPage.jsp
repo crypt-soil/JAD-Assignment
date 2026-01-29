@@ -178,7 +178,7 @@ body {
 				<h4>
 					Grand Total: <strong>S$ <%=String.format("%.2f", grandTotal)%></strong>
 				</h4>
-				<a href="#" class="btn btn-dark mt-3">Checkout</a>
+				<a href="<%=request.getContextPath()%>/checkout" class="btn btn-dark mt-3">Checkout</a>
 			</div>
 
 			<%

@@ -305,6 +305,20 @@ body {
 	session.removeAttribute("loginMessage"); // remove so it won’t show again
 	}
 	%>
+	
+	<%
+		String checkoutMsg = (String) session.getAttribute("checkoutSuccessMessage");
+		if (checkoutMsg != null) {
+		%>
+		    <div class="alert alert-success text-center mt-3" role="alert">
+		        <h5 class="mb-0"><%= checkoutMsg %></h5>
+		    </div>
+		<%
+		    // remove so it only shows once
+		    session.removeAttribute("checkoutSuccessMessage");
+		}
+	%>
+	
 
 	<div class="home-wrapper">
 
