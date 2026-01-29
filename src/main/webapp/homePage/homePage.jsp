@@ -4,7 +4,10 @@
 <!-- Import Java List + your Category model -->
 <%@ page import="java.util.List"%>
 <%@ page import="model.Category"%>
-
+<%
+    String username = (String) session.getAttribute("username");
+    if (username == null) username = "User";
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
