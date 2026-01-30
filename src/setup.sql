@@ -1,18 +1,22 @@
+-- drop database and recreate
 DROP DATABASE IF EXISTS silvercare;
 CREATE DATABASE IF NOT EXISTS silvercare;
 USE silvercare;
 
+-- table: customers
 CREATE TABLE customers (
     customer_id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
+    username VARCHAR(50) UNIQUE NOT NULL,      -- ensure unique login
+    password VARCHAR(255) NOT NULL,            -- remember to hash (e.g. sha-256, bcrypt)
     full_name VARCHAR(100),
-    email VARCHAR(100) UNIQUE,
+    email VARCHAR(100) UNIQUE,                 -- for password recovery & notifications
     phone VARCHAR(20),
     address VARCHAR(255),
     zipcode VARCHAR(10)
 ) ENGINE=InnoDB;
 
+-- insert 1 dummy customer for fk and analytics
+-- original password for testuser: password
 INSERT INTO customers (username, password, full_name, email, phone, address, zipcode)
 VALUES (
     'testuser',
@@ -24,19 +28,28 @@ VALUES (
     '123456'
 );
 
+-- table: service_category
 CREATE TABLE service_category (
     cat_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
-    image_url VARCHAR(255)
+    image_url VARCHAR(255)                     -- store relative path or full image url
 ) ENGINE=InnoDB;
 
+-- insert service categories
 INSERT INTO service_category (cat_id, name, description, image_url)
 VALUES
-(1, 'Personal Care', 'Services that support seniors with daily self-care tasks.', ''),
-(2, 'Home Support', 'Practical help with household tasks.', ''),
-(3, 'Social & Wellness Services', 'Services that support mental and emotional wellbeing.', '');
+(1, 'Personal Care',
+ 'Services that support seniors with daily self-care tasks. These include assistance with bathing, grooming, medication reminders, and mobility support to help them stay safe, comfortable, and independent at home.',
+ 'https://justinvillacare.com/wp-content/uploads/2021/10/Dressing-and-Grooming-Caregiver-Services-For-Seniors-Orange-County.jpg'),
+(2, 'Home Support',
+ 'Practical help with maintaining a clean, safe, and organised living environment. This covers light housekeeping, meal preparation, laundry, and basic home tasks that reduce physical strain for seniors.',
+ 'https://static.vecteezy.com/system/resources/previews/021/780/287/non_2x/happy-family-walking-together-in-the-garden-old-elderly-using-a-walking-stick-to-help-walk-balance-concept-of-love-and-care-of-the-family-and-health-insurance-for-family-photo.jpg'),
+(3, 'Social & Wellness Services',
+ 'Services that enhance emotional well-being and mental engagement. These include companionship visits, social activities, medical escorting, and cognitive exercises designed to prevent loneliness and keep seniors active.',
+ 'https://allsaintsseniorliving.com/wp-content/uploads/2023/04/How-Social-Connections-Keep-Seniors-Healthy-Hero.jpg');
 
+-- table: service
 CREATE TABLE service (
     service_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -44,36 +57,96 @@ CREATE TABLE service (
     price DECIMAL(10,2) NOT NULL,
     image_url VARCHAR(255),
     cat_id INT,
+    status TINYINT NOT NULL DEFAULT 1,         -- 1=active, 0=inactive
     FOREIGN KEY (cat_id) REFERENCES service_category(cat_id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
-INSERT INTO service (name, description, price, image_url, cat_id)
+-- insert services (3 per category)
+INSERT INTO service (name, description, price, image_url, cat_id, status)
 VALUES
-('Bathing Assistance', '', 35.00, '', 1),
-('Medication Reminder', '', 20.00, '', 1),
-('Walking Support', '', 30.00, '', 1),
-('Housekeeping', '', 25.00, '', 2),
-('Laundry', '', 22.00, '', 2),
-('Meal Preparation', '', 35.00, '', 2),
-('Companionship', '', 40.00, '', 3),
-('Medical Escort', '', 50.00, '', 3),
-('Cognitive Activities', '', 28.00, '', 3);
+-- ===== category 1: personal care =====
+('Bathing & Grooming Assistance',
+ 'Helps seniors stay clean and maintain self-confidence. Caregivers assist with showering, sponging, oral hygiene, and dressing.',
+ 35.00,
+ 'https://tse1.mm.bing.net/th/id/OIP.jBsQL9Bkk7m_w1zw9J03GwHaEq?pid=Api&P=0&h=180',
+ 1,
+ 1),
+('Medication Reminder Support',
+ 'Ensures timely and accurate medication intake. Caregivers assist with labeling, preparing pill boxes, and reminders.',
+ 20.00,
+ 'https://www.elderly-homecare.com/wp-content/uploads/2019/08/Nurse-Helping-Senior-Man-To-Organize-Medication.jpg',
+ 1,
+ 1),
+('Mobility & Walking Assistance',
+ 'Supports seniors who have difficulty walking or require supervision to move safely around the home.',
+ 30.00,
+ 'https://blog.honestmed.com/wp-content/uploads/2023/08/Blog-Main-Image-Best-Mobility-Aids-Web-Optimized.png',
+ 1,
+ 1),
 
+-- ===== category 2: home support =====
+('Light Housekeeping',
+ 'Basic cleaning tasks including sweeping, mopping, dusting, and keeping living spaces safe and tidy.',
+ 25.00,
+ 'https://fastmaidservice.com/wp-content/uploads/2022/01/Deep-Cleaning-and-Housekeeping-Services.jpg',
+ 2,
+ 1),
+('Laundry & Ironing Assistance',
+ 'Caregivers help wash, fold, and iron clothes to support seniors who have difficulty managing laundry on their own.',
+ 22.00,
+ 'https://www.aidby.com/_next/static/media/laundry_image3.520466cc.jpg',
+ 2,
+ 1),
+('Meal Preparation',
+ 'Prepares nutritious meals suited to dietary needs. Includes planning, cooking, and cleaning up after meals.',
+ 35.00,
+ 'https://www.bayshore.ca/wp-content/uploads/2018/03/Services-Meal-Prep-1350x850.jpg',
+ 2,
+ 1),
+
+-- ===== category 3: social & wellness services =====
+('Companionship Visits',
+ 'Provides emotional support through conversation, games, and social interaction to reduce loneliness.',
+ 40.00,
+ 'https://uploads-ssl.webflow.com/5de31e9059d27b1b2e24e0d8/5e850bd24f3580899765a71c_Senior%20Visit%20in%20home.jpg',
+ 3,
+ 1),
+('Outdoor & Medical Escort',
+ 'Caregivers accompany seniors to medical appointments, grocery trips, or casual outdoor walks for safety.',
+ 50.00,
+ 'https://img.freepik.com/premium-photo/senior-woman-walker-nurse-outdoor-park-with-healthcare-elderly-exercise-walking-healthcare-professional-female-person-with-peace-physical-therapy-public-garden-with-carer_590464-279351.jpg?w=2000',
+ 3,
+ 1),
+('Cognitive & Memory Activities',
+ 'Engaging activities such as puzzles, memory games, and mental exercises designed to improve cognitive health.',
+ 28.00,
+ 'https://www.setxseniors.com/wp-content/uploads/2014/03/game-night-southeast-texas-senior-citizens-1024x664.jpg',
+ 3,
+ 1);
+
+-- table: bookings
 CREATE TABLE bookings (
     booking_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT,
     booking_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    status INT DEFAULT 1,
+    status INT DEFAULT 1,                      -- 1=pending, 2=confirmed, 3=completed, 4=cancelled
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
+-- insert sample bookings for analytics
+-- status seeded as confirmed for current and future bookings
 INSERT INTO bookings (customer_id, booking_date, status) VALUES
-(1, NOW() - INTERVAL 2 DAY, 3),
-(1, NOW() - INTERVAL 8 DAY, 3),
-(1, NOW() - INTERVAL 30 DAY, 3),
-(1, NOW() - INTERVAL 150 DAY, 3),
-(1, NOW() - INTERVAL 380 DAY, 3);
+(1, NOW(), 2),
+(1, NOW() + INTERVAL 1 DAY, 2),
+(1, NOW() + INTERVAL 3 DAY, 2),
+(1, NOW() + INTERVAL 7 DAY, 2),
+(1, NOW() + INTERVAL 14 DAY, 2);
 
+-- table: caregiver
 CREATE TABLE caregiver (
     caregiver_id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
@@ -84,56 +157,234 @@ CREATE TABLE caregiver (
     photo_url VARCHAR(255)
 ) ENGINE=InnoDB;
 
+-- insert caregivers
 INSERT INTO caregiver (full_name, gender, years_experience, rating, description, photo_url)
 VALUES
-('Alice Tan', 'Female', 5, 4.7, '', ''),
-('Benjamin Lee', 'Male', 7, 4.9, '', '');
+('Alice Tan', 'Female', 5, 4.7,
+ 'Experienced in personal hygiene care and mobility support.',
+ 'https://randomuser.me/api/portraits/women/65.jpg'),
+('Benjamin Lee', 'Male', 7, 4.9,
+ 'Expert in medication management and senior care.',
+ 'https://randomuser.me/api/portraits/men/32.jpg'),
+('Clara Lim', 'Female', 4, 4.6,
+ 'Strong background in dementia care and patient communication.',
+ 'https://randomuser.me/api/portraits/women/44.jpg'),
+('David Wong', 'Male', 3, 4.3,
+ 'Friendly caregiver skilled in housekeeping and light chores.',
+ 'https://randomuser.me/api/portraits/men/52.jpg'),
+('Evelyn Koh', 'Female', 6, 4.8,
+ 'Specializes in meal prep tailored to dietary needs.',
+ 'https://randomuser.me/api/portraits/women/78.jpg'),
+('Farah Noor', 'Female', 8, 4.9,
+ 'Experienced escort caregiver for outings & medical appointments.',
+ 'https://randomuser.me/api/portraits/women/23.jpg');
 
+-- table: caregiver_user
 CREATE TABLE caregiver_user (
     caregiver_user_id INT AUTO_INCREMENT PRIMARY KEY,
     caregiver_id INT NOT NULL,
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     FOREIGN KEY (caregiver_id) REFERENCES caregiver(caregiver_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
+-- insert caregiver login accounts
+-- original password for cg1: password
+-- original password for cg2: password
 INSERT INTO caregiver_user (caregiver_id, username, password)
-VALUES (1, 'cg1', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8');
+VALUES
+(1, 'cg1', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'),
+(2, 'cg2', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8');
 
+-- BRIDGE TABLE: caregiver_service (allows multi-service caregivers)
+CREATE TABLE caregiver_service (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    caregiver_id INT NOT NULL,
+    service_id INT NOT NULL,
+    FOREIGN KEY (caregiver_id) REFERENCES caregiver(caregiver_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES service(service_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- Assign multiple caregivers to multiple services
+INSERT INTO caregiver_service (caregiver_id, service_id) VALUES
+-- Personal Care (1,2,3)
+(1,1),(1,2),(1,3),
+(2,1),(2,3),
+(3,1),(3,2),(3,3),
+
+-- Home Support (4,5,6)
+(4,4),(4,5),
+(5,4),(5,6),
+(1,6),
+
+-- Social & Wellness (7,8,9)
+(6,7),(6,8),
+(3,7),
+(2,9);
+
+-- table: booking_details
 CREATE TABLE booking_details (
     detail_id INT AUTO_INCREMENT PRIMARY KEY,
     booking_id INT,
     service_id INT,
     caregiver_id INT NULL,
     quantity INT DEFAULT 1,
-    start_time DATETIME NOT NULL,
-    end_time DATETIME NOT NULL,
+    start_time DATETIME,
+    end_time DATETIME,
     subtotal DECIMAL(10,2),
-    special_request VARCHAR(255),
-    caregiver_status TINYINT NOT NULL DEFAULT 0,
+    special_request VARCHAR(255) NULL,
+    caregiver_status TINYINT NOT NULL DEFAULT 1,   -- 0=not_assigned, 1=assigned, 2=checked_in, 3=checked_out, 4=cancelled
     check_in_at DATETIME NULL,
     check_out_at DATETIME NULL,
-    FOREIGN KEY (booking_id) REFERENCES bookings(booking_id),
-    FOREIGN KEY (service_id) REFERENCES service(service_id),
+    FOREIGN KEY (booking_id) REFERENCES bookings(booking_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES service(service_id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
     FOREIGN KEY (caregiver_id) REFERENCES caregiver(caregiver_id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
-INSERT INTO booking_details
-(booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status)
+-- insert booking details
+-- start_time and end_time seeded to match booking_date for current and future bookings
+INSERT INTO booking_details (booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
 VALUES
-(1, 1, 1, 1, NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 1 DAY + INTERVAL 1 HOUR, 35.00, 'Bathing assistance', 2),
-(1, 2, 1, 1, NOW() - INTERVAL 2 HOUR, NOW() - INTERVAL 1 HOUR, 20.00, 'Medication reminder', 1),
-(2, 3, 1, 1, NOW() + INTERVAL 30 MINUTE, NOW() + INTERVAL 1 HOUR + INTERVAL 30 MINUTE, 30.00, 'Walking support', 0),
-(3, 6, 1, 1, NOW() + INTERVAL 4 HOUR, NOW() + INTERVAL 5 HOUR, 35.00, 'Meal prep', 0),
-(4, 7, 1, 1, NOW() + INTERVAL 1 DAY, NOW() + INTERVAL 1 DAY + INTERVAL 1 HOUR, 40.00, 'Companionship visit', 0),
-(5, 8, 1, 1, NOW() + INTERVAL 7 DAY, NOW() + INTERVAL 7 DAY + INTERVAL 2 HOUR, 50.00, 'Medical escort', 0);
+(1, 1, 1, 1, NOW(), NOW() + INTERVAL 1 HOUR, 35.00, 'Wheelchair assistance needed', 2, NOW(), NULL),
+(1, 2, 2, 1, NOW(), NOW() + INTERVAL 30 MINUTE, 20.00, NULL, 1, NULL, NULL),
+(2, 6, 5, 1, NOW() + INTERVAL 1 DAY, NOW() + INTERVAL 1 DAY + INTERVAL 1 HOUR, 35.00, 'Low salt meal preferred', 1, NULL, NULL),
+(3, 8, 6, 1, NOW() + INTERVAL 3 DAY, NOW() + INTERVAL 3 DAY + INTERVAL 2 HOUR, 50.00, NULL, 1, NULL, NULL);
 
+-- table: feedback
+CREATE TABLE feedback (
+    feedback_id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_id INT,
+    service_id INT,
+    remarks VARCHAR(255),
+    rating INT CHECK (rating BETWEEN 1 AND 5),
+    FOREIGN KEY (booking_id) REFERENCES bookings(booking_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES service(service_id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- table: admin_user
 CREATE TABLE admin_user (
     admin_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
-    email VARCHAR(100),
+    email VARCHAR(100) UNIQUE,
     password VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB;
 
+-- insert admin user
+-- original password for admin: admin123
 INSERT INTO admin_user (username, email, password)
-VALUES ('admin', 'admin@example.com', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9');
+VALUES (
+    'admin',
+    'admin@example.com',
+    '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9'
+);
+
+-- cart
+CREATE TABLE cart (
+    cart_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- cart items
+CREATE TABLE cart_items (
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    cart_id INT NOT NULL,
+    service_id INT NOT NULL,
+    caregiver_id INT NULL,
+    quantity INT DEFAULT 1,
+    start_time DATETIME NULL,
+    end_time DATETIME NULL,
+    special_request VARCHAR(255) NULL,
+    status TINYINT NOT NULL DEFAULT 1,         -- 1=pending, 2=confirmed, 3=removed
+    FOREIGN KEY (cart_id) REFERENCES cart(cart_id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES service(service_id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (caregiver_id) REFERENCES caregiver(caregiver_id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- insert cart data for test user
+INSERT INTO cart (customer_id) VALUES (1);
+
+INSERT INTO cart_items (cart_id, service_id, caregiver_id, quantity, start_time, end_time, special_request, status)
+VALUES
+(1, 4, 4, 1, NOW() + INTERVAL 2 DAY, NOW() + INTERVAL 2 DAY + INTERVAL 2 HOUR, 'Light housekeeping', 1),
+(1, 1, 1, 1, NOW() + INTERVAL 5 DAY, NOW() + INTERVAL 5 DAY + INTERVAL 1 HOUR, 'Shower chair requested', 1);
+
+-- drop existing procedures and function if any
+DROP PROCEDURE IF EXISTS sp_total_users;
+DROP PROCEDURE IF EXISTS sp_popular_service;
+DROP FUNCTION IF EXISTS fn_revenue;
+
+-- stored procedures and function for analytics dashboard
+DELIMITER $$
+
+CREATE PROCEDURE sp_total_users()
+BEGIN
+   SELECT COUNT(*) AS total FROM customers;
+END $$
+
+CREATE PROCEDURE sp_popular_service()
+BEGIN
+    SELECT s.name, SUM(bd.quantity) AS total_booked
+    FROM booking_details bd
+    JOIN service s ON bd.service_id = s.service_id
+    GROUP BY s.service_id
+    ORDER BY total_booked DESC
+    LIMIT 1;
+END $$
+
+CREATE FUNCTION fn_revenue(rangeType VARCHAR(10))
+RETURNS DECIMAL(10,2)
+DETERMINISTIC
+READS SQL DATA
+BEGIN
+    DECLARE rev DECIMAL(10,2);
+
+    IF rangeType = 'week' THEN
+        SELECT IFNULL(SUM(bd.subtotal), 0)
+          INTO rev
+        FROM bookings b
+        JOIN booking_details bd ON b.booking_id = bd.booking_id
+        WHERE YEARWEEK(b.booking_date, 1) = YEARWEEK(CURDATE(), 1);
+
+    ELSEIF rangeType = 'month' THEN
+        SELECT IFNULL(SUM(bd.subtotal), 0)
+          INTO rev
+        FROM bookings b
+        JOIN booking_details bd ON b.booking_id = bd.booking_id
+        WHERE YEAR(b.booking_date) = YEAR(CURDATE())
+          AND MONTH(b.booking_date) = MONTH(CURDATE());
+
+    ELSE
+        SELECT IFNULL(SUM(bd.subtotal), 0)
+          INTO rev
+        FROM bookings b
+        JOIN booking_details bd ON b.booking_id = bd.booking_id
+        WHERE YEAR(b.booking_date) = YEAR(CURDATE());
+    END IF;
+
+    RETURN rev;
+END $$
+
+DELIMITER ;
