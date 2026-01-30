@@ -150,6 +150,8 @@ INSERT INTO bookings (customer_id, booking_date, status) VALUES
 CREATE TABLE caregiver (
     caregiver_id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+	email VARCHAR(100),
     gender VARCHAR(10),
     years_experience INT DEFAULT 0,
     rating DECIMAL(2,1) DEFAULT 4.5,
@@ -158,26 +160,38 @@ CREATE TABLE caregiver (
 ) ENGINE=InnoDB;
 
 -- insert caregivers
-INSERT INTO caregiver (full_name, gender, years_experience, rating, description, photo_url)
+INSERT INTO caregiver (full_name, gender, years_experience, rating, description, photo_url, phone, email)
 VALUES
 ('Alice Tan', 'Female', 5, 4.7,
  'Experienced in personal hygiene care and mobility support.',
- 'https://randomuser.me/api/portraits/women/65.jpg'),
+ 'https://randomuser.me/api/portraits/women/65.jpg',
+ '91234567',
+ 'alice.tan@silvercare.com'),
 ('Benjamin Lee', 'Male', 7, 4.9,
  'Expert in medication management and senior care.',
- 'https://randomuser.me/api/portraits/men/32.jpg'),
+ 'https://randomuser.me/api/portraits/men/32.jpg',
+ '92345678',
+ 'benjamin.lee@silvercare.com'),
 ('Clara Lim', 'Female', 4, 4.6,
  'Strong background in dementia care and patient communication.',
- 'https://randomuser.me/api/portraits/women/44.jpg'),
+ 'https://randomuser.me/api/portraits/women/44.jpg',
+ '93456789',
+ 'clara.lim@silvercare.com'),
 ('David Wong', 'Male', 3, 4.3,
  'Friendly caregiver skilled in housekeeping and light chores.',
- 'https://randomuser.me/api/portraits/men/52.jpg'),
+ 'https://randomuser.me/api/portraits/men/52.jpg',
+ '94567890',
+ 'david.wong@silvercare.com'),
 ('Evelyn Koh', 'Female', 6, 4.8,
  'Specializes in meal prep tailored to dietary needs.',
- 'https://randomuser.me/api/portraits/women/78.jpg'),
+ 'https://randomuser.me/api/portraits/women/78.jpg',
+ '95678901',
+ 'evelyn.koh@silvercare.com'),
 ('Farah Noor', 'Female', 8, 4.9,
  'Experienced escort caregiver for outings & medical appointments.',
- 'https://randomuser.me/api/portraits/women/23.jpg');
+ 'https://randomuser.me/api/portraits/women/23.jpg',
+ '96789012',
+ 'farah.noor@silvercare.com');
 
 -- table: caregiver_user
 CREATE TABLE caregiver_user (
@@ -191,12 +205,15 @@ CREATE TABLE caregiver_user (
 ) ENGINE=InnoDB;
 
 -- insert caregiver login accounts
--- original password for cg1: password
--- original password for cg2: password
+-- password is password
 INSERT INTO caregiver_user (caregiver_id, username, password)
 VALUES
 (1, 'cg1', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'),
-(2, 'cg2', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8');
+(2, 'cg2', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'),
+(3, 'cg3', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'),
+(4, 'cg4', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'),
+(5, 'cg5', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'),
+(6, 'cg6', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8');
 
 -- BRIDGE TABLE: caregiver_service (allows multi-service caregivers)
 CREATE TABLE caregiver_service (
@@ -255,13 +272,46 @@ CREATE TABLE booking_details (
 
 -- insert booking details
 -- start_time and end_time seeded to match booking_date for current and future bookings
-INSERT INTO booking_details (booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
-VALUES
-(1, 1, 1, 1, NOW(), NOW() + INTERVAL 1 HOUR, 35.00, 'Wheelchair assistance needed', 2, NOW(), NULL),
-(1, 2, 2, 1, NOW(), NOW() + INTERVAL 30 MINUTE, 20.00, NULL, 1, NULL, NULL),
-(2, 6, 5, 1, NOW() + INTERVAL 1 DAY, NOW() + INTERVAL 1 DAY + INTERVAL 1 HOUR, 35.00, 'Low salt meal preferred', 1, NULL, NULL),
-(3, 8, 6, 1, NOW() + INTERVAL 3 DAY, NOW() + INTERVAL 3 DAY + INTERVAL 2 HOUR, 50.00, NULL, 1, NULL, NULL);
 
+INSERT INTO booking_details
+(booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
+VALUES
+(1, 1, 1, 1,
+ (SELECT booking_date FROM bookings WHERE booking_id=1),
+ (SELECT booking_date FROM bookings WHERE booking_id=1) + INTERVAL 1 HOUR,
+ 35.00, 'Wheelchair assistance needed', 2,
+ (SELECT booking_date FROM bookings WHERE booking_id=1), NULL),
+
+(1, 2, 2, 1,
+ (SELECT booking_date FROM bookings WHERE booking_id=1),
+ (SELECT booking_date FROM bookings WHERE booking_id=1) + INTERVAL 30 MINUTE,
+ 20.00, NULL, 1, NULL, NULL),
+
+(2, 6, 5, 1,
+ (SELECT booking_date FROM bookings WHERE booking_id=2),
+ (SELECT booking_date FROM bookings WHERE booking_id=2) + INTERVAL 1 HOUR,
+ 35.00, 'Low salt meal preferred', 1, NULL, NULL),
+
+(3, 8, 6, 1,
+ (SELECT booking_date FROM bookings WHERE booking_id=3),
+ (SELECT booking_date FROM bookings WHERE booking_id=3) + INTERVAL 2 HOUR,
+ 50.00, NULL, 1, NULL, NULL),
+
+(2, 4, NULL, 1,
+ (SELECT booking_date FROM bookings WHERE booking_id=2),
+ (SELECT booking_date FROM bookings WHERE booking_id=2) + INTERVAL 2 HOUR,
+ 50.00, 'Please bring cleaning supplies', 0, NULL, NULL),
+
+(3, 7, NULL, 1,
+ (SELECT booking_date FROM bookings WHERE booking_id=3),
+ (SELECT booking_date FROM bookings WHERE booking_id=3) + INTERVAL 1 HOUR,
+ 40.00, 'Client prefers Chinese speaking caregiver', 0, NULL, NULL),
+
+(1, 3, NULL, 1,
+ (SELECT booking_date FROM bookings WHERE booking_id=1),
+ (SELECT booking_date FROM bookings WHERE booking_id=1) + INTERVAL 45 MINUTE,
+ 30.00, 'Needs assistance to stand up safely', 0, NULL, NULL);
+ 
 -- table: feedback
 CREATE TABLE feedback (
     feedback_id INT AUTO_INCREMENT PRIMARY KEY,

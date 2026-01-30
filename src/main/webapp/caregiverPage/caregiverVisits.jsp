@@ -86,14 +86,21 @@ body { background:#f6f4ff; font-family:"Poppins",sans-serif; }
                     for (CaregiverVisit v : visits) {
                         LocalDate visitDate = v.getStartTime().toLocalDateTime().toLocalDate();
                         boolean isToday = visitDate.equals(today);
-
+                        
                         String badgeClass = "bg-secondary";
-                        String badgeText = "Pending";
-                        if (v.getCaregiverStatus() == 1) { badgeClass = "bg-success"; badgeText = "Checked In"; }
-                        else if (v.getCaregiverStatus() == 2) { badgeClass = "bg-dark"; badgeText = "Checked Out"; }
+                        String badgeText = "Not Assigned";
 
-                        boolean canCheckIn = isToday && v.getCaregiverStatus() == 0;
-                        boolean canCheckOut = isToday && v.getCaregiverStatus() == 1;
+                        switch (v.getCaregiverStatus()) {
+                            case 1: badgeClass = "bg-info text-dark"; badgeText = "Assigned"; break;
+                            case 2: badgeClass = "bg-warning text-dark"; badgeText = "Checked In"; break;
+                            case 3: badgeClass = "bg-dark"; badgeText = "Checked Out"; break;
+                            case 4: badgeClass = "bg-secondary"; badgeText = "Cancelled"; break;
+                            default: badgeClass = "bg-secondary"; badgeText = "Not Assigned"; break;
+                        }
+
+                        boolean canCheckIn = isToday && v.getCaregiverStatus() == 1;
+                        boolean canCheckOut = isToday && v.getCaregiverStatus() == 2;
+
                 %>
                     <tr>
                         <td>

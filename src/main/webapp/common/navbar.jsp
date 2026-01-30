@@ -39,8 +39,11 @@
             <a href="<%= request.getContextPath() %>/caregiver/home">
                 Caregiver Home
             </a>
+            <a href="<%=request.getContextPath()%>/caregiver/requests">
+                Service Requests
+            </a>
             <a href="<%= request.getContextPath() %>/caregiver/visits?filter=today" class="btn btn-purple">
-                Schedule
+                My Schedule
             </a>
             <a href="<%= request.getContextPath() %>/CaregiverLogoutServlet" class="btn btn-white">
                 Logout

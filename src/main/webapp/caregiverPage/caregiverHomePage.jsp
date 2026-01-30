@@ -37,11 +37,15 @@ body { background:#f6f4ff; font-family:"Poppins",sans-serif; }
         <span class="role-tag">Caregiver Portal</span>
         <h2 class="hero-title mt-3">Welcome, <%= caregiverName %>!</h2>
         <p class="hero-subtitle">
-            View your assigned visits and update attendance using check-in/check-out.
+            View service requests, accept assignments, and update attendance using check-in/check-out.
             Families will see real-time updates on their bookings.
         </p>
 
         <div class="mt-3 d-flex gap-2 flex-wrap">
+            <a class="btn btn-soft-primary" href="<%=request.getContextPath()%>/caregiver/requests">
+                View Service Requests
+            </a>
+
             <a class="btn btn-soft-primary" href="<%=request.getContextPath()%>/caregiver/visits?filter=today">
                 View My Schedule
             </a>
