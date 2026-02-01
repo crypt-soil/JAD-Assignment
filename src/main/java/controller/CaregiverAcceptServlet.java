@@ -27,12 +27,20 @@ public class CaregiverAcceptServlet extends HttpServlet {
         }
 
         int detailId = Integer.parseInt(request.getParameter("detailId"));
-
-        boolean ok = requestDAO.acceptRequest(detailId, caregiverId);
-        if (!ok) {
-            response.sendRedirect(request.getContextPath() + "/caregiver/requests?error=clash");
-            return;
+//        System.out.println("acceptRequest detailId=" + detailId + " caregiverId=" + caregiverId);
+        
+        boolean ok;
+        try {
+           ok = requestDAO.acceptRequest(detailId, caregiverId);
+        } catch (Exception e) {
+           response.sendRedirect(request.getContextPath() + "/caregiver/requests?error=db");
+           return;
         }
+        if (!ok) {
+           response.sendRedirect(request.getContextPath() + "/caregiver/requests?error=clash");
+           return;
+        }
+
         
         Integer customerId = new BookingDetailsStatusDAO().getCustomerIdByDetailId(detailId);
         if (customerId != null) {
