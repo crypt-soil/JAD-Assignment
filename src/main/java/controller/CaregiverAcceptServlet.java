@@ -6,7 +6,9 @@ import jakarta.servlet.*;
 
 import java.io.IOException;
 
+import model.BookingDetailsStatusDAO;
 import model.CaregiverRequestDAO;
+import model.NotificationDAO;
 
 @WebServlet("/caregiver/accept")
 public class CaregiverAcceptServlet extends HttpServlet {
@@ -26,7 +28,22 @@ public class CaregiverAcceptServlet extends HttpServlet {
 
         int detailId = Integer.parseInt(request.getParameter("detailId"));
 
-        requestDAO.acceptRequest(detailId, caregiverId);
+        boolean ok = requestDAO.acceptRequest(detailId, caregiverId);
+        if (!ok) {
+            response.sendRedirect(request.getContextPath() + "/caregiver/requests?error=clash");
+            return;
+        }
+        
+        Integer customerId = new BookingDetailsStatusDAO().getCustomerIdByDetailId(detailId);
+        if (customerId != null) {
+            new NotificationDAO().create(
+                customerId,
+                null,
+                detailId,
+                "Request accepted",
+                "A caregiver has accepted your booking request! You can view the booking details in your profile."
+            );
+        }
 
         response.sendRedirect(request.getContextPath() + "/caregiver/requests?filter=future");
     }

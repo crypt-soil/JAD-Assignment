@@ -64,8 +64,8 @@ public class ConfirmCheckoutServlet extends HttpServlet {
             // Insert booking_details
             String detailSql =
                 "INSERT INTO booking_details " +
-                "(booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                "(booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             psDetails = conn.prepareStatement(detailSql);
 
@@ -84,6 +84,8 @@ public class ConfirmCheckoutServlet extends HttpServlet {
                 psDetails.setDouble(7, lineSubtotal);
 
                 psDetails.setString(8, item.getSpecialRequest());
+                int status = (item.getCaregiverId() == null) ? 0 : 1; // 0=not_assigned, 1=assigned
+                psDetails.setInt(9, status);
 
                 psDetails.addBatch();
             }

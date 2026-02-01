@@ -7,6 +7,7 @@ import jakarta.servlet.*;
 import java.io.IOException;
 
 import model.BookingDetailsStatusDAO;
+import model.NotificationDAO;
 
 @WebServlet("/caregiver/checkout")
 public class CaregiverCheckOutServlet extends HttpServlet {
@@ -24,7 +25,35 @@ public class CaregiverCheckOutServlet extends HttpServlet {
         }
 
         int detailId = Integer.parseInt(request.getParameter("detailId"));
-        dao.checkOut(detailId, caregiverId);
+        boolean ok = dao.checkOut(detailId, caregiverId);
+
+        if (ok) {
+            Integer customerId = dao.getCustomerIdByDetailId(detailId);
+            if (customerId != null) {
+
+                String[] info = dao.getBookingInfoByDetailId(detailId);
+                String bookingIdStr = (info != null) ? info[0] : null;
+                String serviceName = (info != null) ? info[1] : null;
+
+                String title = "Caregiver checked out!";
+                String message;
+
+                if (bookingIdStr != null && serviceName != null) {
+                    message = "Caregiver has checked out for " + serviceName +
+                              " (Booking #" + bookingIdStr + "). " +
+                              "If this is not right please contact us at 97735798.";
+                } else {
+                    message = "Caregiver has checked out! If this is not right please contact us at 97735798.";
+                }
+
+                Integer bookingId = null;
+                if (bookingIdStr != null) {
+                    try { bookingId = Integer.parseInt(bookingIdStr); } catch (Exception ignore) {}
+                }
+
+                new NotificationDAO().create(customerId, bookingId, detailId, title, message);
+            }
+        }
 
         response.sendRedirect(request.getContextPath() + "/caregiver/visits?filter=today");
     }

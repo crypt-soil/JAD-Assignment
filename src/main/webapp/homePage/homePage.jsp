@@ -5,8 +5,9 @@
 <%@ page import="java.util.List"%>
 <%@ page import="model.Category"%>
 <%
-    String username = (String) session.getAttribute("username");
-    if (username == null) username = "User";
+String username = (String) session.getAttribute("username");
+if (username == null)
+	username = "User";
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -308,20 +309,19 @@ body {
 	session.removeAttribute("loginMessage"); // remove so it won’t show again
 	}
 	%>
-	
+
 	<%
-		String checkoutMsg = (String) session.getAttribute("checkoutSuccessMessage");
-		if (checkoutMsg != null) {
-		%>
-		    <div class="alert alert-success text-center mt-3" role="alert">
-		        <h5 class="mb-0"><%= checkoutMsg %></h5>
-		    </div>
-		<%
-		    // remove so it only shows once
-		    session.removeAttribute("checkoutSuccessMessage");
-		}
+	String checkoutMsg = (String) session.getAttribute("checkoutSuccessMessage");
+	if (checkoutMsg != null) {
 	%>
-	
+	<div class="alert alert-success text-center mt-3" role="alert">
+		<h5 class="mb-0"><%=checkoutMsg%></h5>
+	</div>
+	<%
+	// remove so it only shows once
+	session.removeAttribute("checkoutSuccessMessage");
+	}
+	%>
 
 	<div class="home-wrapper">
 
@@ -760,5 +760,9 @@ body {
 	</div>
 	<!-- /home-wrapper -->
 	<%@ include file="../common/footer.jsp"%>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

@@ -38,7 +38,7 @@
     int quantity = 1;
     java.sql.Timestamp startTime = null;
     java.sql.Timestamp endTime = null;
-    String specialRequest = "";  
+    String specialRequest = "";
     Integer existingCaregiverId = null;
 
     // caregiver list
@@ -83,19 +83,44 @@
             serviceDesc = rs.getString("description");
             unitPrice = rs.getDouble("price");
             specialRequest = rs.getString("special_request");
-            existingCaregiverId = rs.getInt("caregiver_id"); 
+
+            // caregiver_id can be NULL; rs.getInt returns 0 when NULL
+            Object cgObj = rs.getObject("caregiver_id");
+            existingCaregiverId = (cgObj == null) ? null : ((Number) cgObj).intValue();
         }
 
         rs.close();
         ps.close();
 
         // load caregivers for this service using bridge table (many to many relationship)
-        String cgSql = "SELECT c.caregiver_id, c.full_name, c.rating " +
-        	    "FROM caregiver c " +
-        	    "JOIN caregiver_service cs ON c.caregiver_id = cs.caregiver_id " +
-        	    "WHERE cs.service_id = ?";
+        // if start_time and end_time exist, filter out caregivers with time conflicts
+        String cgSql =
+            "SELECT c.caregiver_id, c.full_name, c.rating " +
+            "FROM caregiver c " +
+            "JOIN caregiver_service cs ON c.caregiver_id = cs.caregiver_id " +
+            "WHERE cs.service_id = ? " +
+            "  AND ( ? IS NULL OR ? IS NULL OR NOT EXISTS ( " +
+            "      SELECT 1 " +
+            "      FROM booking_details bd " +
+            "      JOIN bookings b ON b.booking_id = bd.booking_id " +
+            "      WHERE bd.caregiver_id = c.caregiver_id " +
+            "        AND b.status = 2 " +           
+            "        AND bd.caregiver_status IN (1,2) " +
+            "        AND bd.start_time < ? " +
+            "        AND bd.end_time > ? " +
+            "  ))";
+
         ps = conn.prepareStatement(cgSql);
         ps.setInt(1, serviceId);
+
+        // allow listing all if start/end not set
+        ps.setTimestamp(2, startTime);
+        ps.setTimestamp(3, endTime);
+
+        // overlap check params (newEnd, newStart)
+        ps.setTimestamp(4, endTime);
+        ps.setTimestamp(5, startTime);
+
         rs = ps.executeQuery();
 
         while (rs.next()) {
@@ -115,7 +140,7 @@
             String qtyParam = request.getParameter("quantity");
             String startParam = request.getParameter("startDateTime");
             String endParam = request.getParameter("endDateTime");
-            String caregiverParam = request.getParameter("caregiver_id"); 
+            String caregiverParam = request.getParameter("caregiver_id");
             String specialParam = request.getParameter("special_request");
 
             if (specialParam != null) specialRequest = specialParam;
@@ -172,25 +197,56 @@
 
                     } else {
 
-                        String updateSql =
-                            "UPDATE cart_items SET quantity = ?, start_time = ?, end_time = ?, caregiver_id = ?, special_request = ? WHERE item_id = ?";
+                        // caregiver availability check (only if caregiver is selected)
+                        if (caregiverId != null) {
+                            String cgOverlapSql =
+                                "SELECT 1 " +
+                                "FROM booking_details bd " +
+                                "JOIN bookings b ON b.booking_id = bd.booking_id " +
+                                "WHERE bd.caregiver_id = ? " +
+                                "  AND b.status = 2 " +              // changed line (only confirmed blocks acceptance)
+                                "  AND bd.caregiver_status IN (1,2) " +
+                                "  AND bd.start_time < ? " +
+                                "  AND bd.end_time > ? " +
+                                "LIMIT 1";
 
-                        ps = conn.prepareStatement(updateSql);
-                        ps.setInt(1, quantity);
-                        ps.setTimestamp(2, newStart);
-                        ps.setTimestamp(3, newEnd);
+                            ps = conn.prepareStatement(cgOverlapSql);
+                            ps.setInt(1, caregiverId);
+                            ps.setTimestamp(2, newEnd);
+                            ps.setTimestamp(3, newStart);
+                            rs = ps.executeQuery();
 
-                        if (caregiverId != null) ps.setInt(4, caregiverId);
-                        else ps.setNull(4, java.sql.Types.INTEGER);
+                            boolean caregiverBusy = rs.next();
+                            rs.close();
+                            ps.close();
 
-                        ps.setString(5, specialRequest); 
-                        ps.setInt(6, itemId);
+                            if (caregiverBusy) {
+                                errorMsg = "Selected caregiver is not available during this time. Please choose another caregiver or time.";
+                            }
+                        }
 
-                        ps.executeUpdate();
-                        ps.close();
+                        // proceed to update only if no errorMsg
+                        if (errorMsg == null) {
+                            String updateSql =
+                                "UPDATE cart_items SET quantity = ?, start_time = ?, end_time = ?, caregiver_id = ?, special_request = ? WHERE item_id = ?";
 
-                        response.sendRedirect(request.getContextPath() + "/cartPage/cartPage.jsp");
-                        return;
+                            ps = conn.prepareStatement(updateSql);
+                            ps.setInt(1, quantity);
+                            ps.setTimestamp(2, newStart);
+                            ps.setTimestamp(3, newEnd);
+
+                            if (caregiverId != null) ps.setInt(4, caregiverId);
+                            else ps.setNull(4, java.sql.Types.INTEGER);
+
+                            ps.setString(5, specialRequest);
+                            ps.setInt(6, itemId);
+
+                            ps.executeUpdate();
+                            ps.close();
+
+                            response.sendRedirect(request.getContextPath() + "/cartPage/cartPage.jsp");
+                            return;
+                        }
                     }
 
                     startTime = newStart;

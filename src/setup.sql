@@ -256,7 +256,7 @@ CREATE TABLE booking_details (
     end_time DATETIME,
     subtotal DECIMAL(10,2),
     special_request VARCHAR(255) NULL,
-    caregiver_status TINYINT NOT NULL DEFAULT 1,   -- 0=not_assigned, 1=assigned, 2=checked_in, 3=checked_out, 4=cancelled
+    caregiver_status TINYINT NOT NULL DEFAULT 0,   -- 0=not_assigned, 1=assigned, 2=checked_in, 3=checked_out, 4=cancelled
     check_in_at DATETIME NULL,
     check_out_at DATETIME NULL,
     FOREIGN KEY (booking_id) REFERENCES bookings(booking_id)
@@ -380,6 +380,24 @@ INSERT INTO cart_items (cart_id, service_id, caregiver_id, quantity, start_time,
 VALUES
 (1, 4, 4, 1, NOW() + INTERVAL 2 DAY, NOW() + INTERVAL 2 DAY + INTERVAL 2 HOUR, 'Light housekeeping', 1),
 (1, 1, 1, 1, NOW() + INTERVAL 5 DAY, NOW() + INTERVAL 5 DAY + INTERVAL 1 HOUR, 'Shower chair requested', 1);
+
+CREATE TABLE notifications (
+  notification_id INT AUTO_INCREMENT PRIMARY KEY,
+  customer_id INT NOT NULL,
+  booking_id INT NULL,
+  detail_id INT NULL,
+  title VARCHAR(120) NOT NULL,
+  message VARCHAR(500) NOT NULL,
+  is_read TINYINT NOT NULL DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  INDEX idx_customer_unread (customer_id, is_read, created_at),
+
+  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
 
 -- drop existing procedures and function if any
 DROP PROCEDURE IF EXISTS sp_total_users;
