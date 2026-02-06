@@ -30,24 +30,26 @@ public class CaregiverCheckInServlet extends HttpServlet {
 			Integer customerId = dao.getCustomerIdByDetailId(detailId);
 			if (customerId != null) {
 				String[] info = dao.getBookingInfoByDetailId(detailId);
-		        String bookingIdStr = (info != null) ? info[0] : null;
-		        String serviceName = (info != null) ? info[1] : null;
-		        String title = "Caregiver checked in!";
-		        String message;
-		        if (bookingIdStr != null && serviceName != null) {
-		            message = "Caregiver has checked in for " + serviceName +
-		                      " (Booking #" + bookingIdStr + "). " +
-		                      "If this is not right please contact us at 97735798.";
-		        } else {
-		            message = "Caregiver has checked in! If this is not right please contact us at 97735798.";
-		        }
-		        
-		        Integer bookingId = null;
-		        if (bookingIdStr != null) {
-		            try { bookingId = Integer.parseInt(bookingIdStr); } catch (Exception ignore) {}
-		        }
-		        
-		        new NotificationDAO().create(customerId, bookingId, detailId, title, message);
+				String bookingIdStr = (info != null) ? info[0] : null;
+				String serviceName = (info != null) ? info[1] : null;
+				String title = "Caregiver checked in!";
+				String message;
+				if (bookingIdStr != null && serviceName != null) {
+					message = "Caregiver has checked in for " + serviceName + " (Booking #" + bookingIdStr + "). "
+							+ "If this is not right please contact us at 97735798.";
+				} else {
+					message = "Caregiver has checked in! If this is not right please contact us at 97735798.";
+				}
+
+				Integer bookingId = null;
+				if (bookingIdStr != null) {
+					try {
+						bookingId = Integer.parseInt(bookingIdStr);
+					} catch (Exception ignore) {
+					}
+				}
+
+				new NotificationDAO().create(customerId, bookingId, detailId, title, message);
 			}
 		}
 

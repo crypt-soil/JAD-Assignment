@@ -1,86 +1,87 @@
 package model;
+
 import java.sql.*;
 
 public class UserDAO {
 
-    // Check customers table
-    public boolean validateMember(String username, String password) {
-    	System.out.println(username);
-        boolean isValid = false;
+	// Check customers table
+	public boolean validateMember(String username, String password) {
+		System.out.println(username);
+		boolean isValid = false;
 
-        try (Connection conn = DBConnection.getConnection()) {
-            registerModel rm = new registerModel();
-            String hashedPassword = rm.hashPassword(password);
+		try (Connection conn = DBConnection.getConnection()) {
+			registerModel rm = new registerModel();
+			String hashedPassword = rm.hashPassword(password);
 
-            String sql = "SELECT * FROM customers WHERE (username = ? OR email = ?) AND password = ?";
-            PreparedStatement stmt = conn.prepareStatement(sql);
+			String sql = "SELECT * FROM customers WHERE (username = ? OR email = ?) AND password = ?";
+			PreparedStatement stmt = conn.prepareStatement(sql);
 
-            stmt.setString(1, username);
-            stmt.setString(2, username);
-            stmt.setString(3, hashedPassword);
+			stmt.setString(1, username);
+			stmt.setString(2, username);
+			stmt.setString(3, hashedPassword);
 //            System.out.println("DEBUG HASH: " + hashedPassword);
 
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                isValid = true;
-            }
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+				isValid = true;
+			}
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-        return isValid;
-    }
+		return isValid;
+	}
 
-    // Check admin table
-    public boolean validateAdmin(String username, String password) {
-        boolean isValid = false;
+	// Check admin table
+	public boolean validateAdmin(String username, String password) {
+		boolean isValid = false;
 
-        try (Connection conn = DBConnection.getConnection()) {
-            registerModel rm = new registerModel();
-            String hashedPassword = rm.hashPassword(password);
+		try (Connection conn = DBConnection.getConnection()) {
+			registerModel rm = new registerModel();
+			String hashedPassword = rm.hashPassword(password);
 
-            String sql = "SELECT * FROM admin_user WHERE (username = ? OR email = ?) AND password = ?";
-            PreparedStatement stmt = conn.prepareStatement(sql);
+			String sql = "SELECT * FROM admin_user WHERE (username = ? OR email = ?) AND password = ?";
+			PreparedStatement stmt = conn.prepareStatement(sql);
 
-            stmt.setString(1, username);
-            stmt.setString(2, username);
-            stmt.setString(3, hashedPassword);
+			stmt.setString(1, username);
+			stmt.setString(2, username);
+			stmt.setString(3, hashedPassword);
 
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                isValid = true;
-            }
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+				isValid = true;
+			}
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-        return isValid;
-    }
-    
-    // to get customer_id for profile page 
-    public Integer getCustomerId(String username) {
-        Integer id = null;
+		return isValid;
+	}
 
-        try (Connection conn = DBConnection.getConnection()) {
-            String sql = "SELECT customer_id FROM customers WHERE username = ? OR email = ?";
-            PreparedStatement stmt = conn.prepareStatement(sql);
+	// to get customer_id for profile page
+	public Integer getCustomerId(String username) {
+		Integer id = null;
 
-            stmt.setString(1, username);
-            stmt.setString(2, username);
+		try (Connection conn = DBConnection.getConnection()) {
+			String sql = "SELECT customer_id FROM customers WHERE username = ? OR email = ?";
+			PreparedStatement stmt = conn.prepareStatement(sql);
 
-            ResultSet rs = stmt.executeQuery();
+			stmt.setString(1, username);
+			stmt.setString(2, username);
 
-            if (rs.next()) {
-                id = rs.getInt("customer_id");
-            }
+			ResultSet rs = stmt.executeQuery();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+			if (rs.next()) {
+				id = rs.getInt("customer_id");
+			}
 
-        return id;
-    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return id;
+	}
 
 }

@@ -33,8 +33,9 @@ if ("true".equals(timedOut)) {
 		<%
 		if ("admin".equals(role)) {
 		%>
-
-		<a href="<%=request.getContextPath()%>/admin/management"
+		<a href="<%=request.getContextPath()%>/admin/appointments"
+			class="btn btn-white"> Appointment Management </a> <a
+			href="<%=request.getContextPath()%>/admin/management"
 			class="btn btn-white"> Management Overview </a> <a
 			href="<%=request.getContextPath()%>/adminPage/analyticsDashboard.jsp"
 			class="btn btn-white"> Analytics Dashboard </a> <a

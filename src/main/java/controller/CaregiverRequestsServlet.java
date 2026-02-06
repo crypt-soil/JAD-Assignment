@@ -13,26 +13,26 @@ import model.CaregiverVisit;
 
 @WebServlet("/caregiver/requests")
 public class CaregiverRequestsServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private final CaregiverRequestDAO requestDAO = new CaregiverRequestDAO();
-    private final CaregiverDAO caregiverDAO = new CaregiverDAO();
+	private final CaregiverRequestDAO requestDAO = new CaregiverRequestDAO();
+	private final CaregiverDAO caregiverDAO = new CaregiverDAO();
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        Integer caregiverId = (Integer) request.getSession().getAttribute("caregiver_id");
-        if (caregiverId == null) {
-            response.sendRedirect(request.getContextPath() + "/loginPage/login.jsp");
-            return;
-        }
+		Integer caregiverId = (Integer) request.getSession().getAttribute("caregiver_id");
+		if (caregiverId == null) {
+			response.sendRedirect(request.getContextPath() + "/loginPage/login.jsp");
+			return;
+		}
 
-        List<CaregiverVisit> requests = requestDAO.getOpenRequests(caregiverId);
+		List<CaregiverVisit> requests = requestDAO.getOpenRequests(caregiverId);
 
-        request.setAttribute("requests", requests);
-        request.setAttribute("caregiverName", caregiverDAO.getCaregiverNameById(caregiverId));
+		request.setAttribute("requests", requests);
+		request.setAttribute("caregiverName", caregiverDAO.getCaregiverNameById(caregiverId));
 
-        request.getRequestDispatcher("/caregiverPage/caregiverRequests.jsp").forward(request, response);
-    }
+		request.getRequestDispatcher("/caregiverPage/caregiverRequests.jsp").forward(request, response);
+	}
 }

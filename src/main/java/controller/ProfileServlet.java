@@ -15,31 +15,30 @@ import model.Profile;
 public class ProfileServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+		HttpSession session = request.getSession(false);
+		Integer customerId = (session != null) ? (Integer) session.getAttribute("customer_id") : null;
+		System.out.println(customerId);
+		// redirect to home page if not logged in
+		if (customerId == null) {
+			response.sendRedirect(request.getContextPath() + "/categories");
+			return;
+		}
 
-        HttpSession session = request.getSession(false);
-        Integer customerId = (session != null) ? (Integer) session.getAttribute("customer_id") : null;
-        System.out.println(customerId);
-        // redirect to home page if not logged in
-        if (customerId == null) {
-            response.sendRedirect(request.getContextPath() + "/categories");
-            return;	
-        }
-        
-        // profile info
-        ProfileDAO dao = new ProfileDAO();
-        Profile profile = dao.getProfileById(customerId);
-        
-        request.setAttribute("profile", profile);
-        
-        // bookings info
-        BookingDAO bookingDAO = new BookingDAO();
-        List<Booking> bookings = bookingDAO.getBookingsByCustomerId(customerId);
-        request.setAttribute("bookings", bookings);
-        
-        RequestDispatcher rd = request.getRequestDispatcher("/profilePage/profilePage.jsp");
-        rd.forward(request, response);
-    }
+		// profile info
+		ProfileDAO dao = new ProfileDAO();
+		Profile profile = dao.getProfileById(customerId);
+
+		request.setAttribute("profile", profile);
+
+		// bookings info
+		BookingDAO bookingDAO = new BookingDAO();
+		List<Booking> bookings = bookingDAO.getBookingsByCustomerId(customerId);
+		request.setAttribute("bookings", bookings);
+
+		RequestDispatcher rd = request.getRequestDispatcher("/profilePage/profilePage.jsp");
+		rd.forward(request, response);
+	}
 }

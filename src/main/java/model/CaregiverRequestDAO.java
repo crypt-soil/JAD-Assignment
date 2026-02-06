@@ -54,78 +54,68 @@ public class CaregiverRequestDAO {
 
 	// Accept = assign caregiver to this booking detail (only if still open)
 	public boolean acceptRequest(int detailId, int caregiverId) {
-	    Timestamp startTime = null;
-	    Timestamp endTime = null;
+		Timestamp startTime = null;
+		Timestamp endTime = null;
 
-	    String timeSql = "SELECT start_time, end_time FROM booking_details WHERE detail_id = ?";
-	    
-	    String conflictCheckSql = "SELECT COUNT(*) as conflict_count "
-	            + "FROM booking_details bd2 "
-	            + "JOIN bookings b2 ON b2.booking_id = bd2.booking_id "
-	            + "WHERE bd2.caregiver_id = ? "
-	            + "  AND b2.status = 2 "
-	            + "  AND bd2.caregiver_status IN (1,2) "
-	            + "  AND bd2.start_time < ? "
-	            + "  AND bd2.end_time > ?";
-	    
-	    String updateSql = "UPDATE booking_details bd "
-	            + "JOIN bookings b ON b.booking_id = bd.booking_id "
-	            + "SET bd.caregiver_id = ?, "
-	            + "    bd.caregiver_status = 1, "
-	            + "    bd.check_in_at = NULL, "
-	            + "    bd.check_out_at = NULL "
-	            + "WHERE bd.detail_id = ? "
-	            + "  AND b.status = 2 "
-	            + "  AND bd.caregiver_id IS NULL "
-	            + "  AND bd.caregiver_status = 0";
+		String timeSql = "SELECT start_time, end_time FROM booking_details WHERE detail_id = ?";
 
-	    try (Connection conn = DBConnection.getConnection()) {
-	        // Get the time slot
-	        try (PreparedStatement ps1 = conn.prepareStatement(timeSql)) {
-	            ps1.setInt(1, detailId);
-	            try (ResultSet rs = ps1.executeQuery()) {
-	                if (rs.next()) {
-	                    startTime = rs.getTimestamp("start_time");
-	                    endTime = rs.getTimestamp("end_time");
-	                }
-	            }
-	        }
+		String conflictCheckSql = "SELECT COUNT(*) as conflict_count " + "FROM booking_details bd2 "
+				+ "JOIN bookings b2 ON b2.booking_id = bd2.booking_id " + "WHERE bd2.caregiver_id = ? "
+				+ "  AND b2.status = 2 " + "  AND bd2.caregiver_status IN (1,2) " + "  AND bd2.start_time < ? "
+				+ "  AND bd2.end_time > ?";
 
-	        if (startTime == null || endTime == null) {
-	            return false;
-	        }
+		String updateSql = "UPDATE booking_details bd " + "JOIN bookings b ON b.booking_id = bd.booking_id "
+				+ "SET bd.caregiver_id = ?, " + "    bd.caregiver_status = 1, " + "    bd.check_in_at = NULL, "
+				+ "    bd.check_out_at = NULL " + "WHERE bd.detail_id = ? " + "  AND b.status = 2 "
+				+ "  AND bd.caregiver_id IS NULL " + "  AND bd.caregiver_status = 0";
 
-	        // Check for conflicts
-	        boolean hasConflict = false;
-	        try (PreparedStatement ps2 = conn.prepareStatement(conflictCheckSql)) {
-	            ps2.setInt(1, caregiverId);
-	            ps2.setTimestamp(2, endTime);
-	            ps2.setTimestamp(3, startTime);
-	            
-	            try (ResultSet rs = ps2.executeQuery()) {
-	                if (rs.next() && rs.getInt("conflict_count") > 0) {
-	                    hasConflict = true;
-	                }
-	            }
-	        }
+		try (Connection conn = DBConnection.getConnection()) {
+			// Get the time slot
+			try (PreparedStatement ps1 = conn.prepareStatement(timeSql)) {
+				ps1.setInt(1, detailId);
+				try (ResultSet rs = ps1.executeQuery()) {
+					if (rs.next()) {
+						startTime = rs.getTimestamp("start_time");
+						endTime = rs.getTimestamp("end_time");
+					}
+				}
+			}
 
-	        if (hasConflict) {
-	            return false; // Conflict found, cannot accept
-	        }
+			if (startTime == null || endTime == null) {
+				return false;
+			}
 
-	        // Perform the update
-	        try (PreparedStatement ps3 = conn.prepareStatement(updateSql)) {
-	            ps3.setInt(1, caregiverId);
-	            ps3.setInt(2, detailId);
-	            
-	            return ps3.executeUpdate() > 0;
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return false;
-	    }
+			// Check for conflicts
+			boolean hasConflict = false;
+			try (PreparedStatement ps2 = conn.prepareStatement(conflictCheckSql)) {
+				ps2.setInt(1, caregiverId);
+				ps2.setTimestamp(2, endTime);
+				ps2.setTimestamp(3, startTime);
+
+				try (ResultSet rs = ps2.executeQuery()) {
+					if (rs.next() && rs.getInt("conflict_count") > 0) {
+						hasConflict = true;
+					}
+				}
+			}
+
+			if (hasConflict) {
+				return false; // Conflict found, cannot accept
+			}
+
+			// Perform the update
+			try (PreparedStatement ps3 = conn.prepareStatement(updateSql)) {
+				ps3.setInt(1, caregiverId);
+				ps3.setInt(2, detailId);
+
+				return ps3.executeUpdate() > 0;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
-	
+
 	// Useful for customer notification: who owns this booking detail?
 	public Integer getCustomerIdByDetailId(int detailId) {
 		String sql = "SELECT b.customer_id " + "FROM booking_details bd "
