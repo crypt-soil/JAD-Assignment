@@ -69,16 +69,20 @@ public class ProfileDAO {
 	}
 
 	public void clearField(int id, String field) {
+		String allowed = switch (field) {
+		case "email", "phone", "address", "zipcode", "full_name" -> field;
+		default -> null;
+		};
+		if (allowed == null)
+			return;
+
 		try {
 			Connection conn = DBConnection.getConnection();
-
-			String sql = "UPDATE customers SET " + field + " = NULL WHERE customer_id=?";
+			String sql = "UPDATE customers SET " + allowed + " = NULL WHERE customer_id=?";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setInt(1, id);
-
 			ps.executeUpdate();
 			conn.close();
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

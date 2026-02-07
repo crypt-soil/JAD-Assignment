@@ -11,34 +11,48 @@ import model.Booking;
 import model.BookingDAO;
 import model.Profile;
 
+import model.MedicalInfo;
+import model.MedicalInfoDAO;
+import model.EmergencyContact;
+import model.EmergencyContactDAO;
+
 @WebServlet("/profile")
 public class ProfileServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-		HttpSession session = request.getSession(false);
-		Integer customerId = (session != null) ? (Integer) session.getAttribute("customer_id") : null;
-		System.out.println(customerId);
-		// redirect to home page if not logged in
-		if (customerId == null) {
-			response.sendRedirect(request.getContextPath() + "/categories");
-			return;
-		}
+        HttpSession session = request.getSession(false);
+        Integer customerId = (session != null) ? (Integer) session.getAttribute("customer_id") : null;
 
-		// profile info
-		ProfileDAO dao = new ProfileDAO();
-		Profile profile = dao.getProfileById(customerId);
+        // redirect if not logged in
+        if (customerId == null) {
+            response.sendRedirect(request.getContextPath() + "/categories");
+            return;
+        }
 
-		request.setAttribute("profile", profile);
+        // profile info
+        ProfileDAO dao = new ProfileDAO();
+        Profile profile = dao.getProfileById(customerId);
+        request.setAttribute("profile", profile);
 
-		// bookings info
-		BookingDAO bookingDAO = new BookingDAO();
-		List<Booking> bookings = bookingDAO.getBookingsByCustomerId(customerId);
-		request.setAttribute("bookings", bookings);
+        // bookings info
+        BookingDAO bookingDAO = new BookingDAO();
+        List<Booking> bookings = bookingDAO.getBookingsByCustomerId(customerId);
+        request.setAttribute("bookings", bookings);
 
-		RequestDispatcher rd = request.getRequestDispatcher("/profilePage/profilePage.jsp");
-		rd.forward(request, response);
-	}
+        // medical info
+        MedicalInfoDAO medicalDAO = new MedicalInfoDAO();
+        MedicalInfo medicalInfo = medicalDAO.getByCustomerId(customerId);
+        request.setAttribute("medicalInfo", medicalInfo);
+
+        // emergency contacts
+        EmergencyContactDAO ecDAO = new EmergencyContactDAO();
+        List<EmergencyContact> emergencyContacts = ecDAO.getByCustomerId(customerId);
+        request.setAttribute("emergencyContacts", emergencyContacts);
+
+        RequestDispatcher rd = request.getRequestDispatcher("/profilePage/profilePage.jsp");
+        rd.forward(request, response);
+    }
 }

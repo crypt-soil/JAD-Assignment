@@ -3,17 +3,22 @@ DROP DATABASE IF EXISTS silvercare;
 CREATE DATABASE IF NOT EXISTS silvercare;
 USE silvercare;
 
+
+
+
+
 -- table: customers
 CREATE TABLE customers (
     customer_id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,      -- ensure unique login
-    password VARCHAR(255) NOT NULL,            -- remember to hash (e.g. sha-256, bcrypt)
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
     full_name VARCHAR(100),
-    email VARCHAR(100) UNIQUE,                 -- for password recovery & notifications
+    email VARCHAR(100) UNIQUE,
     phone VARCHAR(20),
     address VARCHAR(255),
     zipcode VARCHAR(10)
 ) ENGINE=InnoDB;
+
 
 -- insert 1 dummy customer for fk and analytics
 -- original password for testuser: password
@@ -25,8 +30,41 @@ VALUES (
     'testuser@example.com',
     '90000000',
     '123 test street',
-    '123456'
+    '123456',
 );
+
+-- 1 row per customer (simple)
+CREATE TABLE customer_medical_info (
+    medical_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL UNIQUE,
+    medical_info TEXT NULL,                  -- asthma, diabetes, allergies, care notes
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- allow multiple contacts per customer
+CREATE TABLE emergency_contacts (
+    contact_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    contact_name VARCHAR(100) NOT NULL,
+    relationship VARCHAR(50) NULL,
+    phone VARCHAR(20) NOT NULL,
+    email VARCHAR(100) NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+
+INSERT INTO customer_medical_info (customer_id, medical_info)
+VALUES (1, 'Asthma');
+
+INSERT INTO emergency_contacts (customer_id, contact_name, relationship, phone)
+VALUES
+(1, 'Mum Tan', 'Mother', '91234567'),
+(1, 'Dad Tan', 'Father', '98765432');
+
 
 -- table: service_category
 CREATE TABLE service_category (
