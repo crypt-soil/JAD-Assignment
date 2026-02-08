@@ -48,12 +48,15 @@ if ("true".equals(timedOut)) {
 		%>
 
 		<a href="<%=request.getContextPath()%>/caregiver/home">Caregiver
-			Home</a> <a href="<%=request.getContextPath()%>/caregiver/requests">Service
-			Requests</a> <a
+			Home</a> <a href="<%=request.getContextPath()%>/caregiver/requests">
+			Service Requests </a> <a
 			href="<%=request.getContextPath()%>/caregiver/visits?filter=today"
 			class="btn btn-purple"> My Schedule </a> <a
+			href="<%=request.getContextPath()%>/caregiverProfile"
+			class="btn btn-purple"> My Profile </a> <a
 			href="<%=request.getContextPath()%>/CaregiverLogoutServlet"
 			class="btn btn-white"> Logout </a>
+
 
 		<%-- ================= MEMBER ================= --%>
 		<%

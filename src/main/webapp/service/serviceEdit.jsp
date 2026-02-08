@@ -107,7 +107,9 @@ body {
                  EDIT SERVICE FORM
                  Sends update request to /service
                  ============================ -->
-			<form action="<%=request.getContextPath()%>/service" method="post">
+			<form action="<%=request.getContextPath()%>/service" method="post"
+				enctype="multipart/form-data">
+
 
 				<!-- Hidden fields needed by servlet -->
 				<input type="hidden" name="action" value="update"> <input
@@ -134,12 +136,37 @@ body {
 						value="<%=s.getPrice()%>" required>
 				</div>
 
-				<!-- IMAGE URL -->
+				<!-- IMAGE (Preview + URL + Upload) -->
 				<div class="mb-3">
-					<label class="form-label label-text">Image URL</label> <input
-						type="text" name="imageUrl" class="form-control"
-						value="<%=s.getImageUrl()%>">
+					<label class="form-label label-text">Current Image</label><br>
+					<%
+					String img = s.getImageUrl();
+					String preview;
+					if (img == null || img.trim().isEmpty())
+						preview = "https://via.placeholder.com/400x300";
+					else if (img.startsWith("http"))
+						preview = img;
+					else
+						preview = request.getContextPath() + "/" + img;
+					%>
+					<img src="<%=preview%>"
+						style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px; border: 1px solid #eee;">
 				</div>
+
+				<div class="mb-3">
+					<label class="form-label label-text">Image URL (optional)</label> <input
+						type="text" name="imageUrl" class="form-control"
+						value="<%=(s.getImageUrl() == null ? "" : s.getImageUrl())%>">
+					<div class="form-text">Uploading a new image will override
+						this value.</div>
+				</div>
+
+				<div class="mb-3">
+					<label class="form-label label-text">Upload New Image
+						(optional)</label> <input type="file" name="serviceImage"
+						class="form-control" accept="image/*">
+				</div>
+
 
 				<!-- ACTION BUTTONS -->
 				<div class="mt-4">

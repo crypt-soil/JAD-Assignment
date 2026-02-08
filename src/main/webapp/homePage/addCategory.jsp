@@ -89,7 +89,6 @@ body {
 
 	<!-- ============================
          NAVBAR INCLUDE
-         Loads the shared navigation bar
          ============================ -->
 	<%@ include file="../common/navbar.jsp"%>
 
@@ -103,9 +102,10 @@ body {
 
 			<!-- ==================================================
                  CATEGORY CREATE FORM
-                 Sends POST request to /categories
+                 IMPORTANT: multipart/form-data for file uploads
                  ================================================== -->
-			<form action="<%=request.getContextPath()%>/categories" method="post">
+			<form action="<%=request.getContextPath()%>/categories" method="post"
+				enctype="multipart/form-data">
 
 				<!-- Hidden fields to tell servlet what action to perform -->
 				<input type="hidden" name="action" value="create">
@@ -117,19 +117,31 @@ body {
 				<!-- CATEGORY NAME -->
 				<div class="mb-3">
 					<label class="form-label label-text">Category Name</label> <input
-						type="text" name="name" class="form-control" required>
+						type="text" name="name" class="form-control"
+						placeholder="e.g. Home Care" required>
 				</div>
 
 				<!-- DESCRIPTION -->
 				<div class="mb-3">
 					<label class="form-label label-text">Description</label>
-					<textarea name="description" class="form-control" rows="4" required></textarea>
+					<textarea name="description" class="form-control" rows="4"
+						placeholder="Describe this category..." required></textarea>
 				</div>
 
-				<!-- IMAGE URL -->
+				<!-- IMAGE URL (Optional) -->
 				<div class="mb-3">
-					<label class="form-label label-text">Image URL</label> <input
-						type="text" name="imageUrl" class="form-control">
+					<label class="form-label label-text">Image URL (optional)</label> <input
+						type="text" name="imageUrl" class="form-control"
+						placeholder="https://...">
+					<div class="form-text">If you upload an image below, it will
+						override this URL.</div>
+				</div>
+
+				<!-- IMAGE UPLOAD (Optional) -->
+				<div class="mb-3">
+					<label class="form-label label-text">Upload Image
+						(optional)</label> <input type="file" name="categoryImage"
+						class="form-control" accept="image/*">
 				</div>
 
 				<!-- BUTTONS -->
@@ -150,7 +162,6 @@ body {
 
 	<!-- ============================
          FOOTER INCLUDE
-         Shared footer across the site
          ============================ -->
 	<%@ include file="../common/footer.jsp"%>
 

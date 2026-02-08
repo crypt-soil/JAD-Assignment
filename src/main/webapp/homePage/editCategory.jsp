@@ -3,7 +3,6 @@
 <%@ page import="model.Category"%>
 
 <%
-// Retrieve the category object passed from the servlet
 Category c = (Category) request.getAttribute("category");
 %>
 
@@ -95,7 +94,6 @@ body {
 
 	<!-- ============================
          NAVBAR INCLUDE
-         Loads the main navigation bar
          ============================ -->
 	<%@ include file="../common/navbar.jsp"%>
 
@@ -105,25 +103,21 @@ body {
 			<!-- Page heading -->
 			<h2 class="page-title mb-3">Edit Category</h2>
 
-			<!-- Display which category is being edited -->
 			<p class="text-muted mb-4">
 				You are editing the category: <strong><%=c.getName()%></strong>
 			</p>
 
 			<!-- ==================================================
                  EDIT CATEGORY FORM
-                 Sends POST request to /categories?action=update
+                 IMPORTANT: multipart/form-data for uploads
                  ================================================== -->
-			<form action="<%=request.getContextPath()%>/categories" method="post">
+			<form action="<%=request.getContextPath()%>/categories" method="post"
+				enctype="multipart/form-data">
 
-				<!-- Hidden: action identifier for servlet -->
-				<input type="hidden" name="action" value="update">
-
-				<!-- Hidden: ID of the category being edited -->
-				<input type="hidden" name="id" value="<%=c.getId()%>">
-
-				<!-- Hidden: where to redirect after saving -->
-				<input type="hidden" name="redirectUrl"
+				<!-- Hidden fields -->
+				<input type="hidden" name="action" value="update"> <input
+					type="hidden" name="id" value="<%=c.getId()%>"> <input
+					type="hidden" name="redirectUrl"
 					value="<%=request.getHeader("referer")%>">
 
 				<!-- CATEGORY NAME -->
@@ -139,20 +133,45 @@ body {
 					<textarea name="description" class="form-control" rows="4" required><%=c.getDescription()%></textarea>
 				</div>
 
+				<!-- CURRENT IMAGE PREVIEW -->
+				<div class="mb-3">
+					<label class="form-label label-text">Current Image</label><br>
+					<%
+					String img = c.getImageUrl();
+					String preview;
+					if (img == null || img.trim().isEmpty())
+						preview = "https://via.placeholder.com/400x300";
+					else if (img.startsWith("http"))
+						preview = img;
+					else
+						preview = request.getContextPath() + "/" + img;
+					%>
+
+					<img src="<%=preview%>"
+						style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px; border: 1px solid #eee;">
+				</div>
+
 				<!-- IMAGE URL -->
 				<div class="mb-3">
-					<label class="form-label label-text">Image URL</label> <input
+					<label class="form-label label-text">Image URL (optional)</label> <input
 						type="text" name="imageUrl" class="form-control"
-						value="<%=c.getImageUrl()%>">
+						value="<%=c.getImageUrl() == null ? "" : c.getImageUrl()%>">
+					<div class="form-text">Uploading a new image will override
+						this URL.</div>
+				</div>
+
+				<!-- IMAGE UPLOAD -->
+				<div class="mb-3">
+					<label class="form-label label-text">Upload New Image</label> <input
+						type="file" name="categoryImage" class="form-control"
+						accept="image/*">
 				</div>
 
 				<!-- BUTTONS -->
 				<div class="mt-4">
-					<!-- Submit the form -->
 					<button type="submit" class="btn btn-soft-primary btn-sm me-2">
 						Save Changes</button>
 
-					<!-- Cancel: go back to previous page -->
 					<a href="<%=request.getHeader("referer")%>"
 						class="btn btn-soft-cancel btn-sm ms-2"> Cancel </a>
 				</div>
@@ -164,7 +183,6 @@ body {
 
 	<!-- ============================
          FOOTER INCLUDE
-         Shared footer
          ============================ -->
 	<%@ include file="../common/footer.jsp"%>
 
