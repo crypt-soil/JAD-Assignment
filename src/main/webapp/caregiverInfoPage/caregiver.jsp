@@ -1,15 +1,55 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-
-<%@ page import="java.util.List, java.util.ArrayList, model.Caregiver"%>
+<%@ page import="java.sql.*, java.util.*, model.DBConnection"%>
 
 <%
-@SuppressWarnings("unchecked")
-List<Caregiver> caregivers = (List<Caregiver>) request.getAttribute("caregivers");
-if (caregivers == null) {
-	caregivers = new ArrayList<>();
+Connection conn = null;
+PreparedStatement ps = null;
+ResultSet rs = null;
+
+List<Map<String, Object>> caregivers = new ArrayList<>();
+
+try {
+	conn = DBConnection.getConnection();
+
+	// load all caregivers (excluding caregiver_id in UI only)
+	String sql = "SELECT full_name, gender, years_experience, rating, description, photo_url FROM caregiver ORDER BY full_name";
+
+	ps = conn.prepareStatement(sql);
+	rs = ps.executeQuery();
+
+	while (rs.next()) {
+		Map<String, Object> c = new HashMap<>();
+		c.put("name", rs.getString("full_name"));
+		c.put("gender", rs.getString("gender"));
+		c.put("exp", rs.getInt("years_experience"));
+		c.put("rating", rs.getDouble("rating"));
+		c.put("desc", rs.getString("description"));
+		c.put("photo", rs.getString("photo_url")); // can be http... OR uploads/...
+		caregivers.add(c);
+	}
+
+} catch (Exception e) {
+	e.printStackTrace();
+} finally {
+	try {
+		if (rs != null)
+	rs.close();
+	} catch (Exception ignore) {
+	}
+	try {
+		if (ps != null)
+	ps.close();
+	} catch (Exception ignore) {
+	}
+	try {
+		if (conn != null)
+	conn.close();
+	} catch (Exception ignore) {
+	}
 }
 %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,6 +72,7 @@ body {
 .page-wrapper {
 	max-width: 1100px;
 	margin: 40px auto;
+	padding: 0 16px;
 }
 
 .caregiver-card {
@@ -40,6 +81,7 @@ body {
 	padding: 25px;
 	box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
 	transition: 0.3s;
+	border: 1px solid #ede9fe;
 }
 
 .caregiver-card:hover {
@@ -52,6 +94,7 @@ body {
 	border-radius: 50%;
 	object-fit: cover;
 	border: 3px solid #e6dfff;
+	flex: 0 0 auto;
 }
 
 .caregiver-name {
@@ -64,6 +107,10 @@ body {
 	font-weight: 600;
 	color: #444;
 	margin-right: 4px;
+}
+
+.muted {
+	color: #666;
 }
 </style>
 
@@ -78,35 +125,56 @@ body {
 			Meet Our Caregivers</h2>
 
 		<div class="row g-4">
+
 			<%
-			for (Caregiver c : caregivers) {
+			for (Map<String, Object> c : caregivers) {
 			%>
+
+			<%
+			String photo = (String) c.get("photo");
+			String photoSrc;
+
+			if (photo == null || photo.trim().isEmpty()) {
+				photoSrc = "https://via.placeholder.com/110";
+			} else if (photo.startsWith("http")) {
+				photoSrc = photo; // external image url
+			} else {
+				// uploaded image stored like "uploads/caregivers/xxxx.png"
+				photoSrc = request.getContextPath() + "/" + photo;
+			}
+			%>
+
 			<div class="col-md-6">
 				<div class="caregiver-card d-flex gap-3 align-items-start">
 
-					<img src="<%=c.getPhotoUrl()%>" alt="Caregiver Photo"
+					<img src="<%=photoSrc%>" alt="Caregiver Photo"
 						class="caregiver-photo">
 
 					<div>
-						<div class="caregiver-name"><%=c.getFullName()%></div>
+						<div class="caregiver-name"><%=c.get("name")%></div>
 
-						<div>
-							<span class="caregiver-detail-label">Gender:</span><%=c.getGender()%></div>
-						<div>
-							<span class="caregiver-detail-label">Experience:</span><%=c.getYearsExperience()%>
+						<div class="muted">
+							<span class="caregiver-detail-label">Gender:</span><%=c.get("gender")%>
+						</div>
+
+						<div class="muted">
+							<span class="caregiver-detail-label">Experience:</span><%=c.get("exp")%>
 							years
 						</div>
-						<div>
-							<span class="caregiver-detail-label">Rating:</span>⭐
-							<%=c.getRating()%></div>
 
-						<div class="mt-2">
-							<span class="caregiver-detail-label">About:</span> <span><%=c.getDescription()%></span>
+						<div class="muted">
+							<span class="caregiver-detail-label">Rating:</span>⭐
+							<%=c.get("rating")%>
 						</div>
 
+						<div class="mt-2">
+							<span class="caregiver-detail-label">About:</span> <span><%=c.get("desc")%></span>
+						</div>
 					</div>
+
 				</div>
 			</div>
+
 			<%
 			}
 			%>
@@ -114,8 +182,6 @@ body {
 		</div>
 
 	</div>
-
-	<%@ include file="../common/footer.jsp"%>
 
 </body>
 </html>

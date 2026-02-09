@@ -144,8 +144,7 @@ body {
  if ("admin".equals(role)) {
  %> Admin View <%
  } else if ("member".equals(role)) {
- %> Member
-					View <%
+ %> Member View <%
  } else {
  %> Public View <%
  }
@@ -166,9 +165,21 @@ body {
 
 				<!-- LEFT: Service image -->
 				<div class="col-md-6">
-					<img
-						src="<%=service.getImageUrl() != null ? service.getImageUrl() : "https://via.placeholder.com/400x300"%>"
-						class="detail-img" alt="<%=service.getName()%>">
+					<%
+					String img = service.getImageUrl();
+					String src;
+
+					if (img == null || img.trim().isEmpty()) {
+						src = "https://via.placeholder.com/400x300";
+					} else if (img.startsWith("http")) {
+						src = img; // external url
+					} else {
+						src = request.getContextPath() + "/" + img; // relative file in your app
+					}
+					%>
+
+					<img src="<%=src%>" class="detail-img" alt="<%=service.getName()%>">
+
 				</div>
 
 				<!-- RIGHT: Service text details -->

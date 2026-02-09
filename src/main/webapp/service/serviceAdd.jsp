@@ -111,7 +111,9 @@ body {
                  ADD SERVICE FORM
                  Sends POST to /service with action=insert
                  ============================================ -->
-			<form action="<%=request.getContextPath()%>/service" method="post">
+			<form action="<%=request.getContextPath()%>/service" method="post"
+				enctype="multipart/form-data">
+
 
 				<!-- Hidden: command for servlet -->
 				<input type="hidden" name="action" value="insert">
@@ -140,12 +142,21 @@ body {
 						placeholder="e.g. 15.00" required>
 				</div>
 
-				<!-- SERVICE IMAGE URL -->
+				<!-- SERVICE IMAGE (URL or Upload) -->
 				<div class="mb-3">
-					<label class="form-label label-text">Image URL</label> <input
+					<label class="form-label label-text">Image URL (optional)</label> <input
 						type="text" name="imageUrl" class="form-control"
-						placeholder="Optional">
+						placeholder="https://... or leave blank">
+					<div class="form-text">If you upload an image below, it will
+						override this URL.</div>
 				</div>
+
+				<div class="mb-3">
+					<label class="form-label label-text">Upload Image
+						(optional)</label> <input type="file" name="serviceImage"
+						class="form-control" accept="image/*">
+				</div>
+
 
 				<!-- FORM BUTTONS -->
 				<div class="mt-4">

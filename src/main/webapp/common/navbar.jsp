@@ -38,19 +38,21 @@ if ("true".equals(timedOut)) {
 		<a href="<%=request.getContextPath()%>/admin/appointments" class="btn btn-white"> Appointment Management </a> 
 		<a href="<%=request.getContextPath()%>/admin/inquiries" class="btn btn-white"> Service Inquiries</a> 
 		<a href="<%=request.getContextPath()%>/LogoutServlet" class="btn btn-purple"> Logout </a>
-
 		<%-- ================= CAREGIVER ================= --%>
 		<%
 		} else if (caregiverId != null) {
 		%>
 
 		<a href="<%=request.getContextPath()%>/caregiver/home">Caregiver
-			Home</a> <a href="<%=request.getContextPath()%>/caregiver/requests">Service
-			Requests</a> <a
+			Home</a> <a href="<%=request.getContextPath()%>/caregiver/requests">
+			Service Requests </a> <a
 			href="<%=request.getContextPath()%>/caregiver/visits?filter=today"
 			class="btn btn-purple"> My Schedule </a> <a
+			href="<%=request.getContextPath()%>/caregiverProfile"
+			class="btn btn-purple"> My Profile </a> <a
 			href="<%=request.getContextPath()%>/CaregiverLogoutServlet"
 			class="btn btn-white"> Logout </a>
+
 
 		<%-- ================= MEMBER ================= --%>
 		<%

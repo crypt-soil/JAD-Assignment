@@ -1,9 +1,14 @@
 package controller;
 
 import jakarta.servlet.*;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 import model.ServiceDAO;
 import model.Service;
@@ -24,6 +29,10 @@ import model.Category;
  * Default behavior redirects to homepage.
  */
 @WebServlet("/service")
+@MultipartConfig(fileSizeThreshold = 1024 * 1024, // 1MB
+		maxFileSize = 5 * 1024 * 1024, // 5MB
+		maxRequestSize = 6 * 1024 * 1024 // 6MB
+)
 public class ServiceServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -46,18 +55,19 @@ public class ServiceServlet extends HttpServlet {
 		// ------------------------------------------------------------
 		// SHOW ADD SERVICE FORM (requires category ID)
 		// ------------------------------------------------------------
-		case "add":
+		case "add": {
 			int catId = Integer.parseInt(request.getParameter("catId"));
 			Category category = categoryDAO.getCategoryById(catId);
 
 			request.setAttribute("category", category);
 			request.getRequestDispatcher("/service/serviceAdd.jsp").forward(request, response);
 			break;
+		}
 
 		// ------------------------------------------------------------
 		// SHOW EDIT SERVICE FORM
 		// ------------------------------------------------------------
-		case "edit":
+		case "edit": {
 			int id = Integer.parseInt(request.getParameter("id"));
 			Service service = serviceDAO.getServiceById(id);
 
@@ -69,11 +79,12 @@ public class ServiceServlet extends HttpServlet {
 			request.setAttribute("service", service);
 			request.getRequestDispatcher("/service/serviceEdit.jsp").forward(request, response);
 			break;
+		}
 
 		// ------------------------------------------------------------
 		// SHOW DELETE CONFIRMATION PAGE
 		// ------------------------------------------------------------
-		case "confirmDelete":
+		case "confirmDelete": {
 			int deleteId = Integer.parseInt(request.getParameter("id"));
 			Service s = serviceDAO.getServiceById(deleteId);
 
@@ -85,6 +96,7 @@ public class ServiceServlet extends HttpServlet {
 			request.setAttribute("service", s);
 			request.getRequestDispatcher("/service/serviceDelete.jsp").forward(request, response);
 			break;
+		}
 
 		// ------------------------------------------------------------
 		// DEFAULT → redirect home
@@ -102,6 +114,11 @@ public class ServiceServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		String action = request.getParameter("action");
+
+		if (action == null) {
+			response.sendRedirect("homePage/homePage.jsp");
+			return;
+		}
 
 		switch (action) {
 
@@ -126,17 +143,80 @@ public class ServiceServlet extends HttpServlet {
 	}
 
 	// ============================================================
-	// INSERT SERVICE
+	// IMAGE UPLOAD HELPER
+	// Priority logic (used by insert/update):
+	// 1) if file uploaded -> store in /uploads/services and return relative path
+	// 2) if no file uploaded -> return null (caller decides to use typed URL / keep
+	// old)
 	// ============================================================
-	private void insertService(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private String handleServiceImageUpload(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
+
+		Part imagePart = request.getPart("serviceImage"); // must match input name="serviceImage"
+		if (imagePart == null || imagePart.getSize() == 0) {
+			return null;
+		}
+
+		// Get original filename safely
+		String submitted = Paths.get(imagePart.getSubmittedFileName()).getFileName().toString();
+
+		// Extract extension
+		String ext = "";
+		int dot = submitted.lastIndexOf(".");
+		if (dot >= 0) {
+			ext = submitted.substring(dot + 1).toLowerCase();
+		}
+
+		// Basic allow-list
+		if (!ext.equals("jpg") && !ext.equals("jpeg") && !ext.equals("png") && !ext.equals("webp")) {
+			response.sendError(400, "Only jpg/jpeg/png/webp images are allowed.");
+			return null; // response committed
+		}
+
+		// Generate safe unique filename
+		String newName = UUID.randomUUID().toString().replace("-", "") + "." + ext;
+
+		// Save into webapp folder (publicly accessible)
+		String uploadDir = getServletContext().getRealPath("/uploads/services");
+		File dir = new File(uploadDir);
+		if (!dir.exists()) {
+			dir.mkdirs();
+		}
+
+		imagePart.write(uploadDir + File.separator + newName);
+
+		// Store RELATIVE path in DB so JSP can do contextPath + "/" + imageUrl
+		return "uploads/services/" + newName;
+	}
+
+	// ============================================================
+	// INSERT SERVICE
+	// Rules:
+	// - if uploaded image exists -> use it
+	// - else if typed URL exists -> use it
+	// - else -> null (detail page fallback)
+	// ============================================================
+	private void insertService(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
 
 		int catId = Integer.parseInt(request.getParameter("catId"));
+
+		String typedUrl = request.getParameter("imageUrl");
+		if (typedUrl != null)
+			typedUrl = typedUrl.trim();
+
+		String uploadedPath = handleServiceImageUpload(request, response);
+		if (response.isCommitted())
+			return;
+
+		String finalImageUrl = (uploadedPath != null) ? uploadedPath
+				: ((typedUrl != null && !typedUrl.isEmpty()) ? typedUrl : null);
 
 		Service s = new Service();
 		s.setName(request.getParameter("name"));
 		s.setDescription(request.getParameter("description"));
 		s.setPrice(Double.parseDouble(request.getParameter("price")));
-		s.setImageUrl(request.getParameter("imageUrl"));
+		s.setImageUrl(finalImageUrl);
 		s.setCategoryId(catId);
 
 		serviceDAO.insertService(s);
@@ -147,18 +227,43 @@ public class ServiceServlet extends HttpServlet {
 
 	// ============================================================
 	// UPDATE SERVICE
+	// Rules:
+	// - if uploaded image exists -> use it
+	// - else if typed URL exists -> use it
+	// - else -> keep existing imageUrl from DB
 	// ============================================================
-	private void updateService(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private void updateService(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
 
 		int id = Integer.parseInt(request.getParameter("id"));
 		int catId = Integer.parseInt(request.getParameter("catId"));
+
+		String typedUrl = request.getParameter("imageUrl");
+		if (typedUrl != null)
+			typedUrl = typedUrl.trim();
+
+		String uploadedPath = handleServiceImageUpload(request, response);
+		if (response.isCommitted())
+			return;
+
+		String finalImageUrl;
+
+		if (uploadedPath != null) {
+			finalImageUrl = uploadedPath;
+		} else if (typedUrl != null && !typedUrl.isEmpty()) {
+			finalImageUrl = typedUrl;
+		} else {
+			// keep old if admin didn't provide anything
+			Service existing = serviceDAO.getServiceById(id);
+			finalImageUrl = (existing != null) ? existing.getImageUrl() : null;
+		}
 
 		Service s = new Service();
 		s.setId(id);
 		s.setName(request.getParameter("name"));
 		s.setDescription(request.getParameter("description"));
 		s.setPrice(Double.parseDouble(request.getParameter("price")));
-		s.setImageUrl(request.getParameter("imageUrl"));
+		s.setImageUrl(finalImageUrl);
 		s.setCategoryId(catId);
 
 		serviceDAO.updateService(s);
@@ -168,6 +273,7 @@ public class ServiceServlet extends HttpServlet {
 
 	// ============================================================
 	// DELETE SERVICE (AFTER CONFIRMATION)
+	// (Optional improvement: delete the old file from uploads folder too)
 	// ============================================================
 	private void performDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
