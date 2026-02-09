@@ -84,4 +84,5 @@ public class Caregiver {
 	public void setPhotoUrl(String photoUrl) {
 		this.photoUrl = photoUrl;
 	}
+	
 }
