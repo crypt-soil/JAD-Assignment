@@ -37,11 +37,12 @@ if ("true".equals(timedOut)) {
 			class="btn btn-white"> Appointment Management </a> <a
 			href="<%=request.getContextPath()%>/admin/management"
 			class="btn btn-white"> Management Overview </a> <a
-			href="<%=request.getContextPath()%>/adminPage/analyticsDashboard.jsp"
+			href="<%=request.getContextPath()%>/viewFeedback"
+			class="btn btn-white"> View Feedback </a> <a
+			href="<%=request.getContextPath()%>/admin/analytics"
 			class="btn btn-white"> Analytics Dashboard </a> <a
 			href="<%=request.getContextPath()%>/LogoutServlet"
 			class="btn btn-purple"> Logout </a>
-
 		<%-- ================= CAREGIVER ================= --%>
 		<%
 		} else if (caregiverId != null) {

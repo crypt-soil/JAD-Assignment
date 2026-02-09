@@ -1,6 +1,7 @@
 package model;
 
 public class BookingItem {
+	private int serviceId; 
 	private String serviceName;
 	private int quantity;
 	private double subtotal;
@@ -8,14 +9,19 @@ public class BookingItem {
 	private String caregiverName;
 	private String caregiverContact;
 
-	public BookingItem(String serviceName, int quantity, double subtotal, int caregiverStatus, String caregiverName,
-			String caregiverContact) {
+	public BookingItem(int serviceId, String serviceName, int quantity, double subtotal, int caregiverStatus,
+			String caregiverName, String caregiverContact) {
+		this.serviceId = serviceId;
 		this.serviceName = serviceName;
 		this.quantity = quantity;
 		this.subtotal = subtotal;
 		this.caregiverStatus = caregiverStatus;
 		this.caregiverName = caregiverName;
 		this.caregiverContact = caregiverContact;
+	}
+
+	public int getServiceId() {
+		return serviceId;
 	}
 
 	public String getServiceName() {

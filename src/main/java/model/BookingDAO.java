@@ -9,7 +9,7 @@ public class BookingDAO {
 		List<Booking> bookings = new ArrayList<>();
 
 		String sql = "SELECT b.booking_id, b.booking_date, b.status, "
-				+ "       s.name AS service_name, bd.quantity, bd.subtotal, bd.caregiver_status, "
+				+ "       bd.service_id, s.name AS service_name, bd.quantity, bd.subtotal, bd.caregiver_status, "
 				+ "       c.full_name AS caregiver_name, c.phone AS caregiver_phone " + "FROM bookings b "
 				+ "JOIN booking_details bd ON b.booking_id = bd.booking_id "
 				+ "JOIN service s ON bd.service_id = s.service_id "
@@ -20,17 +20,12 @@ public class BookingDAO {
 
 			ps.setInt(1, customerId);
 			ResultSet rs = ps.executeQuery();
-			/*
-			 * itemsByBooking groups items by booking_id itemsByBooking = { 101: [
-			 * BookingItem("Nursing",1,30.00), BookingItem("Home Care",2,50.00) ], 102: [
-			 * BookingItem("Cooking",1,15.00) ] } metaByBooking stores date + status per
-			 * booking_id metaByBooking = { 101: BookingMeta(date=2025-01-01 10:00,
-			 * status=2), 102: BookingMeta(date=2025-01-03 14:00, status=1) }
-			 */
+
 			Map<Integer, List<BookingItem>> itemsByBooking = new LinkedHashMap<>();
 			Map<Integer, BookingMeta> metaByBooking = new LinkedHashMap<>();
 
 			while (rs.next()) {
+
 				int bookingId = rs.getInt("booking_id");
 
 				// meta (date & status) – only set once per booking
@@ -39,7 +34,8 @@ public class BookingDAO {
 					metaByBooking.put(bookingId, meta);
 				}
 
-				// collect items
+				// ✅ collect items (NOW includes serviceId)
+				int serviceId = rs.getInt("service_id"); // ✅ NEW
 				String serviceName = rs.getString("service_name");
 				int qty = rs.getInt("quantity");
 				double subtotal = rs.getDouble("subtotal");
@@ -48,8 +44,9 @@ public class BookingDAO {
 				String caregiverName = rs.getString("caregiver_name");
 				String caregiverPhone = rs.getString("caregiver_phone");
 
-				BookingItem item = new BookingItem(serviceName, qty, subtotal, caregiverStatus, caregiverName,
-						caregiverPhone);
+				// ✅ NEW constructor (serviceId first)
+				BookingItem item = new BookingItem(serviceId, serviceName, qty, subtotal, caregiverStatus,
+						caregiverName, caregiverPhone);
 
 				itemsByBooking.computeIfAbsent(bookingId, k -> new ArrayList<>()).add(item);
 			}

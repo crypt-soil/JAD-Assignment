@@ -25,6 +25,11 @@ List<EmergencyContact> emergencyContacts = (List<EmergencyContact>) request.getA
 String addContact = request.getParameter("addContact");
 String editIdStr = request.getParameter("editContactId");
 
+// ✅ Feedback overlay controls (service-level)
+String feedback = request.getParameter("feedback");
+String bookingIdStr = request.getParameter("bookingId");
+String serviceIdStr = request.getParameter("serviceId");
+
 EmergencyContact editContact = null;
 if (editIdStr != null) {
 	try {
@@ -143,110 +148,31 @@ body {
 
 .overlay-card {
 	width: 100%;
-	max-width: 520px;
+	max-width: 620px; /* slightly wider for 2-section feedback */
 	background: #fff;
-	border-radius: 14px;
-	box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+	border-radius: 16px;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
 	overflow: hidden;
 }
 
-/* =========================
-   Better Bootstrap Modal UI
-   ========================= */
-
-/* softer backdrop */
-.modal-backdrop.show {
-  opacity: 0.35;
+.overlay-card .form-label {
+	font-weight: 600;
+	color: #374151;
+	margin-bottom: 6px;
 }
 
-/* rounder + shadow */
-.modal-content {
-  border: 0;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
-  overflow: hidden;
+.overlay-card .form-control {
+	border-radius: 12px;
+	border: 1px solid #e5e7eb;
+	padding: 10px 12px;
+	background: #f9fafb;
 }
 
-/* nicer header */
-.modal-header {
-  padding: 18px 22px;
-  background: #fbfbfd;
-  border-bottom: 1px solid #eef0f3;
+.overlay-card .form-control:focus {
+	background: #fff;
+	border-color: #6d4a8d;
+	box-shadow: 0 0 0 0.2rem rgba(109, 74, 141, 0.15);
 }
-
-.modal-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: 0.2px;
-}
-
-/* nicer close button */
-.modal-header .btn-close {
-  background-color: transparent;
-  border-radius: 10px;
-  padding: 10px;
-}
-.modal-header .btn-close:hover {
-  background: rgba(0, 0, 0, 0.06);
-}
-
-/* body spacing */
-.modal-body {
-  padding: 20px 22px;
-}
-
-/* tighter label spacing */
-.modal-body .form-label {
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 6px;
-}
-
-/* form controls: softer, consistent height */
-.modal-body .form-control {
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  padding: 10px 12px;
-  background: #f9fafb;
-}
-
-.modal-body .form-control:focus {
-  background: #fff;
-  border-color: #6d4a8d; /* matches your theme */
-  box-shadow: 0 0 0 0.2rem rgba(109, 74, 141, 0.15);
-}
-
-/* footer spacing + buttons */
-.modal-footer {
-  padding: 16px 22px;
-  border-top: 1px solid #eef0f3;
-  background: #fff;
-}
-
-.modal-footer .btn {
-  border-radius: 12px;
-  padding: 10px 16px;
-  font-weight: 600;
-}
-
-/* theme the primary button */
-.modal-footer .btn-primary {
-  background: #6d4a8d;
-  border-color: #6d4a8d;
-}
-.modal-footer .btn-primary:hover {
-  background: #5c3c7a;
-  border-color: #5c3c7a;
-}
-
-/* optional: make modal slightly wider on desktop */
-@media (min-width: 992px) {
-  .modal-dialog {
-    max-width: 720px;
-  }
-}
-
-
 </style>
 </head>
 
@@ -291,14 +217,13 @@ body {
 			%>
 
 			<!-- ======================
-             PROFILE DETAILS
-        ====================== -->
+                 PROFILE DETAILS
+            ====================== -->
 			<form action="<%=request.getContextPath()%>/UpdateProfileServlet"
 				method="post" id="profileForm">
 				<div class="row">
 					<div class="col-md-6">
 
-						<!-- full name -->
 						<label class="info-label">Full Name</label>
 						<div class="d-flex mb-3 align-items-start">
 							<input type="text" class="form-control input-box"
@@ -311,7 +236,6 @@ body {
 							</a>
 						</div>
 
-						<!-- phone -->
 						<label class="info-label">Phone Number</label>
 						<div class="d-flex mb-3 align-items-start">
 							<input type="text" class="form-control input-box" name="phone"
@@ -327,7 +251,6 @@ body {
 
 					<div class="col-md-6">
 
-						<!-- address -->
 						<label class="info-label">Address</label>
 						<div class="d-flex mb-3 align-items-start">
 							<input type="text" class="form-control input-box" name="address"
@@ -339,7 +262,6 @@ body {
 							</a>
 						</div>
 
-						<!-- zipcode -->
 						<label class="info-label">Zip Code</label>
 						<div class="d-flex mb-3 align-items-start">
 							<input type="text" class="form-control input-box" name="zipcode"
@@ -358,9 +280,7 @@ body {
 					Changes</button>
 			</form>
 
-			<!-- ======================
-             MEDICAL INFO
-        ====================== -->
+			<!-- MEDICAL INFO -->
 			<div class="card mt-4">
 				<div
 					class="card-header d-flex justify-content-between align-items-center">
@@ -378,7 +298,6 @@ body {
 						<div class="d-flex gap-2 mt-3">
 							<button type="submit" class="btn btn-primary">Save
 								Medical Info</button>
-
 							<a class="btn btn-outline-danger"
 								href="<%=request.getContextPath()%>/ClearMedicalInfoServlet"
 								onclick="return confirm('Clear medical information?');">
@@ -391,16 +310,17 @@ body {
 				</div>
 			</div>
 
-			<!-- ======================
-             EMERGENCY CONTACTS
-        ====================== -->
+			<!-- EMERGENCY CONTACTS -->
 			<div class="card mt-4">
 				<div
 					class="card-header d-flex justify-content-between align-items-center">
-					<strong>Emergency Contacts</strong> <a
-						class="btn btn-sm btn-primary"
-						href="<%=request.getContextPath()%>/profile?tab=profile&addContact=1">
-						+ Add Contact </a>
+					<strong>Emergency Contacts</strong>
+
+					<div class="d-flex gap-2">
+						<a class="btn btn-sm btn-primary"
+							href="<%=request.getContextPath()%>/profile?tab=profile&addContact=1">
+							+ Add Contact </a>
+					</div>
 				</div>
 
 				<div class="card-body">
@@ -455,8 +375,8 @@ body {
 			%>
 
 			<!-- ======================
-             BOOKINGS (NO JS)
-        ====================== -->
+                 BOOKINGS (NO JS)
+            ====================== -->
 			<%
 			if (bookings == null || bookings.isEmpty()) {
 			%>
@@ -485,8 +405,10 @@ body {
 					break;
 				}
 			%>
+
 			<div class="card mb-3">
 				<div class="card-body">
+
 					<div class="d-flex justify-content-between align-items-center mb-2">
 						<div>
 							<strong>Booking #<%=b.getBookingId()%></strong><br> <small
@@ -505,6 +427,7 @@ body {
 								<th style="width: 150px;">Contact</th>
 								<th style="width: 150px;">Caregiver Status</th>
 								<th style="width: 120px;" class="text-end">Subtotal</th>
+								<th style="width: 120px;">Feedback</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -546,6 +469,12 @@ body {
 								<td><%=item.getCaregiverContact() != null ? item.getCaregiverContact() : "-"%></td>
 								<td><span class="badge badge-status <%=cgClass%>"><%=cgLabel%></span></td>
 								<td class="text-end">$<%=String.format("%.2f", item.getSubtotal())%></td>
+
+								<!-- ✅ Feedback button per service row -->
+								<td><a class="btn btn-sm btn-outline-primary"
+									href="<%=request.getContextPath()%>/profile?tab=bookings&feedback=1&bookingId=<%=b.getBookingId()%>&serviceId=<%=item.getServiceId()%>">
+										<i class="bi bi-chat-left-text me-1"></i> Feedback
+								</a></td>
 							</tr>
 							<%
 							}
@@ -558,6 +487,7 @@ body {
 					</div>
 				</div>
 			</div>
+
 			<%
 			}
 			}
@@ -572,6 +502,89 @@ body {
 
 	<!-- ============= NO-JS OVERLAY "MODALS" ============= -->
 
+	<!-- ✅ FEEDBACK OVERLAY (service-level, 2 ratings + 2 remarks) -->
+	<%
+	if (feedback != null) {
+	%>
+	<div class="overlay">
+		<div class="overlay-card">
+			<div
+				class="p-3 border-bottom d-flex justify-content-between align-items-center">
+				<strong> Submit Feedback <%=(bookingIdStr != null ? ("(Booking #" + bookingIdStr + ")") : "")%>
+				</strong> <a class="btn btn-sm btn-outline-secondary"
+					href="<%=request.getContextPath()%>/profile?tab=bookings">X</a>
+			</div>
+
+			<div class="p-3">
+				<form method="post"
+					action="<%=request.getContextPath()%>/SubmitFeedbackServlet">
+
+					<input type="hidden" name="booking_id"
+						value="<%=bookingIdStr != null ? bookingIdStr : ""%>"> <input
+						type="hidden" name="service_id"
+						value="<%=serviceIdStr != null ? serviceIdStr : ""%>">
+
+					<!-- SERVICE -->
+					<div class="mb-3">
+						<label class="form-label">Service Rating</label> <select
+							name="service_rating" class="form-control" required>
+							<option value="" disabled selected>Select a rating</option>
+							<option value="5">5 - Excellent</option>
+							<option value="4">4 - Good</option>
+							<option value="3">3 - Okay</option>
+							<option value="2">2 - Bad</option>
+							<option value="1">1 - Very Bad</option>
+						</select> <small class="text-muted">Rate the service (e.g., Meal
+							Prep, Escort)</small>
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label">Service Remarks</label>
+						<textarea name="service_remarks" class="form-control" rows="3"
+							required
+							placeholder="What did you like/dislike about the service?"></textarea>
+					</div>
+
+					<hr class="my-4">
+
+					<!-- CAREGIVER -->
+					<div class="mb-3">
+						<label class="form-label">Caregiver Rating</label> <select
+							name="caregiver_rating" class="form-control" required>
+							<option value="" disabled selected>Select a rating</option>
+							<option value="5">5 - Excellent</option>
+							<option value="4">4 - Good</option>
+							<option value="3">3 - Okay</option>
+							<option value="2">2 - Bad</option>
+							<option value="1">1 - Very Bad</option>
+						</select> <small class="text-muted">Rate the caregiver assigned for
+							this service</small>
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label">Caregiver Remarks</label>
+						<textarea name="caregiver_remarks" class="form-control" rows="3"
+							required
+							placeholder="How was the caregiver (attitude, punctuality, care)?"></textarea>
+					</div>
+
+					<div class="d-flex gap-2">
+						<a class="btn btn-outline-secondary"
+							href="<%=request.getContextPath()%>/profile?tab=bookings">Cancel</a>
+						<button class="btn btn-primary" type="submit">Send</button>
+					</div>
+				</form>
+
+				<small class="text-muted d-block mt-2"> Thank you! Your
+					feedback helps us improve both services and caregivers. </small>
+			</div>
+		</div>
+	</div>
+	<%
+	}
+	%>
+
+	<!-- ADD CONTACT OVERLAY -->
 	<%
 	if (addContact != null) {
 	%>
@@ -622,6 +635,7 @@ body {
 	}
 	%>
 
+	<!-- EDIT CONTACT OVERLAY -->
 	<%
 	if (editContact != null) {
 	%>
