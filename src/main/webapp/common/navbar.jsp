@@ -36,7 +36,8 @@ if ("true".equals(timedOut)) {
 		<a href="<%=request.getContextPath()%>/admin/management" class="btn"> Management Overview </a>
 		<a href="<%=request.getContextPath()%>/adminPage/analyticsDashboard.jsp" class="btn"> Analytics Dashboard </a> 
 		<a href="<%=request.getContextPath()%>/admin/appointments" class="btn btn-white"> Appointment Management </a> 
-		<a href="<%=request.getContextPath()%>/admin/inquiries" class="btn btn-white"> Service Inquiries</a> 
+		<a href="<%=request.getContextPath()%>/admin/inquiries" class="btn btn-white"> Service Inquiries</a>
+		<a href="<%=request.getContextPath()%>/viewFeedback" class="btn btn-white"> View Feedback </a> 
 		<a href="<%=request.getContextPath()%>/LogoutServlet" class="btn btn-purple"> Logout </a>
 		<%-- ================= CAREGIVER ================= --%>
 		<%

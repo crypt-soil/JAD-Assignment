@@ -151,7 +151,7 @@ body {
 							<%
 							for (Caregiver c : caregivers) {
 							%>
-							<option value="<%=c.getCaregiverId()%>"><%=c.getFullName()%></option>
+							<option value="<%=c.getId()%>"><%=c.getFullName()%></option>
 							<%
 							}
 							%>
