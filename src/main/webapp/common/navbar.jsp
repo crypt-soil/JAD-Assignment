@@ -33,14 +33,11 @@ if ("true".equals(timedOut)) {
 		<%
 		if ("admin".equals(role)) {
 		%>
-		<a href="<%=request.getContextPath()%>/admin/appointments"
-			class="btn btn-white"> Appointment Management </a> <a
-			href="<%=request.getContextPath()%>/admin/management"
-			class="btn btn-white"> Management Overview </a> <a
-			href="<%=request.getContextPath()%>/adminPage/analyticsDashboard.jsp"
-			class="btn btn-white"> Analytics Dashboard </a> <a
-			href="<%=request.getContextPath()%>/LogoutServlet"
-			class="btn btn-purple"> Logout </a>
+		<a href="<%=request.getContextPath()%>/admin/management" class="btn"> Management Overview </a>
+		<a href="<%=request.getContextPath()%>/adminPage/analyticsDashboard.jsp" class="btn"> Analytics Dashboard </a> 
+		<a href="<%=request.getContextPath()%>/admin/appointments" class="btn btn-white"> Appointment Management </a> 
+		<a href="<%=request.getContextPath()%>/admin/inquiries" class="btn btn-white"> Service Inquiries</a> 
+		<a href="<%=request.getContextPath()%>/LogoutServlet" class="btn btn-purple"> Logout </a>
 
 		<%-- ================= CAREGIVER ================= --%>
 		<%
@@ -61,8 +58,7 @@ if ("true".equals(timedOut)) {
 		%>
 
 		<a href="<%=request.getContextPath()%>/categories">Service
-			Category</a> <a
-			href="<%=request.getContextPath()%>/caregiverInfoPage/caregiver.jsp">Our
+			Category</a> <a href="<%=request.getContextPath()%>/caregivers">Our
 			Caregivers</a> <a href="<%=request.getContextPath()%>/profile"
 			class="btn btn-white">Profile</a> <a
 			href="<%=request.getContextPath()%>/cartPage/cartPage.jsp"
@@ -99,8 +95,7 @@ if ("true".equals(timedOut)) {
 		%>
 
 		<a href="<%=request.getContextPath()%>/categories">Service
-			Category</a> <a
-			href="<%=request.getContextPath()%>/caregiverInfoPage/caregiver.jsp">Our
+			Category</a> <a href="<%=request.getContextPath()%>/caregivers">Our
 			Caregivers</a> <a
 			href="<%=request.getContextPath()%>/registerPage/registerPage.jsp"
 			class="btn btn-white"> Sign Up </a> <a

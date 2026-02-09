@@ -183,4 +183,34 @@ public class ServiceDAO {
 			e.printStackTrace();
 		}
 	}
+
+	public List<Service> getAllServices() {
+		List<Service> list = new ArrayList<>();
+
+		try {
+			Connection conn = DBConnection.getConnection();
+
+			String sql = "SELECT service_id, name, description, price, image_url, cat_id "
+					+ "FROM service WHERE status = 1 ORDER BY name";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				Service s = new Service();
+				s.setId(rs.getInt("service_id"));
+				s.setName(rs.getString("name"));
+				s.setDescription(rs.getString("description"));
+				s.setPrice(rs.getDouble("price"));
+				s.setImageUrl(rs.getString("image_url"));
+				s.setCategoryId(rs.getInt("cat_id"));
+				list.add(s);
+			}
+
+			DBConnection.closeConnection(conn);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return list;
+	}
 }

@@ -30,7 +30,7 @@ VALUES (
     'testuser@example.com',
     '90000000',
     '123 test street',
-    '123456',
+    '123456'
 );
 
 -- 1 row per customer (simple)
@@ -436,6 +436,46 @@ CREATE TABLE notifications (
     ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
+
+-- table : service inquiries 
+CREATE TABLE service_inquiries (
+  inquiry_id INT AUTO_INCREMENT PRIMARY KEY,
+
+  customer_id INT NULL,
+  service_id INT NULL,
+  caregiver_id INT NULL,
+
+  -- required fields from your form
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL,
+  category VARCHAR(50) NOT NULL,
+  message TEXT NOT NULL,
+
+  -- preferred contact ( the radio buttons)
+  preferred_contact ENUM('EMAIL','PHONE') NOT NULL DEFAULT 'EMAIL',
+  phone VARCHAR(20) NULL,
+
+  -- admin management
+  status ENUM('NEW','READ','ARCHIVED') NOT NULL DEFAULT 'NEW',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  INDEX idx_inquiry_status_date (status, created_at),
+  INDEX idx_inquiry_customer (customer_id),
+  INDEX idx_inquiry_service (service_id),
+  INDEX idx_inquiry_caregiver (caregiver_id),
+
+  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE,
+
+  FOREIGN KEY (service_id) REFERENCES service(service_id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE,
+
+  FOREIGN KEY (caregiver_id) REFERENCES caregiver(caregiver_id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
 -- drop existing procedures and function if any
 DROP PROCEDURE IF EXISTS sp_total_users;
