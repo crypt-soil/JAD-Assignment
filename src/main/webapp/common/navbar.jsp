@@ -25,15 +25,21 @@ if ("true".equals(timedOut)) {
 
 <nav
 	class="navbar navbar-custom d-flex justify-content-between align-items-center sticky-top">
-	<% 	if(caregiverId!=null)
-	{%>
-		<a class="fw-semibold" href="<%=request.getContextPath()%>/caregiverPage/caregiverHomePage.jsp" class="btn">
-		Silver Care </a>
-	<%}else{%>
+	<%
+	if (caregiverId != null) {
+	%>
+	<a class="fw-semibold"
+		href="<%=request.getContextPath()%>/caregiverPage/caregiverHomePage.jsp"
+		class="btn"> Silver Care </a>
+	<%
+	} else {
+	%>
 
-	<a class="fw-semibold" href="<%=request.getContextPath()%>/categories" class="btn">
-		Silver Care </a>
-<%}%>
+	<a class="fw-semibold" href="<%=request.getContextPath()%>/categories"
+		class="btn"> Silver Care </a>
+	<%
+	}
+	%>
 	<div>
 
 		<%-- ================= ADMIN ================= --%>
