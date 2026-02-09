@@ -25,20 +25,33 @@ if ("true".equals(timedOut)) {
 
 <nav
 	class="navbar navbar-custom d-flex justify-content-between align-items-center sticky-top">
-	<div class="fw-semibold">Silver Care</div>
+	<% 	if(caregiverId!=null)
+	{%>
+		<a class="fw-semibold" href="<%=request.getContextPath()%>/caregiverPage/caregiverHomePage.jsp" class="btn">
+		Silver Care </a>
+	<%}else{%>
 
+	<a class="fw-semibold" href="<%=request.getContextPath()%>/categories" class="btn">
+		Silver Care </a>
+<%}%>
 	<div>
 
 		<%-- ================= ADMIN ================= --%>
 		<%
 		if ("admin".equals(role)) {
 		%>
-		<a href="<%=request.getContextPath()%>/admin/management" class="btn"> Management Overview </a>
-		<a href="<%=request.getContextPath()%>/adminPage/analyticsDashboard.jsp" class="btn"> Analytics Dashboard </a> 
-		<a href="<%=request.getContextPath()%>/admin/appointments" class="btn btn-white"> Appointment Management </a> 
-		<a href="<%=request.getContextPath()%>/admin/inquiries" class="btn btn-white"> Service Inquiries</a>
-		<a href="<%=request.getContextPath()%>/viewFeedback" class="btn btn-white"> View Feedback </a> 
-		<a href="<%=request.getContextPath()%>/LogoutServlet" class="btn btn-purple"> Logout </a>
+		<a href="<%=request.getContextPath()%>/admin/management" class="btn">
+			Management Overview </a> <a
+			href="<%=request.getContextPath()%>/adminPage/analyticsDashboard.jsp"
+			class="btn"> Analytics Dashboard </a> <a
+			href="<%=request.getContextPath()%>/admin/appointments"
+			class="btn btn-white"> Appointment Management </a> <a
+			href="<%=request.getContextPath()%>/admin/inquiries"
+			class="btn btn-white"> Service Inquiries</a> <a
+			href="<%=request.getContextPath()%>/viewFeedback"
+			class="btn btn-white"> View Feedback </a> <a
+			href="<%=request.getContextPath()%>/LogoutServlet"
+			class="btn btn-purple"> Logout </a>
 		<%-- ================= CAREGIVER ================= --%>
 		<%
 		} else if (caregiverId != null) {
