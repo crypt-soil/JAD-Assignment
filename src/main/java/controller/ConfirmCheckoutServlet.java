@@ -34,10 +34,11 @@ public class ConfirmCheckoutServlet extends HttpServlet {
 			return;
 		}
 
-		// totals (for display; your current bookings table does not store totals)
+		// ✅ totals (not stored in bookings table; for any future use)
 		double subtotal = 0.0;
-		for (CartItem item : items)
-			subtotal += item.getLineTotal();
+		for (CartItem item : items) {
+			subtotal += item.getLineTotal(); // ✅ now includes durationHours * qty * hourly rate
+		}
 		double gstRate = 0.09;
 		double gstAmount = subtotal * gstRate;
 		double total = subtotal + gstAmount;
@@ -51,7 +52,8 @@ public class ConfirmCheckoutServlet extends HttpServlet {
 			conn = DBConnection.getConnection();
 			conn.setAutoCommit(false);
 
-			// Insert into bookings
+			// 1) Insert into bookings (booking_date handled by DB default or triggers if
+			// any)
 			String bookingSql = "INSERT INTO bookings (customer_id, status) VALUES (?, ?)";
 			psBooking = conn.prepareStatement(bookingSql, Statement.RETURN_GENERATED_KEYS);
 			psBooking.setInt(1, customerId);
@@ -63,7 +65,7 @@ public class ConfirmCheckoutServlet extends HttpServlet {
 				throw new SQLException("Failed to create booking (no generated key).");
 			int bookingId = keys.getInt(1);
 
-			// Insert booking_details
+			// 2) Insert booking_details
 			String detailSql = "INSERT INTO booking_details "
 					+ "(booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status) "
 					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -71,40 +73,57 @@ public class ConfirmCheckoutServlet extends HttpServlet {
 			psDetails = conn.prepareStatement(detailSql);
 
 			for (CartItem item : items) {
+
+				// ✅ basic validation (optional but safer)
+				if (item.getQuantity() < 1) {
+					throw new SQLException("Invalid quantity for item_id=" + item.getItemId());
+				}
+				if (item.getStartTime() == null || item.getEndTime() == null) {
+					throw new SQLException("Missing start/end time for item_id=" + item.getItemId());
+				}
+				if (!item.getEndTime().after(item.getStartTime())) {
+					throw new SQLException("End time must be after start time for item_id=" + item.getItemId());
+				}
+
 				psDetails.setInt(1, bookingId);
 				psDetails.setInt(2, item.getServiceId());
 
-				if (item.getCaregiverId() == null)
+				if (item.getCaregiverId() == null) {
 					psDetails.setNull(3, Types.INTEGER);
-				else
+				} else {
 					psDetails.setInt(3, item.getCaregiverId());
+				}
 
 				psDetails.setInt(4, item.getQuantity());
 				psDetails.setTimestamp(5, item.getStartTime());
 				psDetails.setTimestamp(6, item.getEndTime());
 
-				double lineSubtotal = item.getPrice() * item.getQuantity();
+				// ✅ IMPORTANT CHANGE:
+				// subtotal MUST include duration-based pricing
+				// CartItem.getLineTotal() = price(hourly) * durationHours * quantity
+				double lineSubtotal = item.getLineTotal();
 				psDetails.setDouble(7, lineSubtotal);
 
 				psDetails.setString(8, item.getSpecialRequest());
-				int status = (item.getCaregiverId() == null) ? 0 : 1; // 0=not_assigned, 1=assigned
-				psDetails.setInt(9, status);
+
+				int caregiverStatus = (item.getCaregiverId() == null) ? 0 : 1; // 0=not_assigned, 1=assigned
+				psDetails.setInt(9, caregiverStatus);
 
 				psDetails.addBatch();
 			}
 
 			psDetails.executeBatch();
 
-			// 3) clear cart
+			// 3) clear cart (ideally should use same conn; keeping your DAO call as-is)
 			cartDAO.clearCartByCustomerId(customerId);
 
 			conn.commit();
 
-			// Set one-time success message (flash message)
+			// flash message
 			HttpSession session = request.getSession();
 			session.setAttribute("checkoutSuccessMessage", "Booking successful! Your booking ID is #" + bookingId);
 
-			// Redirect back to home (Categories page)
+			// Redirect back to Categories page
 			response.sendRedirect(request.getContextPath() + "/categories");
 
 		} catch (Exception e) {
@@ -114,6 +133,7 @@ public class ConfirmCheckoutServlet extends HttpServlet {
 					conn.rollback();
 			} catch (SQLException ignore) {
 			}
+
 			response.sendRedirect(request.getContextPath() + "/checkout?error=checkout_failed");
 
 		} finally {
