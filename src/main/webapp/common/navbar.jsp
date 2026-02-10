@@ -48,7 +48,7 @@ if ("true".equals(timedOut)) {
 		%>
 		<a href="<%=request.getContextPath()%>/admin/management" class="btn">
 			Management Overview </a> <a
-			href="<%=request.getContextPath()%>/adminPage/analyticsDashboard.jsp"
+			href="<%=request.getContextPath()%>/admin/analytics"
 			class="btn"> Analytics Dashboard </a> <a
 			href="<%=request.getContextPath()%>/admin/appointments"
 			class="btn btn-white"> Appointment Management </a> <a

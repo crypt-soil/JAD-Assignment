@@ -53,11 +53,26 @@ public class AdminCustomerServlet extends HttpServlet {
 			return;
 
 		String action = request.getPathInfo();
-
-		// management list
+		// management list + inquiry (search & filter)
 		if (action == null || action.equals("/") || action.equals("/management")) {
-			List<Customer> list = dao.getAllCustomers();
+
+			String q = request.getParameter("q");
+			String zipcode = request.getParameter("zipcode");
+
+			q = (q == null || q.trim().isEmpty()) ? null : q.trim();
+			zipcode = (zipcode == null || zipcode.trim().isEmpty()) ? null : zipcode.trim();
+
+			List<Customer> list;
+			if (q == null && zipcode == null) {
+				list = dao.getAllCustomers();
+			} else {
+				list = dao.searchCustomers(q, zipcode); // ✅ new DAO method
+			}
+
 			request.setAttribute("clientList", list);
+			request.setAttribute("q", q);
+			request.setAttribute("zipcode", zipcode);
+
 			request.getRequestDispatcher("/adminPage/managementOverview.jsp").forward(request, response);
 			return;
 		}
@@ -149,7 +164,8 @@ public class AdminCustomerServlet extends HttpServlet {
 				c.setPassword(existing.getPassword());
 			}
 
-			dao.updateCustomer(c);
+			dao.updateCustomerWithPassword(c);
+
 			response.sendRedirect(request.getContextPath() + "/admin/management");
 			return;
 		}
