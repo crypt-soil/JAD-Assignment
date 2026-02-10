@@ -151,7 +151,7 @@ VALUES
  'https://uploads-ssl.webflow.com/5de31e9059d27b1b2e24e0d8/5e850bd24f3580899765a71c_Senior%20Visit%20in%20home.jpg',
  3,
  1),
-('Outdoor & Medical Escort',
+('Outdoor & Medical Companion',
  'Caregivers accompany seniors to medical appointments, grocery trips, or casual outdoor walks for safety.',
  50.00,
  'https://img.freepik.com/premium-photo/senior-woman-walker-nurse-outdoor-park-with-healthcare-elderly-exercise-walking-healthcare-professional-female-person-with-peace-physical-therapy-public-garden-with-carer_590464-279351.jpg?w=2000',

@@ -729,9 +729,9 @@ h1 {
 							<form method="get"
 								action="<%=request.getContextPath()%>/admin/analytics"
 								class="mb-3 d-flex gap-2">
-
-								<input type="hidden" name="range" value="<%=range%>" />
-								<input type="hidden" name="range" value="<%=range%>" /> 
+								
+								    <input type="hidden" name="tab" value="sales" />
+								    <input type="hidden" name="range" value="<%=range%>" />
 								<select
 									name="serviceId" class="form-select form-select-sm"
 									onchange="this.form.submit()">

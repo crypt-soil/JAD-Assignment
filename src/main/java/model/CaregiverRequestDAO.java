@@ -19,7 +19,7 @@ public class CaregiverRequestDAO {
 				+ "JOIN customers c ON c.customer_id = b.customer_id "
 				+ "JOIN service s ON s.service_id = bd.service_id "
 				+ "JOIN caregiver_service cs ON cs.service_id = bd.service_id " + "WHERE cs.caregiver_id = ? "
-				+ "  AND b.status = 2 " + // booking confirmed
+				+ "  AND b.status = 1 " +
 				"  AND bd.caregiver_status = 0 " + // not_assigned
 				"  AND bd.caregiver_id IS NULL " + "ORDER BY bd.start_time ASC";
 
