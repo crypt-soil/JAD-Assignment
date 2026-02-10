@@ -18,7 +18,8 @@ if (tab == null || tab.trim().isEmpty())
 List<Booking> bookings = (List<Booking>) request.getAttribute("bookings");
 
 MedicalInfo medicalInfo = (MedicalInfo) request.getAttribute("medicalInfo");
-String medicalText = (medicalInfo != null && medicalInfo.getMedicalInfo() != null) ? medicalInfo.getMedicalInfo() : "";
+
+
 
 List<EmergencyContact> emergencyContacts = (List<EmergencyContact>) request.getAttribute("emergencyContacts");
 
@@ -325,7 +326,7 @@ body {
 						<label class="info-label">Address</label>
 						<div class="d-flex mb-3 align-items-start">
 							<input type="text" class="form-control input-box" name="address"
-								value="<%=(p.getAddress() != null ? p.getAddress() : "")%>">
+								value="<%=(p.getAddress() != null ? p.getAddress() : "")%>"> 
 							<a class="delete-btn"
 								href="<%=request.getContextPath()%>/DeleteFieldServlet?field=address"
 								onclick="return confirm('Clear address?');"> <i
@@ -351,6 +352,31 @@ body {
 					Changes</button>
 			</form>
 
+			<%
+			// ===== Medical conditions list =====
+			String[] conditionOptions = { "Diabetes", "Heart Disease", "Heart Failure", "Stroke", "Asthma", "COPD", "Arthritis",
+					"Cancer", "High Blood Pressure", "Alzheimer’s Disease / Dementia", "Other" };
+
+			// Read saved values from backend (you will update MedicalInfo model later)
+			String savedConditionsCsv = "";
+			String savedAllergies = "";
+
+			if (medicalInfo != null) {
+				try {
+					savedConditionsCsv = (medicalInfo.getConditionsCsv() != null) ? medicalInfo.getConditionsCsv() : "";
+				} catch (Exception e) {
+				}
+				try {
+					savedAllergies = (medicalInfo.getAllergiesText() != null) ? medicalInfo.getAllergiesText() : "";
+				} catch (Exception e) {
+				}
+			}
+
+			// Helper: check if option is selected (simple contains check on CSV)
+			// Pad commas to avoid partial match (e.g. "COPD" vs "COPD-like")
+			String padded = "," + savedConditionsCsv.replace(" ", "") + ",";
+			%>
+
 			<!-- MEDICAL INFO -->
 			<div class="card mt-4">
 				<div
@@ -362,22 +388,52 @@ body {
 					<form
 						action="<%=request.getContextPath()%>/UpdateMedicalInfoServlet"
 						method="post">
-						<textarea class="form-control input-box" name="medical_info"
-							rows="4"
-							placeholder="e.g. Asthma, diabetes, allergies, mobility issues, special care notes"><%=medicalText%></textarea>
+
+						<label class="info-label mb-2">Medical Conditions</label>
+
+						<div class="row g-2 mb-3">
+							<%
+							for (String opt : conditionOptions) {
+								String key = opt.replace(" ", "_").replace("’", "").replace("/", "_");
+								boolean checked = padded.contains("," + opt.replace(" ", "") + ","); // matches CSV without spaces
+							%>
+							<div class="col-12 col-md-6 col-lg-4">
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox"
+										name="conditions" id="cond_<%=key%>" value="<%=opt%>"
+										<%=checked ? "checked" : ""%>> <label
+										class="form-check-label" for="cond_<%=key%>"> <%=opt%>
+									</label>
+								</div>
+							</div>
+							<%
+							}
+							%>
+						</div>
+
+						<div class="mb-3">
+							<label class="info-label">Allergies (food / medication /
+								environmental)</label>
+							<textarea class="form-control input-box" name="allergies"
+								rows="3" placeholder="e.g. Penicillin, shellfish, dust"><%=savedAllergies%></textarea>
+						</div>
 
 						<div class="d-flex gap-2 mt-3">
 							<button type="submit" class="btn btn-primary">Save
 								Medical Info</button>
+
+							<!-- you can keep your clear servlet -->
 							<a class="btn btn-outline-danger"
 								href="<%=request.getContextPath()%>/ClearMedicalInfoServlet"
 								onclick="return confirm('Clear medical information?');">Clear</a>
 						</div>
 					</form>
-					<small class="text-muted d-block mt-2">Tip: Keep it short
-						(conditions, allergies, special care notes).</small>
+
+					<small class="text-muted d-block mt-2"> Tip: Tick the
+						conditions, then list allergies below. </small>
 				</div>
 			</div>
+
 
 			<!-- EMERGENCY CONTACTS -->
 			<div class="card mt-4">

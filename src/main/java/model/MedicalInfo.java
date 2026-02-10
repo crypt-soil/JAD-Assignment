@@ -1,19 +1,43 @@
 package model;
 
 public class MedicalInfo {
-    private int medicalId;
-    private int customerId;
-    private String medicalInfo;
 
-    public MedicalInfo(int medicalId, int customerId, String medicalInfo) {
-        this.medicalId = medicalId;
-        this.customerId = customerId;
-        this.medicalInfo = medicalInfo;
-    }
+	private int medicalId;
+	private int customerId;
+	private String conditionsCsv;
+	private String allergiesText;
 
-    public int getMedicalId() { return medicalId; }
-    public int getCustomerId() { return customerId; }
-    public String getMedicalInfo() { return medicalInfo; }
+	// ✅ Constructor used by DAO
+	public MedicalInfo(int medicalId, int customerId, String conditionsCsv, String allergiesText) {
+		this.medicalId = medicalId;
+		this.customerId = customerId;
+		this.conditionsCsv = conditionsCsv;
+		this.allergiesText = allergiesText;
+	}
 
-    public void setMedicalInfo(String medicalInfo) { this.medicalInfo = medicalInfo; }
+	public int getMedicalId() {
+		return medicalId;
+	}
+
+	public int getCustomerId() {
+		return customerId;
+	}
+
+	// ===== Medical Conditions =====
+	public String getConditionsCsv() {
+		return conditionsCsv;
+	}
+
+	public void setConditionsCsv(String conditionsCsv) {
+		this.conditionsCsv = conditionsCsv;
+	}
+
+	// ===== Allergies =====
+	public String getAllergiesText() {
+		return allergiesText;
+	}
+
+	public void setAllergiesText(String allergiesText) {
+		this.allergiesText = allergiesText;
+	}
 }

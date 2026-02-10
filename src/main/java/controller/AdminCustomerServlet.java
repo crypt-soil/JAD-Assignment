@@ -205,12 +205,21 @@ public class AdminCustomerServlet extends HttpServlet {
 		// form action: /admin/clients/medical/update
 		if (action.equals("/clients/medical/update")) {
 			int customerId = Integer.parseInt(request.getParameter("customer_id"));
-			String medicalText = request.getParameter("medical_info");
-			if (medicalText != null)
-				medicalText = medicalText.trim();
+
+			String[] conditionsArr = request.getParameterValues("conditions");
+			String allergies = request.getParameter("allergies");
+
+			if (allergies == null)
+				allergies = "";
+			allergies = allergies.trim();
+
+			String conditionsCsv = "";
+			if (conditionsArr != null && conditionsArr.length > 0) {
+				conditionsCsv = String.join(",", conditionsArr).trim();
+			}
 
 			MedicalInfoDAO medicalDAO = new MedicalInfoDAO();
-			medicalDAO.saveOrUpdate(customerId, medicalText);
+			medicalDAO.saveOrUpdate(customerId, conditionsCsv, allergies);
 
 			response.sendRedirect(request.getContextPath() + "/admin/clients/profile?id=" + customerId);
 			return;

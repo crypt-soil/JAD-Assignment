@@ -23,7 +23,8 @@ public class ClearMedicalInfoServlet extends HttpServlet {
         int customerId = (int) session.getAttribute("customer_id");
 
         MedicalInfoDAO dao = new MedicalInfoDAO();
-        dao.saveOrUpdate(customerId, null); // clears it
+        dao.saveOrUpdate(customerId, "", "");
+
 
         response.sendRedirect(request.getContextPath()
                 + "/profile?success=Medical+information+cleared!");

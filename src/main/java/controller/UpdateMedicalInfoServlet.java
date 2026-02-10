@@ -9,27 +9,38 @@ import model.MedicalInfoDAO;
 
 @WebServlet("/UpdateMedicalInfoServlet")
 public class UpdateMedicalInfoServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("customer_id") == null) {
-            response.sendRedirect(request.getContextPath() + "/categories");
-            return;
-        }
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("customer_id") == null) {
+			response.sendRedirect(request.getContextPath() + "/categories");
+			return;
+		}
 
-        int customerId = (int) session.getAttribute("customer_id");
-        String medicalInfo = request.getParameter("medical_info");
+		int customerId = (int) session.getAttribute("customer_id");
 
-        // optional: trim
-        if (medicalInfo != null) medicalInfo = medicalInfo.trim();
+		// ✅ Checkboxes (multiple values)
+		String[] conditionsArr = request.getParameterValues("conditions");
 
-        MedicalInfoDAO dao = new MedicalInfoDAO();
-        dao.saveOrUpdate(customerId, medicalInfo);
+		// ✅ Allergies text
+		String allergies = request.getParameter("allergies");
+		if (allergies == null)
+			allergies = "";
+		allergies = allergies.trim();
 
-        response.sendRedirect(request.getContextPath()
-                + "/profile?success=Medical+information+saved!");
-    }
+		// ✅ Convert conditions array -> CSV (store the label values)
+		String conditionsCsv = "";
+		if (conditionsArr != null && conditionsArr.length > 0) {
+			// keep original labels; join with comma
+			conditionsCsv = String.join(",", conditionsArr).trim();
+		}
+
+		MedicalInfoDAO dao = new MedicalInfoDAO();
+		dao.saveOrUpdate(customerId, conditionsCsv, allergies);
+
+		response.sendRedirect(request.getContextPath() + "/profile?tab=profile&success=Medical+information+saved!");
+	}
 }

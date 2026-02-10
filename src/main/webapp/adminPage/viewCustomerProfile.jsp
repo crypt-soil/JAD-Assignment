@@ -23,10 +23,18 @@ if (customer == null) {
 	return;
 }
 
-String medicalText = "";
-if (medicalInfo != null && medicalInfo.getMedicalInfo() != null) {
-	medicalText = medicalInfo.getMedicalInfo();
+String savedConditionsCsv = "";
+String savedAllergies = "";
+
+if (medicalInfo != null) {
+	if (medicalInfo.getConditionsCsv() != null)
+		savedConditionsCsv = medicalInfo.getConditionsCsv();
+	if (medicalInfo.getAllergiesText() != null)
+		savedAllergies = medicalInfo.getAllergiesText();
 }
+
+// for checkbox matching
+String padded = "," + savedConditionsCsv.replace(" ", "") + ",";
 %>
 
 <!DOCTYPE html>
@@ -235,15 +243,43 @@ body {
 			</div>
 
 			<div class="card-body">
+				<%
+				String[] conditionOptions = {"Diabetes", "Heart Disease", "Heart Failure", "Stroke", "Asthma", "COPD", "Arthritis",
+						"Cancer", "High Blood Pressure", "Alzheimer’s Disease / Dementia", "Other"};
+				%>
+
 				<form method="post"
 					action="<%=request.getContextPath()%>/admin/clients/medical/update">
+
 					<input type="hidden" name="customer_id"
 						value="<%=customer.getCustomer_id()%>">
 
-					<div class="label">Care notes / allergies / conditions</div>
-					<textarea class="form-control input-soft" name="medical_info"
-						rows="4"
-						placeholder="e.g. Asthma, diabetes, allergies, fall risk, mobility notes..."><%=medicalText%></textarea>
+					<div class="label mb-2">Medical Conditions</div>
+
+					<div class="row g-2">
+						<%
+						for (String opt : conditionOptions) {
+							String key = opt.replace(" ", "_").replace("’", "").replace("/", "_");
+							boolean checked = padded.contains("," + opt.replace(" ", "") + ",");
+						%>
+						<div class="col-12 col-md-6 col-lg-4">
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox"
+									name="conditions" id="cond_<%=key%>" value="<%=opt%>"
+									<%=checked ? "checked" : ""%>> <label
+									class="form-check-label" for="cond_<%=key%>"><%=opt%></label>
+							</div>
+						</div>
+						<%
+						}
+						%>
+					</div>
+
+					<div class="mt-3">
+						<div class="label">Allergies</div>
+						<textarea class="form-control input-soft" name="allergies"
+							rows="3" placeholder="e.g. Penicillin, shellfish, dust"><%=savedAllergies%></textarea>
+					</div>
 
 					<div class="d-flex gap-2 mt-3">
 						<button type="submit" class="btn btn-primary-soft">
@@ -253,6 +289,7 @@ body {
 				</form>
 			</div>
 		</div>
+
 
 		<!-- EMERGENCY CONTACTS -->
 		<div class="card card-soft">

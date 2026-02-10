@@ -4,56 +4,68 @@ import java.sql.*;
 
 public class MedicalInfoDAO {
 
-    public MedicalInfo getByCustomerId(int customerId) {
-        MedicalInfo info = null;
+	public MedicalInfo getByCustomerId(int customerId) {
+		MedicalInfo info = null;
 
-        try {
-            Connection conn = DBConnection.getConnection();
+		String sql = "SELECT medical_id, customer_id, conditions_csv, allergies_text "
+				+ "FROM customer_medical_info WHERE customer_id = ?";
 
-            String sql = "SELECT * FROM customer_medical_info WHERE customer_id = ?";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, customerId);
+		try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                info = new MedicalInfo(
-                    rs.getInt("medical_id"),
-                    rs.getInt("customer_id"),
-                    rs.getString("medical_info")
-                );
-            }
+			ps.setInt(1, customerId);
 
-            conn.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					info = new MedicalInfo(rs.getInt("medical_id"), rs.getInt("customer_id"),
+							rs.getString("conditions_csv"), rs.getString("allergies_text"));
+				}
+			}
 
-        return info; // can be null if no row yet
-    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-    // Upsert: if exists -> update, else -> insert
-    public void saveOrUpdate(int customerId, String medicalInfo) {
-        try {
-            Connection conn = DBConnection.getConnection();
+		return info; // can be null if no row yet
+	}
 
-            String sql =
-                "INSERT INTO customer_medical_info (customer_id, medical_info) " +
-                "VALUES (?, ?) " +
-                "ON DUPLICATE KEY UPDATE medical_info = VALUES(medical_info)";
+	// Upsert: if exists -> update, else -> insert
+	public void saveOrUpdate(int customerId, String conditionsCsv, String allergiesText) {
+		String checkSql = "SELECT medical_id FROM customer_medical_info WHERE customer_id=?";
+		String insertSql = "INSERT INTO customer_medical_info (customer_id, conditions_csv, allergies_text) VALUES (?, ?, ?)";
+		String updateSql = "UPDATE customer_medical_info SET conditions_csv=?, allergies_text=? WHERE customer_id=?";
 
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, customerId);
-            ps.setString(2, medicalInfo);
+		try (Connection conn = DBConnection.getConnection();
+				PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
 
-            ps.executeUpdate();
-            conn.close();
+			checkStmt.setInt(1, customerId);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+			try (ResultSet rs = checkStmt.executeQuery()) {
+				if (rs.next()) {
+					// update
+					try (PreparedStatement stmt = conn.prepareStatement(updateSql)) {
+						stmt.setString(1, conditionsCsv);
+						stmt.setString(2, allergiesText);
+						stmt.setInt(3, customerId);
+						stmt.executeUpdate();
+					}
+				} else {
+					// insert
+					try (PreparedStatement stmt = conn.prepareStatement(insertSql)) {
+						stmt.setInt(1, customerId);
+						stmt.setString(2, conditionsCsv);
+						stmt.setString(3, allergiesText);
+						stmt.executeUpdate();
+					}
+				}
+			}
 
-    public void clearMedicalInfo(int customerId) {
-        saveOrUpdate(customerId, null);
-    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void clearMedicalInfo(int customerId) {
+		// clear both columns
+		saveOrUpdate(customerId, "", "");
+	}
 }
