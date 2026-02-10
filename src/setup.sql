@@ -350,20 +350,54 @@ VALUES
  (SELECT booking_date FROM bookings WHERE booking_id=1) + INTERVAL 45 MINUTE,
  30.00, 'Needs assistance to stand up safely', 0, NULL, NULL);
  
--- table: feedback
+-- =========================
+-- table: feedback (NEW)
+-- matches screenshot columns
+-- =========================
+
+DROP TABLE IF EXISTS feedback;
+
 CREATE TABLE feedback (
     feedback_id INT AUTO_INCREMENT PRIMARY KEY,
-    booking_id INT,
-    service_id INT,
-    remarks VARCHAR(255),
-    rating INT CHECK (rating BETWEEN 1 AND 5),
+    booking_id INT NOT NULL,
+    service_id INT NOT NULL,
+
+    caregiver_rating INT NOT NULL CHECK (caregiver_rating BETWEEN 1 AND 5),
+    service_rating   INT NOT NULL CHECK (service_rating BETWEEN 1 AND 5),
+
+    caregiver_remarks VARCHAR(255) NULL,
+    service_remarks   VARCHAR(255) NULL,
+
+    INDEX idx_feedback_booking (booking_id),
+    INDEX idx_feedback_service (service_id),
+
     FOREIGN KEY (booking_id) REFERENCES bookings(booking_id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
+
     FOREIGN KEY (service_id) REFERENCES service(service_id)
-        ON DELETE SET NULL
+        ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
+-- =========================
+-- dummy data (like screenshot)
+-- =========================
+INSERT INTO feedback
+(booking_id, service_id, caregiver_rating, service_rating, caregiver_remarks, service_remarks)
+VALUES
+(2, 6, 3, 5, 'subpar', 'good'),
+(1, 1, 5, 5, 'Excellent care, very attentive', 'Service was smooth and professional'),
+(1, 2, 4, 4, 'Friendly and helpful', 'Good overall experience'),
+(2, 3, 3, 4, 'Average performance', 'Service was okay'),
+(2, 4, 2, 3, 'Caregiver seemed rushed', 'Service could be improved'),
+(3, 1, 5, 5, 'Outstanding caregiver', 'Top quality service'),
+(3, 5, 4, 5, 'Very patient and kind', 'Excellent service delivery'),
+(4, 2, 3, 3, 'Acceptable but nothing special', 'Average service'),
+(4, 6, 1, 2, 'Very poor attitude', 'Disappointing service'),
+(5, 3, 4, 4, 'Professional and calm', 'Good service'),
+(5, 4, 2, 3, 'Needs improvement', 'Service was below expectations');
+
 
 -- table: admin_user
 CREATE TABLE admin_user (
