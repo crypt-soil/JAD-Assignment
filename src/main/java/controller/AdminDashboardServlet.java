@@ -53,9 +53,34 @@ public class AdminDashboardServlet extends HttpServlet {
 			request.setAttribute("topServices", dao.getTopServicesByFeedback(limit));
 			request.setAttribute("worstServices", dao.getWorstServicesByFeedback(limit));
 
-			// ✅ NEW: demand/availability lists
+			// Demand/availability lists
 			request.setAttribute("highDemandServices", dao.getHighDemandServices(range, limit));
 			request.setAttribute("lowAvailabilityServices", dao.getLowAvailabilityServices(range, limit));
+			
+			// Sales & Reports params
+			String serviceIdStr = request.getParameter("serviceId");
+			Integer serviceId = null;
+			try {
+			    if (serviceIdStr != null && !serviceIdStr.isBlank()) {
+			        serviceId = Integer.parseInt(serviceIdStr);
+			    }
+			} catch (NumberFormatException ignored) {}
+
+			// Sales & Reports Data
+			request.setAttribute("servicesList", dao.getActiveServices());
+
+			int reportLimit = 10;
+			request.setAttribute("scheduleRows", dao.getBookingSchedule(range, reportLimit));
+			request.setAttribute("topClients", dao.getTopClientsByValue(range, limit)); // reuse limit=5
+
+			if (serviceId != null) {
+			    request.setAttribute("selectedServiceId", serviceId);
+			    request.setAttribute("clientsByService", dao.getClientsByService(range, serviceId, reportLimit));
+			} else {
+			    request.setAttribute("selectedServiceId", null);
+			    request.setAttribute("clientsByService", new java.util.ArrayList<>());
+			}
+
 
 			request.getRequestDispatcher("/adminPage/analyticsDashboard.jsp").forward(request, response);
 

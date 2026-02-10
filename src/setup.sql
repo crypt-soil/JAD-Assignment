@@ -350,6 +350,74 @@ VALUES
  (SELECT booking_date FROM bookings WHERE booking_id=1) + INTERVAL 45 MINUTE,
  30.00, 'Needs assistance to stand up safely', 0, NULL, NULL);
  
+ 
+ -- ==========================================
+-- EXTRA BOOKINGS to test week/month/year filters
+-- ==========================================
+
+-- 1) This week (2 days ago)  ✅ should appear in "week", "month", "year"
+INSERT INTO bookings (customer_id, booking_date, status)
+VALUES (1, NOW() - INTERVAL 2 DAY, 2);
+
+SET @b_week := LAST_INSERT_ID();
+
+INSERT INTO booking_details
+(booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
+VALUES
+(@b_week, 1, 1, 1,
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_week),
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_week) + INTERVAL 1 HOUR,
+ 35.00, 'Seed: this week', 2,
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_week), NULL);
+
+
+-- 2) This month but NOT this week (20 days ago) ✅ should appear in "month", "year" (usually NOT week)
+INSERT INTO bookings (customer_id, booking_date, status)
+VALUES (1, NOW() - INTERVAL 20 DAY, 2);
+
+SET @b_month := LAST_INSERT_ID();
+
+INSERT INTO booking_details
+(booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
+VALUES
+(@b_month, 6, 5, 1,
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_month),
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_month) + INTERVAL 2 HOUR,
+ 35.00, 'Seed: this month', 1,
+ NULL, NULL);
+
+
+-- 3) This year but NOT this month (3 months ago) ✅ should appear in "year" only
+INSERT INTO bookings (customer_id, booking_date, status)
+VALUES (1, NOW() - INTERVAL 3 MONTH, 2);
+
+SET @b_year := LAST_INSERT_ID();
+
+INSERT INTO booking_details
+(booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
+VALUES
+(@b_year, 8, 6, 1,
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_year),
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_year) + INTERVAL 1 HOUR,
+ 50.00, 'Seed: this year', 1,
+ NULL, NULL);
+
+
+-- 4) Last year (14 months ago) ✅ should NOT appear in this year's filter
+INSERT INTO bookings (customer_id, booking_date, status)
+VALUES (1, NOW() - INTERVAL 14 MONTH, 2);
+
+SET @b_lastyear := LAST_INSERT_ID();
+
+INSERT INTO booking_details
+(booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
+VALUES
+(@b_lastyear, 7, NULL, 1,
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_lastyear),
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_lastyear) + INTERVAL 1 HOUR,
+ 40.00, 'Seed: last year', 0,
+ NULL, NULL);
+
 -- =========================
 -- table: feedback (NEW)
 -- matches screenshot columns

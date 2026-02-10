@@ -209,4 +209,145 @@ public class AdminDashboardDAO {
 
 		return list;
 	}
+
+	// =========================
+	// SALES & REPORTS (FEATURE 5)
+	// =========================
+
+	// 1) Booking / Care schedule rows (by range)
+	public List<Map<String, Object>> getBookingSchedule(String range, int limit) throws SQLException {
+		int days = rangeToDays(range);
+
+		String sql = "SELECT bd.detail_id AS detailId, " + "       b.booking_id AS bookingId, "
+				+ "       b.booking_date AS bookingDate, " + "       bd.start_time AS startTime, "
+				+ "       bd.end_time AS endTime, " + "       c.full_name AS customerName, "
+				+ "       s.name AS serviceName, " + "       cg.full_name AS caregiverName, "
+				+ "       bd.caregiver_status AS caregiverStatus, " + "       bd.subtotal AS subtotal "
+				+ "FROM booking_details bd " + "JOIN bookings b ON b.booking_id = bd.booking_id "
+				+ "JOIN customers c ON c.customer_id = b.customer_id "
+				+ "JOIN service s ON s.service_id = bd.service_id "
+				+ "LEFT JOIN caregiver cg ON cg.caregiver_id = bd.caregiver_id "
+				+ "WHERE b.booking_date >= DATE_SUB(NOW(), INTERVAL ? DAY) "
+				+ "ORDER BY bd.start_time ASC, b.booking_id ASC " + "LIMIT ?";
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+			ps.setInt(1, days);
+			ps.setInt(2, limit);
+
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					Map<String, Object> row = new HashMap<>();
+					row.put("detailId", rs.getInt("detailId"));
+					row.put("bookingId", rs.getInt("bookingId"));
+					row.put("bookingDate", rs.getTimestamp("bookingDate"));
+					row.put("startTime", rs.getTimestamp("startTime"));
+					row.put("endTime", rs.getTimestamp("endTime"));
+					row.put("customerName", rs.getString("customerName"));
+					row.put("serviceName", rs.getString("serviceName"));
+					row.put("caregiverName", rs.getString("caregiverName")); // can be null
+					row.put("caregiverStatus", rs.getInt("caregiverStatus"));
+					row.put("subtotal", rs.getDouble("subtotal"));
+					list.add(row);
+				}
+			}
+		}
+
+		return list;
+	}
+
+	// 2) Top clients by total value spent (by range)
+	public List<Map<String, Object>> getTopClientsByValue(String range, int limit) throws SQLException {
+		int days = rangeToDays(range);
+
+		String sql = "SELECT c.customer_id AS customerId, " + "       c.full_name AS customerName, "
+				+ "       COUNT(DISTINCT b.booking_id) AS bookingCount, " + "       COUNT(bd.detail_id) AS itemCount, "
+				+ "       ROUND(IFNULL(SUM(bd.subtotal), 0), 2) AS totalSpent " + "FROM customers c "
+				+ "JOIN bookings b ON b.customer_id = c.customer_id "
+				+ "JOIN booking_details bd ON bd.booking_id = b.booking_id "
+				+ "WHERE b.booking_date >= DATE_SUB(NOW(), INTERVAL ? DAY) " + "GROUP BY c.customer_id, c.full_name "
+				+ "ORDER BY totalSpent DESC, bookingCount DESC, c.full_name ASC " + "LIMIT ?";
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+			ps.setInt(1, days);
+			ps.setInt(2, limit);
+
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					Map<String, Object> row = new HashMap<>();
+					row.put("customerId", rs.getInt("customerId"));
+					row.put("customerName", rs.getString("customerName"));
+					row.put("bookingCount", rs.getInt("bookingCount"));
+					row.put("itemCount", rs.getInt("itemCount"));
+					row.put("totalSpent", rs.getDouble("totalSpent"));
+					list.add(row);
+				}
+			}
+		}
+
+		return list;
+	}
+
+	// 3) Clients who booked a certain service (by range + serviceId)
+	public List<Map<String, Object>> getClientsByService(String range, int serviceId, int limit) throws SQLException {
+		int days = rangeToDays(range);
+
+		String sql = "SELECT c.customer_id AS customerId, " + "       c.full_name AS customerName, "
+				+ "       COUNT(bd.detail_id) AS timesBooked, "
+				+ "       ROUND(IFNULL(SUM(bd.subtotal), 0), 2) AS totalSpent " + "FROM booking_details bd "
+				+ "JOIN bookings b ON b.booking_id = bd.booking_id "
+				+ "JOIN customers c ON c.customer_id = b.customer_id "
+				+ "WHERE b.booking_date >= DATE_SUB(NOW(), INTERVAL ? DAY) " + "  AND bd.service_id = ? "
+				+ "GROUP BY c.customer_id, c.full_name "
+				+ "ORDER BY timesBooked DESC, totalSpent DESC, c.full_name ASC " + "LIMIT ?";
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+			ps.setInt(1, days);
+			ps.setInt(2, serviceId);
+			ps.setInt(3, limit);
+
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					Map<String, Object> row = new HashMap<>();
+					row.put("customerId", rs.getInt("customerId"));
+					row.put("customerName", rs.getString("customerName"));
+					row.put("timesBooked", rs.getInt("timesBooked"));
+					row.put("totalSpent", rs.getDouble("totalSpent"));
+					list.add(row);
+				}
+			}
+		}
+
+		return list;
+	}
+
+	// 4) Services list for dropdown
+	public List<Map<String, Object>> getActiveServices() throws SQLException {
+		String sql = "SELECT service_id AS serviceId, name AS name FROM service WHERE status = 1 ORDER BY name ASC";
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		try (Connection conn = DBConnection.getConnection();
+				PreparedStatement ps = conn.prepareStatement(sql);
+				ResultSet rs = ps.executeQuery()) {
+
+			while (rs.next()) {
+				Map<String, Object> row = new HashMap<>();
+				row.put("serviceId", rs.getInt("serviceId"));
+				row.put("name", rs.getString("name"));
+				list.add(row);
+			}
+		}
+
+		return list;
+	}
+
 }
