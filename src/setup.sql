@@ -178,11 +178,11 @@ CREATE TABLE bookings (
 -- insert sample bookings for analytics
 -- status seeded as confirmed for current and future bookings
 INSERT INTO bookings (customer_id, booking_date, status) VALUES
-(1, NOW(), 2),
-(1, NOW() + INTERVAL 1 DAY, 2),
-(1, NOW() + INTERVAL 3 DAY, 2),
-(1, NOW() + INTERVAL 7 DAY, 2),
-(1, NOW() + INTERVAL 14 DAY, 2);
+(1, NOW(), 1),
+(1, NOW() + INTERVAL 1 DAY, 1),
+(1, NOW() + INTERVAL 3 DAY, 1),
+(1, NOW() + INTERVAL 7 DAY, 1),
+(1, NOW() + INTERVAL 14 DAY, 1);
 
 -- table: caregiver
 CREATE TABLE caregiver (
@@ -351,107 +351,137 @@ CREATE TABLE booking_details (
 
 -- Insert booking details
 -- start_time and end_time seeded to match booking_date for current and future bookings
+-- Insert booking details (main seed)
+-- booking 1 is pending: mix of assigned + open
+-- booking 2 is confirmed: all assigned
+-- booking 3 is pending: open partner request
+-- booking 4 is pending: open request
+-- booking 5 is confirmed: all assigned
 
 INSERT INTO booking_details
 (booking_id, service_id, caregiver_id, partner_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
 VALUES
+-- booking 1 (status=1 pending)
 (1, 1, 1, NULL, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=1),
  (SELECT booking_date FROM bookings WHERE booking_id=1) + INTERVAL 1 HOUR,
- 35.00, 'Wheelchair assistance needed', 2,
- (SELECT booking_date FROM bookings WHERE booking_id=1), NULL),
+ 35.00, 'Wheelchair assistance needed', 1, NULL, NULL),
 
-(1, 2, 2, NULL, 1,
+(1, 2, NULL, NULL, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=1),
  (SELECT booking_date FROM bookings WHERE booking_id=1) + INTERVAL 30 MINUTE,
- 20.00, NULL, 1, NULL, NULL),
+ 20.00, NULL, 0, NULL, NULL),
 
+(1, 3, NULL, NULL, 1,
+ (SELECT booking_date FROM bookings WHERE booking_id=1),
+ (SELECT booking_date FROM bookings WHERE booking_id=1) + INTERVAL 45 MINUTE,
+ 30.00, 'Needs assistance to stand up safely', 0, NULL, NULL),
+
+-- booking 2 (status=2 confirmed)
 (2, 6, 5, NULL, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=2),
  (SELECT booking_date FROM bookings WHERE booking_id=2) + INTERVAL 1 HOUR,
  35.00, 'Low salt meal preferred', 1, NULL, NULL),
 
-(3, 8, 6, 1, 1,
- (SELECT booking_date FROM bookings WHERE booking_id=3),
- (SELECT booking_date FROM bookings WHERE booking_id=3) + INTERVAL 2 HOUR,
- 50.00, NULL, 1, NULL, NULL),
-
-(2, 4, NULL, NULL, 1,
+(2, 4, 4, NULL, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=2),
  (SELECT booking_date FROM bookings WHERE booking_id=2) + INTERVAL 2 HOUR,
- 50.00, 'Please bring cleaning supplies', 0, NULL, NULL),
+ 50.00, 'Please bring cleaning supplies', 1, NULL, NULL),
 
-(3, 7, NULL, NULL, 1,
+-- booking 3 (status=1 pending, partner-side open)
+(3, 8, NULL, 1, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=3),
- (SELECT booking_date FROM bookings WHERE booking_id=3) + INTERVAL 1 HOUR,
+ (SELECT booking_date FROM bookings WHERE booking_id=3) + INTERVAL 2 HOUR,
+ 50.00, NULL, 0, NULL, NULL),
+
+-- booking 4 (status=1 pending, open caregiver request)
+(4, 7, NULL, NULL, 1,
+ (SELECT booking_date FROM bookings WHERE booking_id=4),
+ (SELECT booking_date FROM bookings WHERE booking_id=4) + INTERVAL 1 HOUR,
  40.00, 'Client prefers Chinese speaking caregiver', 0, NULL, NULL),
 
-(1, 3, NULL, NULL, 1,
- (SELECT booking_date FROM bookings WHERE booking_id=1),
- (SELECT booking_date FROM bookings WHERE booking_id=1) + INTERVAL 45 MINUTE,
- 30.00, 'Needs assistance to stand up safely', 0, NULL, NULL);
+-- booking 5 (status=2 confirmed)
+(5, 1, 3, NULL, 1,
+ (SELECT booking_date FROM bookings WHERE booking_id=5),
+ (SELECT booking_date FROM bookings WHERE booking_id=5) + INTERVAL 1 HOUR,
+ 35.00, 'Seed: confirmed booking', 1, NULL, NULL);
 
+ 
 -- Extra bookings to test week/month/year filters
+-- Seed as completed jobs so they do not show as open requests and do not affect logic
 
 -- 1) This week (2 days ago): should appear in week, month, year
 INSERT INTO bookings (customer_id, booking_date, status)
-VALUES (1, NOW() - INTERVAL 2 DAY, 2);
+VALUES (1, NOW() - INTERVAL 2 DAY, 3);
 
 SET @b_week := LAST_INSERT_ID();
 
 INSERT INTO booking_details
-(booking_id, service_id, caregiver_id, partner_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
+(booking_id, service_id, caregiver_id, partner_id, quantity, start_time, end_time, subtotal,
+ special_request, caregiver_status, check_in_at, check_out_at)
 VALUES
 (@b_week, 1, 1, NULL, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=@b_week),
  (SELECT booking_date FROM bookings WHERE booking_id=@b_week) + INTERVAL 1 HOUR,
- 35.00, 'Seed: this week', 2,
- (SELECT booking_date FROM bookings WHERE booking_id=@b_week), NULL);
+ 35.00, 'Seed: this week',
+ 3,
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_week),
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_week) + INTERVAL 1 HOUR);
 
 -- 2) This month but not this week (20 days ago): should appear in month, year
 INSERT INTO bookings (customer_id, booking_date, status)
-VALUES (1, NOW() - INTERVAL 20 DAY, 2);
+VALUES (1, NOW() - INTERVAL 20 DAY, 3);
 
 SET @b_month := LAST_INSERT_ID();
 
 INSERT INTO booking_details
-(booking_id, service_id, caregiver_id, partner_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
+(booking_id, service_id, caregiver_id, partner_id, quantity, start_time, end_time, subtotal,
+ special_request, caregiver_status, check_in_at, check_out_at)
 VALUES
 (@b_month, 6, 5, NULL, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=@b_month),
  (SELECT booking_date FROM bookings WHERE booking_id=@b_month) + INTERVAL 2 HOUR,
- 35.00, 'Seed: this month', 1,
- NULL, NULL);
+ 35.00, 'Seed: this month',
+ 3,
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_month),
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_month) + INTERVAL 2 HOUR);
 
 -- 3) This year but not this month (3 months ago): should appear in year only
 INSERT INTO bookings (customer_id, booking_date, status)
-VALUES (1, NOW() - INTERVAL 3 MONTH, 2);
+VALUES (1, NOW() - INTERVAL 3 MONTH, 3);
 
 SET @b_year := LAST_INSERT_ID();
 
 INSERT INTO booking_details
-(booking_id, service_id, caregiver_id, partner_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
+(booking_id, service_id, caregiver_id, partner_id, quantity, start_time, end_time, subtotal,
+ special_request, caregiver_status, check_in_at, check_out_at)
 VALUES
 (@b_year, 8, 6, 1, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=@b_year),
  (SELECT booking_date FROM bookings WHERE booking_id=@b_year) + INTERVAL 1 HOUR,
- 50.00, 'Seed: this year', 1,
- NULL, NULL);
+ 50.00, 'Seed: this year',
+ 3,
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_year),
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_year) + INTERVAL 1 HOUR);
 
 -- 4) Last year (14 months ago): should not appear in this year's filter
 INSERT INTO bookings (customer_id, booking_date, status)
-VALUES (1, NOW() - INTERVAL 14 MONTH, 2);
+VALUES (1, NOW() - INTERVAL 14 MONTH, 3);
 
 SET @b_lastyear := LAST_INSERT_ID();
 
 INSERT INTO booking_details
-(booking_id, service_id, caregiver_id, partner_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
+(booking_id, service_id, caregiver_id, partner_id, quantity, start_time, end_time, subtotal,
+ special_request, caregiver_status, check_in_at, check_out_at)
 VALUES
-(@b_lastyear, 7, NULL, NULL, 1,
+(@b_lastyear, 7, 3, NULL, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=@b_lastyear),
  (SELECT booking_date FROM bookings WHERE booking_id=@b_lastyear) + INTERVAL 1 HOUR,
- 40.00, 'Seed: last year', 0,
- NULL, NULL);
+ 40.00, 'Seed: last year',
+ 3,
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_lastyear),
+ (SELECT booking_date FROM bookings WHERE booking_id=@b_lastyear) + INTERVAL 1 HOUR);
+
 
 -- =========================
 -- table: feedback (NEW)

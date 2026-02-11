@@ -23,8 +23,8 @@ public class CaregiverVisitDAO {
 				+ "JOIN bookings b ON b.booking_id = bd.booking_id "
 				+ "JOIN customers c ON c.customer_id = b.customer_id "
 				+ "JOIN service s ON s.service_id = bd.service_id " + "WHERE bd.caregiver_id = ? "
-				+ "  AND b.status = 2 " + // show only confirmed bookings
-				whereDate + "ORDER BY bd.start_time ASC";
+				+ "  AND b.status IN (1,2) " + "  AND bd.caregiver_status IN (1,2,3) " + whereDate
+				+ "ORDER BY bd.start_time ASC";
 
 		try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
