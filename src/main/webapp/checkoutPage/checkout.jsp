@@ -130,9 +130,6 @@ body {
 					<a href="<%=request.getContextPath()%>/cartPage/cartPage.jsp"
 						class="btn btn-outline-secondary ms-2">Back to Cart</a>
 				</form>
-
-				<div class="small muted mt-2">Note: Total is calculated using
-					hourly rate × duration (hours) × quantity.</div>
 			</div>
 
 			<%

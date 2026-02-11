@@ -20,7 +20,7 @@ public class DBConnection {
 
 			// Attempt to connect to the database
 			conn = DriverManager.getConnection(URL, USER, PASSWORD);
-			System.out.println("Successfully connected to MySQL!");
+//			System.out.println("Successfully connected to MySQL!");
 		}
 
 		// If driver class not found

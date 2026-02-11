@@ -90,6 +90,7 @@ body {
 
             <%
                 String errorMsg = (String) request.getAttribute("errorMsg");
+            
                 if (errorMsg != null) {
             %>
                 <div class="alert alert-danger text-center" role="alert">

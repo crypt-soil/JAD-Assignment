@@ -22,7 +22,8 @@ public class ConfirmCheckoutServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		Integer customerId = (Integer) request.getSession().getAttribute("customer_id");
+		HttpSession sess = request.getSession(false);
+		Integer customerId = (sess == null) ? null : (Integer) sess.getAttribute("customer_id");
 		if (customerId == null) {
 			response.sendRedirect(request.getContextPath() + "/loginPage/login.jsp");
 			return;
@@ -34,97 +35,94 @@ public class ConfirmCheckoutServlet extends HttpServlet {
 			return;
 		}
 
-		// ✅ totals (not stored in bookings table; for any future use)
-		double subtotal = 0.0;
-		for (CartItem item : items) {
-			subtotal += item.getLineTotal(); // ✅ now includes durationHours * qty * hourly rate
-		}
-		double gstRate = 0.09;
-		double gstAmount = subtotal * gstRate;
-		double total = subtotal + gstAmount;
-
 		Connection conn = null;
 		PreparedStatement psBooking = null;
-		PreparedStatement psDetails = null;
-		ResultSet keys = null;
+		PreparedStatement psDraft = null;
+		PreparedStatement psDraftItems = null;
+		ResultSet bookingKeys = null;
 
 		try {
 			conn = DBConnection.getConnection();
 			conn.setAutoCommit(false);
 
-			// 1) Insert into bookings (booking_date handled by DB default or triggers if
-			// any)
-			String bookingSql = "INSERT INTO bookings (customer_id, status) VALUES (?, ?)";
-			psBooking = conn.prepareStatement(bookingSql, Statement.RETURN_GENERATED_KEYS);
-			psBooking.setInt(1, customerId);
-			psBooking.setInt(2, 1); // 1 = pending
-			psBooking.executeUpdate();
-
-			keys = psBooking.getGeneratedKeys();
-			if (!keys.next())
-				throw new SQLException("Failed to create booking (no generated key).");
-			int bookingId = keys.getInt(1);
-
-			// 2) Insert booking_details
-			String detailSql = "INSERT INTO booking_details "
-					+ "(booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status) "
-					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-			psDetails = conn.prepareStatement(detailSql);
-
-			for (CartItem item : items) {
-
-				// ✅ basic validation (optional but safer)
-				if (item.getQuantity() < 1) {
-					throw new SQLException("Invalid quantity for item_id=" + item.getItemId());
-				}
-				if (item.getStartTime() == null || item.getEndTime() == null) {
-					throw new SQLException("Missing start/end time for item_id=" + item.getItemId());
-				}
-				if (!item.getEndTime().after(item.getStartTime())) {
-					throw new SQLException("End time must be after start time for item_id=" + item.getItemId());
-				}
-
-				psDetails.setInt(1, bookingId);
-				psDetails.setInt(2, item.getServiceId());
-
-				if (item.getCaregiverId() == null) {
-					psDetails.setNull(3, Types.INTEGER);
-				} else {
-					psDetails.setInt(3, item.getCaregiverId());
-				}
-
-				psDetails.setInt(4, item.getQuantity());
-				psDetails.setTimestamp(5, item.getStartTime());
-				psDetails.setTimestamp(6, item.getEndTime());
-
-				// ✅ IMPORTANT CHANGE:
-				// subtotal MUST include duration-based pricing
-				// CartItem.getLineTotal() = price(hourly) * durationHours * quantity
-				double lineSubtotal = item.getLineTotal();
-				psDetails.setDouble(7, lineSubtotal);
-
-				psDetails.setString(8, item.getSpecialRequest());
-
-				int caregiverStatus = (item.getCaregiverId() == null) ? 0 : 1; // 0=not_assigned, 1=assigned
-				psDetails.setInt(9, caregiverStatus);
-
-				psDetails.addBatch();
+			// ✅ OPTIONAL: If you want "one active pending booking at a time" per customer:
+			// Reuse existing pending unpaid booking draft instead of creating another.
+			Integer existingBookingId = findExistingPendingDraftBooking(conn, customerId);
+			if (existingBookingId != null) {
+				System.out.println("[CONFIRM CHECKOUT] Reusing existing pending bookingId=" + existingBookingId);
+				conn.commit();
+				response.sendRedirect(
+						request.getContextPath() + "/stripe/create-checkout-session?bookingId=" + existingBookingId);
+				return;
 			}
 
-			psDetails.executeBatch();
+			// 1) create booking header (pending + unpaid)
+			String bookingSql = "INSERT INTO bookings (customer_id, status, payment_status) VALUES (?, ?, ?)";
+			psBooking = conn.prepareStatement(bookingSql, Statement.RETURN_GENERATED_KEYS);
+			psBooking.setInt(1, customerId);
+			psBooking.setInt(2, 1); // pending
+			psBooking.setInt(3, 0); // unpaid
+			psBooking.executeUpdate();
 
-			// 3) clear cart (ideally should use same conn; keeping your DAO call as-is)
-			cartDAO.clearCartByCustomerId(customerId);
+			bookingKeys = psBooking.getGeneratedKeys();
+			if (!bookingKeys.next())
+				throw new SQLException("Failed to create booking (no generated key).");
+			int bookingId = bookingKeys.getInt(1);
+
+			// 2) create booking_drafts row
+			String draftSql = "INSERT INTO booking_drafts (booking_id, customer_id, status) VALUES (?, ?, 0)";
+			psDraft = conn.prepareStatement(draftSql, Statement.RETURN_GENERATED_KEYS);
+			psDraft.setInt(1, bookingId);
+			psDraft.setInt(2, customerId);
+			psDraft.executeUpdate();
+
+			ResultSet draftKeys = psDraft.getGeneratedKeys();
+			if (!draftKeys.next())
+				throw new SQLException("Failed to create draft (no generated key).");
+			int draftId = draftKeys.getInt(1);
+			draftKeys.close();
+
+			// 3) snapshot cart -> booking_draft_items
+			String draftItemSql = "INSERT INTO booking_draft_items "
+					+ "(draft_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status) "
+					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			psDraftItems = conn.prepareStatement(draftItemSql);
+
+			for (CartItem item : items) {
+				if (item.getQuantity() < 1)
+					throw new SQLException("Invalid quantity for item_id=" + item.getItemId());
+				if (item.getStartTime() == null || item.getEndTime() == null)
+					throw new SQLException("Missing start/end time for item_id=" + item.getItemId());
+				if (!item.getEndTime().after(item.getStartTime()))
+					throw new SQLException("End time must be after start time for item_id=" + item.getItemId());
+
+				psDraftItems.setInt(1, draftId);
+				psDraftItems.setInt(2, item.getServiceId());
+
+				if (item.getCaregiverId() == null)
+					psDraftItems.setNull(3, Types.INTEGER);
+				else
+					psDraftItems.setInt(3, item.getCaregiverId());
+
+				psDraftItems.setInt(4, item.getQuantity());
+				psDraftItems.setTimestamp(5, item.getStartTime());
+				psDraftItems.setTimestamp(6, item.getEndTime());
+				psDraftItems.setDouble(7, item.getLineTotal());
+				psDraftItems.setString(8, item.getSpecialRequest());
+
+				int caregiverStatus = (item.getCaregiverId() == null) ? 0 : 1;
+				psDraftItems.setInt(9, caregiverStatus);
+
+				psDraftItems.addBatch();
+			}
+			psDraftItems.executeBatch();
 
 			conn.commit();
 
-			// flash message
-			HttpSession session = request.getSession();
-			session.setAttribute("checkoutSuccessMessage", "Booking successful! Your booking ID is #" + bookingId);
+			System.out.println("[CONFIRM CHECKOUT] Created bookingId=" + bookingId + ", draft snapshot saved.");
 
-			// Redirect back to Categories page
-			response.sendRedirect(request.getContextPath() + "/categories");
+			// 4) redirect to Stripe
+			response.sendRedirect(request.getContextPath() + "/stripe/create-checkout-session?bookingId=" + bookingId);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -133,18 +131,21 @@ public class ConfirmCheckoutServlet extends HttpServlet {
 					conn.rollback();
 			} catch (SQLException ignore) {
 			}
-
 			response.sendRedirect(request.getContextPath() + "/checkout?error=checkout_failed");
-
 		} finally {
 			try {
-				if (keys != null)
-					keys.close();
+				if (bookingKeys != null)
+					bookingKeys.close();
 			} catch (Exception ignore) {
 			}
 			try {
-				if (psDetails != null)
-					psDetails.close();
+				if (psDraftItems != null)
+					psDraftItems.close();
+			} catch (Exception ignore) {
+			}
+			try {
+				if (psDraft != null)
+					psDraft.close();
 			} catch (Exception ignore) {
 			}
 			try {
@@ -156,6 +157,21 @@ public class ConfirmCheckoutServlet extends HttpServlet {
 				if (conn != null)
 					conn.close();
 			} catch (Exception ignore) {
+			}
+		}
+	}
+
+	// Finds an existing pending unpaid booking that has a draft (status=0)
+	private Integer findExistingPendingDraftBooking(Connection conn, int customerId) throws SQLException {
+		String sql = "SELECT b.booking_id " + "FROM bookings b "
+				+ "JOIN booking_drafts d ON d.booking_id = b.booking_id "
+				+ "WHERE b.customer_id=? AND b.payment_status=0 AND d.status=0 " + "ORDER BY b.booking_id DESC LIMIT 1";
+		try (PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setInt(1, customerId);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (!rs.next())
+					return null;
+				return rs.getInt("booking_id");
 			}
 		}
 	}
