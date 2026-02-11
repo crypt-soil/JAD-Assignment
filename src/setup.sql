@@ -169,20 +169,72 @@ CREATE TABLE bookings (
     booking_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT,
     booking_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+
     status INT DEFAULT 1,                      -- 1=pending, 2=confirmed, 3=completed, 4=cancelled
+
+    -- ✅ Stripe/payment columns
+    payment_status TINYINT NOT NULL DEFAULT 0, -- 0=unpaid, 1=paid
+    stripe_session_id VARCHAR(255) NULL,
+    stripe_payment_intent_id VARCHAR(255) NULL,
+
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
+
 -- insert sample bookings for analytics
 -- status seeded as confirmed for current and future bookings
-INSERT INTO bookings (customer_id, booking_date, status) VALUES
-(1, NOW(), 1),
-(1, NOW() + INTERVAL 1 DAY, 1),
-(1, NOW() + INTERVAL 3 DAY, 1),
-(1, NOW() + INTERVAL 7 DAY, 1),
-(1, NOW() + INTERVAL 14 DAY, 1);
+INSERT INTO bookings (customer_id, booking_date, status, payment_status) VALUES
+(1, NOW(), 1, 0),
+(1, NOW() + INTERVAL 1 DAY, 1, 0),
+(1, NOW() + INTERVAL 3 DAY, 1, 0),
+(1, NOW() + INTERVAL 7 DAY, 1, 0),
+(1, NOW() + INTERVAL 14 DAY, 1, 0);
+
+
+CREATE TABLE booking_drafts (
+  draft_id INT AUTO_INCREMENT PRIMARY KEY,
+  booking_id INT NOT NULL,
+  customer_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status TINYINT NOT NULL DEFAULT 0, -- 0=pending_payment, 1=paid_copied, 2=cancelled
+
+  UNIQUE KEY uk_booking_id (booking_id),
+
+  FOREIGN KEY (booking_id) REFERENCES bookings(booking_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+
+  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE booking_draft_items (
+  draft_item_id INT AUTO_INCREMENT PRIMARY KEY,
+  draft_id INT NOT NULL,
+  service_id INT NOT NULL,
+  caregiver_id INT NULL,
+  quantity INT NOT NULL,
+  start_time DATETIME NOT NULL,
+  end_time DATETIME NOT NULL,
+  subtotal DECIMAL(10,2) NOT NULL,
+  special_request VARCHAR(255) NULL,
+  caregiver_status TINYINT NOT NULL,
+
+  FOREIGN KEY (draft_id) REFERENCES booking_drafts(draft_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+
+  FOREIGN KEY (service_id) REFERENCES service(service_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+
+  FOREIGN KEY (caregiver_id) REFERENCES caregiver(caregiver_id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
 -- table: caregiver
 CREATE TABLE caregiver (
