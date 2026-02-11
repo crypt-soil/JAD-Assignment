@@ -20,33 +20,60 @@ public class CaregiverAcceptServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		// Caregiver guard
 		Integer caregiverId = (Integer) request.getSession().getAttribute("caregiver_id");
 		if (caregiverId == null) {
 			response.sendRedirect(request.getContextPath() + "/loginPage/login.jsp");
 			return;
 		}
 
-		int detailId = Integer.parseInt(request.getParameter("detailId"));
-//        System.out.println("acceptRequest detailId=" + detailId + " caregiverId=" + caregiverId);
-
-		boolean ok;
+		// Validate detailId
+		int detailId;
 		try {
-			ok = requestDAO.acceptRequest(detailId, caregiverId);
+			detailId = Integer.parseInt(request.getParameter("detailId"));
 		} catch (Exception e) {
-			response.sendRedirect(request.getContextPath() + "/caregiver/requests?error=db");
-			return;
-		}
-		if (!ok) {
-			response.sendRedirect(request.getContextPath() + "/caregiver/requests?error=clash");
+			response.sendRedirect(request.getContextPath() + "/caregiver/requests?error=invalid_request");
 			return;
 		}
 
-		Integer customerId = new BookingDetailsStatusDAO().getCustomerIdByDetailId(detailId);
-		if (customerId != null) {
-			new NotificationDAO().create(customerId, null, detailId, "Request accepted",
-					"A caregiver has accepted your booking request! You can view the booking details in your profile.");
+		// Attempt accept
+		CaregiverRequestDAO.AcceptResult result;
+		try {
+			result = requestDAO.acceptRequest(detailId, caregiverId);
+		} catch (Exception e) {
+			response.sendRedirect(request.getContextPath() + "/caregiver/requests?error=database_error");
+			return;
 		}
 
-		response.sendRedirect(request.getContextPath() + "/caregiver/requests?filter=future");
+		// Route based on DAO result
+		switch (result) {
+		case OK: {
+			// Create customer notification when accept succeeds
+			Integer customerId = new BookingDetailsStatusDAO().getCustomerIdByDetailId(detailId);
+			if (customerId != null) {
+				new NotificationDAO().create(customerId, null, detailId, "Request accepted",
+						"A caregiver has accepted your booking request! You can view the booking details in your profile.");
+			}
+
+			response.sendRedirect(request.getContextPath() + "/caregiver/requests?success=accepted");
+			return;
+		}
+
+		case NOT_FOUND:
+			response.sendRedirect(request.getContextPath() + "/caregiver/requests?error=request_not_found");
+			return;
+
+		case ALREADY_TAKEN:
+			response.sendRedirect(request.getContextPath() + "/caregiver/requests?error=already_taken");
+			return;
+
+		case TIME_CONFLICT:
+			response.sendRedirect(request.getContextPath() + "/caregiver/requests?error=time_conflict");
+			return;
+
+		default:
+			response.sendRedirect(request.getContextPath() + "/caregiver/requests?error=unknown_error");
+			return;
+		}
 	}
 }

@@ -23,6 +23,38 @@ if (requests == null)
 <%
 SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 %>
+<%
+String error = request.getParameter("error");
+String success = request.getParameter("success");
+%>
+
+<% if ("accepted".equals(success)) { %>
+    <div class="alert alert-success">
+        Request accepted successfully and added to your schedule.
+    </div>
+<% } %>
+
+<% if ("request_not_found".equals(error)) { %>
+    <div class="alert alert-danger">
+        This request no longer exists.
+    </div>
+<% } else if ("already_taken".equals(error)) { %>
+    <div class="alert alert-danger">
+        Another caregiver has already accepted this request.
+    </div>
+<% } else if ("time_conflict".equals(error)) { %>
+    <div class="alert alert-danger">
+        You already have another booking during this time.
+    </div>
+<% } else if ("database_error".equals(error)) { %>
+    <div class="alert alert-danger">
+        System error occurred. Please try again later.
+    </div>
+<% } else if ("invalid_request".equals(error)) { %>
+    <div class="alert alert-danger">
+        Invalid request. Please refresh and try again.
+    </div>
+<% } %>
 
 <!DOCTYPE html>
 <html lang="en">
