@@ -33,15 +33,18 @@ VALUES (
     '123456'
 );
 
--- 1 row per customer (simple)
 CREATE TABLE customer_medical_info (
     medical_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT NOT NULL UNIQUE,
-    medical_info TEXT NULL,                  -- asthma, diabetes, allergies, care notes
+
+    conditions_csv VARCHAR(255) NULL,
+    allergies_text TEXT NULL,
+
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
 
 -- allow multiple contacts per customer
 CREATE TABLE emergency_contacts (
@@ -56,9 +59,6 @@ CREATE TABLE emergency_contacts (
         ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
-
-INSERT INTO customer_medical_info (customer_id, medical_info)
-VALUES (1, 'Asthma');
 
 INSERT INTO emergency_contacts (customer_id, contact_name, relationship, phone)
 VALUES
@@ -283,12 +283,48 @@ INSERT INTO caregiver_service (caregiver_id, service_id) VALUES
 (3,7),
 (2,9);
 
+CREATE TABLE partner_user (
+  partner_id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50) UNIQUE NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,   -- sha256 hash
+  company_name VARCHAR(100) NOT NULL,
+  is_active TINYINT NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- seed 1 partner account (password = password)
+INSERT INTO partner_user (username, email, password, company_name)
+VALUES (
+  'partner1',
+  'partner1@companion.sg',
+  '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+  'Companion SG'
+);
+
+
+CREATE TABLE partner_tokens (
+  token VARCHAR(80) PRIMARY KEY,
+  partner_id INT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  expires_at DATETIME NOT NULL,
+
+  FOREIGN KEY (partner_id) REFERENCES partner_user(partner_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+
+  INDEX idx_partner_tokens_partner (partner_id),
+  INDEX idx_partner_tokens_expiry (expires_at)
+) ENGINE=InnoDB;
+
+
 -- table: booking_details
 CREATE TABLE booking_details (
     detail_id INT AUTO_INCREMENT PRIMARY KEY,
     booking_id INT,
     service_id INT,
     caregiver_id INT NULL,
+    partner_id INT NULL, -- which partner company this booking detail is assigned to
     quantity INT DEFAULT 1,
     start_time DATETIME,
     end_time DATETIME,
@@ -305,114 +341,113 @@ CREATE TABLE booking_details (
         ON UPDATE CASCADE,
     FOREIGN KEY (caregiver_id) REFERENCES caregiver(caregiver_id)
         ON DELETE SET NULL
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (partner_id) REFERENCES partner_user(partner_id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE,
+
+    INDEX idx_partner_service (partner_id, service_id)
 ) ENGINE=InnoDB;
 
--- insert booking details
+-- Insert booking details
 -- start_time and end_time seeded to match booking_date for current and future bookings
 
 INSERT INTO booking_details
-(booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
+(booking_id, service_id, caregiver_id, partner_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
 VALUES
-(1, 1, 1, 1,
+(1, 1, 1, NULL, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=1),
  (SELECT booking_date FROM bookings WHERE booking_id=1) + INTERVAL 1 HOUR,
  35.00, 'Wheelchair assistance needed', 2,
  (SELECT booking_date FROM bookings WHERE booking_id=1), NULL),
 
-(1, 2, 2, 1,
+(1, 2, 2, NULL, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=1),
  (SELECT booking_date FROM bookings WHERE booking_id=1) + INTERVAL 30 MINUTE,
  20.00, NULL, 1, NULL, NULL),
 
-(2, 6, 5, 1,
+(2, 6, 5, NULL, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=2),
  (SELECT booking_date FROM bookings WHERE booking_id=2) + INTERVAL 1 HOUR,
  35.00, 'Low salt meal preferred', 1, NULL, NULL),
 
-(3, 8, 6, 1,
+(3, 8, 6, 1, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=3),
  (SELECT booking_date FROM bookings WHERE booking_id=3) + INTERVAL 2 HOUR,
  50.00, NULL, 1, NULL, NULL),
 
-(2, 4, NULL, 1,
+(2, 4, NULL, NULL, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=2),
  (SELECT booking_date FROM bookings WHERE booking_id=2) + INTERVAL 2 HOUR,
  50.00, 'Please bring cleaning supplies', 0, NULL, NULL),
 
-(3, 7, NULL, 1,
+(3, 7, NULL, NULL, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=3),
  (SELECT booking_date FROM bookings WHERE booking_id=3) + INTERVAL 1 HOUR,
  40.00, 'Client prefers Chinese speaking caregiver', 0, NULL, NULL),
 
-(1, 3, NULL, 1,
+(1, 3, NULL, NULL, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=1),
  (SELECT booking_date FROM bookings WHERE booking_id=1) + INTERVAL 45 MINUTE,
  30.00, 'Needs assistance to stand up safely', 0, NULL, NULL);
- 
- 
- -- ==========================================
--- EXTRA BOOKINGS to test week/month/year filters
--- ==========================================
 
--- 1) This week (2 days ago)  ✅ should appear in "week", "month", "year"
+-- Extra bookings to test week/month/year filters
+
+-- 1) This week (2 days ago): should appear in week, month, year
 INSERT INTO bookings (customer_id, booking_date, status)
 VALUES (1, NOW() - INTERVAL 2 DAY, 2);
 
 SET @b_week := LAST_INSERT_ID();
 
 INSERT INTO booking_details
-(booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
+(booking_id, service_id, caregiver_id, partner_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
 VALUES
-(@b_week, 1, 1, 1,
+(@b_week, 1, 1, NULL, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=@b_week),
  (SELECT booking_date FROM bookings WHERE booking_id=@b_week) + INTERVAL 1 HOUR,
  35.00, 'Seed: this week', 2,
  (SELECT booking_date FROM bookings WHERE booking_id=@b_week), NULL);
 
-
--- 2) This month but NOT this week (20 days ago) ✅ should appear in "month", "year" (usually NOT week)
+-- 2) This month but not this week (20 days ago): should appear in month, year
 INSERT INTO bookings (customer_id, booking_date, status)
 VALUES (1, NOW() - INTERVAL 20 DAY, 2);
 
 SET @b_month := LAST_INSERT_ID();
 
 INSERT INTO booking_details
-(booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
+(booking_id, service_id, caregiver_id, partner_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
 VALUES
-(@b_month, 6, 5, 1,
+(@b_month, 6, 5, NULL, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=@b_month),
  (SELECT booking_date FROM bookings WHERE booking_id=@b_month) + INTERVAL 2 HOUR,
  35.00, 'Seed: this month', 1,
  NULL, NULL);
 
-
--- 3) This year but NOT this month (3 months ago) ✅ should appear in "year" only
+-- 3) This year but not this month (3 months ago): should appear in year only
 INSERT INTO bookings (customer_id, booking_date, status)
 VALUES (1, NOW() - INTERVAL 3 MONTH, 2);
 
 SET @b_year := LAST_INSERT_ID();
 
 INSERT INTO booking_details
-(booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
+(booking_id, service_id, caregiver_id, partner_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
 VALUES
-(@b_year, 8, 6, 1,
+(@b_year, 8, 6, 1, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=@b_year),
  (SELECT booking_date FROM bookings WHERE booking_id=@b_year) + INTERVAL 1 HOUR,
  50.00, 'Seed: this year', 1,
  NULL, NULL);
 
-
--- 4) Last year (14 months ago) ✅ should NOT appear in this year's filter
+-- 4) Last year (14 months ago): should not appear in this year's filter
 INSERT INTO bookings (customer_id, booking_date, status)
 VALUES (1, NOW() - INTERVAL 14 MONTH, 2);
 
 SET @b_lastyear := LAST_INSERT_ID();
 
 INSERT INTO booking_details
-(booking_id, service_id, caregiver_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
+(booking_id, service_id, caregiver_id, partner_id, quantity, start_time, end_time, subtotal, special_request, caregiver_status, check_in_at, check_out_at)
 VALUES
-(@b_lastyear, 7, NULL, 1,
+(@b_lastyear, 7, NULL, NULL, 1,
  (SELECT booking_date FROM bookings WHERE booking_id=@b_lastyear),
  (SELECT booking_date FROM bookings WHERE booking_id=@b_lastyear) + INTERVAL 1 HOUR,
  40.00, 'Seed: last year', 0,
@@ -578,6 +613,7 @@ CREATE TABLE service_inquiries (
     ON DELETE SET NULL
     ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+  
 
 -- drop existing procedures and function if any
 DROP PROCEDURE IF EXISTS sp_total_users;
