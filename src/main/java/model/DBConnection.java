@@ -7,12 +7,18 @@ import java.sql.SQLException;
 public class DBConnection {
 
 	// Keep credentials private so they can’t be accessed directly
-	private static final String URL = "jdbc:mysql://silvercare-db-unique123.mysql.database.azure.com:3306/silvercare"
-			+ "?useSSL=true" + "&requireSSL=true" + "&verifyServerCertificate=false" + "&serverTimezone=UTC";
+	private static final String URL =
+		    "jdbc:mysql://silvercare-db-unique123.mysql.database.azure.com:3306/silvercare"
+		    + "?useSSL=true"
+		    + "&requireSSL=true"
+		    + "&verifyServerCertificate=false"
+		    + "&serverTimezone=UTC";
 
-	private static final String USER = "silveradmin@silvercare-db-unique123";
+		private static final String USER =
+		    "silveradmin";
 
-	private static final String PASSWORD = "Silvercare123!";
+		private static final String PASSWORD =
+		    "Jvss1234";
 
 	public static Connection getConnection() {
 		Connection conn = null;
