@@ -76,9 +76,7 @@ body {
 
 
 					<div class="d-grid gap-2">
-						<a class="btn btn-dark"
-							href="<%=request.getContextPath()%>/stripe/create-checkout-session?bookingId=<%=bookingId%>">
-							Try Payment Again </a> <a class="btn btn-outline-secondary"
+						<a class="btn btn-outline-secondary"
 							href="<%=request.getContextPath()%>/profile?tab=bookings">
 							Back to Bookings </a>
 					</div>
