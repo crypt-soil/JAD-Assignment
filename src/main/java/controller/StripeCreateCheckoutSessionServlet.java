@@ -62,7 +62,7 @@ public class StripeCreateCheckoutSessionServlet extends HttpServlet {
 			return;
 		}
 
-		// ✅ OPTION A: subtotal must come from DRAFT snapshot (not booking_details)
+		// subtotal must come from DRAFT snapshot (not booking_details)
 		double subtotal = dao.sumDraftSubtotalByBookingId(bookingId);
 
 		if (subtotal <= 0) {

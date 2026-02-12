@@ -1,4 +1,4 @@
-package controller;
+package controller.Caregiver;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;

@@ -1,4 +1,4 @@
-package controller;
+package controller.Caregiver;
 
 import java.io.IOException;
 import jakarta.servlet.ServletException;

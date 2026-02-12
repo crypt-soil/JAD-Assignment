@@ -45,7 +45,6 @@ public class ConfirmCheckoutServlet extends HttpServlet {
 			conn = DBConnection.getConnection();
 			conn.setAutoCommit(false);
 
-			// ✅ OPTIONAL: If you want "one active pending booking at a time" per customer:
 			// Reuse existing pending unpaid booking draft instead of creating another.
 			Integer existingBookingId = findExistingPendingDraftBooking(conn, customerId);
 			if (existingBookingId != null) {
