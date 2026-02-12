@@ -78,9 +78,7 @@ if ("true".equals(timedOut)) {
 		<%
 		} else if (customerId != null && "member".equals(role)) {
 		%>
-
-		<a href="<%=request.getContextPath()%>/categories">Service
-			Category</a> <a href="<%=request.getContextPath()%>/caregivers">Our
+			 <a href="<%=request.getContextPath()%>/caregivers">Our
 			Caregivers</a> <a href="<%=request.getContextPath()%>/profile"
 			class="btn btn-white">Profile</a> <a
 			href="<%=request.getContextPath()%>/cartPage/cartPage.jsp"

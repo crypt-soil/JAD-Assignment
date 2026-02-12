@@ -211,30 +211,6 @@ CREATE TABLE booking_drafts (
     ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
-CREATE TABLE booking_draft_items (
-  draft_item_id INT AUTO_INCREMENT PRIMARY KEY,
-  draft_id INT NOT NULL,
-  service_id INT NOT NULL,
-  caregiver_id INT NULL,
-  quantity INT NOT NULL,
-  start_time DATETIME NOT NULL,
-  end_time DATETIME NOT NULL,
-  subtotal DECIMAL(10,2) NOT NULL,
-  special_request VARCHAR(255) NULL,
-  caregiver_status TINYINT NOT NULL,
-
-  FOREIGN KEY (draft_id) REFERENCES booking_drafts(draft_id)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-
-  FOREIGN KEY (service_id) REFERENCES service(service_id)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-
-  FOREIGN KEY (caregiver_id) REFERENCES caregiver(caregiver_id)
-    ON DELETE SET NULL
-    ON UPDATE CASCADE
-) ENGINE=InnoDB;
 
 -- table: caregiver
 CREATE TABLE caregiver (
@@ -282,6 +258,31 @@ VALUES
  'https://randomuser.me/api/portraits/women/23.jpg',
  '96789012',
  'farah.noor@silvercare.com');
+ 
+ CREATE TABLE booking_draft_items (
+  draft_item_id INT AUTO_INCREMENT PRIMARY KEY,
+  draft_id INT NOT NULL,
+  service_id INT NOT NULL,
+  caregiver_id INT NULL,
+  quantity INT NOT NULL,
+  start_time DATETIME NOT NULL,
+  end_time DATETIME NOT NULL,
+  subtotal DECIMAL(10,2) NOT NULL,
+  special_request VARCHAR(255) NULL,
+  caregiver_status TINYINT NOT NULL,
+
+  FOREIGN KEY (draft_id) REFERENCES booking_drafts(draft_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+
+  FOREIGN KEY (service_id) REFERENCES service(service_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+
+  FOREIGN KEY (caregiver_id) REFERENCES caregiver(caregiver_id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
 -- table: caregiver_user
 CREATE TABLE caregiver_user (
