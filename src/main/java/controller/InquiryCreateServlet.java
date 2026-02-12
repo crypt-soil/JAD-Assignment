@@ -7,8 +7,8 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.net.URLEncoder;
 
-import model.ServiceInquiry;
-import model.ServiceInquiryDAO;
+import model.Service.ServiceInquiry;
+import model.Service.ServiceInquiryDAO;
 
 @WebServlet("/inquiry/create")
 public class InquiryCreateServlet extends HttpServlet {

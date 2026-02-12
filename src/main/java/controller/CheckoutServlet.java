@@ -6,8 +6,8 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 
-import model.CartDAO;
-import model.CartItem;
+import model.cart.CartDAO;
+import model.cart.CartItem;
 
 @WebServlet("/checkout")
 public class CheckoutServlet extends HttpServlet {

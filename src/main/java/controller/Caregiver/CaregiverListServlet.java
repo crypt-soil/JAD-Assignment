@@ -9,8 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-import model.Caregiver;
-import model.CaregiverDAO;
+import model.caregiver.Caregiver;
+import model.caregiver.CaregiverDAO;
 
 @WebServlet("/caregivers")
 public class CaregiverListServlet extends HttpServlet {

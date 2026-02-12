@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.stream.Collectors;
 
-import model.BookingPaymentDAO;
 import model.DBConnection;
+import model.Bookings.BookingPaymentDAO;
 
 @WebServlet("/stripe/webhook")
 public class StripeWebhookServlet extends HttpServlet {

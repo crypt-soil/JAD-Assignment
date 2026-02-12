@@ -1,5 +1,5 @@
 <%@ page language="java"%>
-<%@ page import="model.Category"%>
+<%@ page import="model.category.Category"%>
 
 <%
 // Retrieve the category object passed from the servlet

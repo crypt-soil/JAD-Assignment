@@ -2,10 +2,9 @@ package controller;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import model.Bookings.BookingPaymentDAO;
 
 import java.io.IOException;
-
-import model.BookingPaymentDAO;
 
 @WebServlet("/stripe/cancel")
 public class StripeCancelServlet extends HttpServlet {

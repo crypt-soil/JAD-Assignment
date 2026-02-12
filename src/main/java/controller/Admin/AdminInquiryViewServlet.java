@@ -4,8 +4,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import model.ServiceInquiry;
-import model.ServiceInquiryDAO;
+
+import model.Service.ServiceInquiry;
+import model.Service.ServiceInquiryDAO;
 
 @WebServlet("/admin/inquiries/view")
 public class AdminInquiryViewServlet extends HttpServlet {

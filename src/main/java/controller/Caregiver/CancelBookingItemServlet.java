@@ -6,8 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import model.BookingDAO;
+import model.Bookings.BookingDAO;
 
 @WebServlet("/CancelBookingItemServlet")
 public class CancelBookingItemServlet extends HttpServlet {

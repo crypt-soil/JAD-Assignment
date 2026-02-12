@@ -10,10 +10,10 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.UUID;
 
-import model.ServiceDAO;
-import model.Service;
-import model.CategoryDAO;
-import model.Category;
+import model.Service.Service;
+import model.Service.ServiceDAO;
+import model.category.Category;
+import model.category.CategoryDAO;
 
 /**
  * Handles CRUD operations for Service objects.

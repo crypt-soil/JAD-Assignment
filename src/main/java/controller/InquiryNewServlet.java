@@ -7,12 +7,12 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 
-import model.Caregiver;
-import model.CaregiverDAO;
-import model.Category;
-import model.CategoryDAO;
-import model.Service;
-import model.ServiceDAO;
+import model.Service.Service;
+import model.Service.ServiceDAO;
+import model.caregiver.Caregiver;
+import model.caregiver.CaregiverDAO;
+import model.category.Category;
+import model.category.CategoryDAO;
 
 @WebServlet("/inquiry/new")
 public class InquiryNewServlet extends HttpServlet {

@@ -6,9 +6,9 @@ import jakarta.servlet.*;
 
 import java.io.IOException;
 
-import model.BookingDetailsStatusDAO;
-import model.CaregiverRequestDAO;
-import model.NotificationDAO;
+import model.Bookings.BookingDetailsStatusDAO;
+import model.Notification.NotificationDAO;
+import model.caregiver.CaregiverRequestDAO;
 
 @WebServlet("/caregiver/accept")
 public class CaregiverAcceptServlet extends HttpServlet {

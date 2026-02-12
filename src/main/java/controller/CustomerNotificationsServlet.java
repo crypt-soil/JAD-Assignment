@@ -7,8 +7,8 @@ import jakarta.servlet.*;
 import java.io.IOException;
 import java.util.List;
 
-import model.Notification;
-import model.NotificationDAO;
+import model.Notification.Notification;
+import model.Notification.NotificationDAO;
 
 @WebServlet("/notifications")
 public class CustomerNotificationsServlet extends HttpServlet {

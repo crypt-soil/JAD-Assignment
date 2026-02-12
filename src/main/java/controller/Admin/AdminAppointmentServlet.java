@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import model.BookingDetailAppointment;
-import model.BookingDetailAppointmentDAO;
+import model.Bookings.BookingDetailAppointment;
+import model.Bookings.BookingDetailAppointmentDAO;
 
 @WebServlet("/admin/appointments")
 public class AdminAppointmentServlet extends HttpServlet {

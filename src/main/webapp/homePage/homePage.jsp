@@ -3,7 +3,7 @@
 
 <!-- Import Java List + your Category model -->
 <%@ page import="java.util.List"%>
-<%@ page import="model.Category"%>
+<%@ page import="model.category.Category"%>
 <%
 String username = (String) session.getAttribute("username");
 if (username == null)
@@ -421,12 +421,12 @@ body {
 
 								<%
 								/* If category contains services */
-								if (c.getServices() != null && !c.getServices().isEmpty()) {
+														if (c.getServices() != null && !c.getServices().isEmpty()) {
 
-									for (model.Service s : c.getServices()) {
+															for (model.Service.Service s : c.getServices()) {
 
-										/* Highlighted if search matched service name */
-										if (s.isHighlighted()) {
+																/* Highlighted if search matched service name */
+																if (s.isHighlighted()) {
 								%>
 								<li class="highlight-service"><%=s.getName()%></li>
 								<%
@@ -435,9 +435,9 @@ body {
 								<li><%=s.getName()%></li>
 								<%
 								}
-								}
+														}
 
-								} else {
+														} else {
 								%>
 
 								<!-- No services case -->
@@ -563,9 +563,9 @@ body {
 								<%
 								if (c.getServices() != null && !c.getServices().isEmpty()) {
 
-									for (model.Service s : c.getServices()) {
+															for (model.Service.Service s : c.getServices()) {
 
-										if (s.isHighlighted()) {
+																if (s.isHighlighted()) {
 								%>
 								<!-- Highlight services that matched search -->
 								<li class="highlight-service"><%=s.getName()%></li>
@@ -575,9 +575,9 @@ body {
 								<li><%=s.getName()%></li>
 								<%
 								}
-								}
+														}
 
-								} else {
+														} else {
 								%>
 								<!-- If no services found -->
 								<li style="color: #888;">No services available</li>
@@ -703,9 +703,9 @@ body {
 								<%
 								if (c.getServices() != null && !c.getServices().isEmpty()) {
 
-									for (model.Service s : c.getServices()) {
+															for (model.Service.Service s : c.getServices()) {
 
-										if (s.isHighlighted()) {
+																if (s.isHighlighted()) {
 								%>
 								<!-- Highlight matching search results -->
 								<li class="highlight-service"><%=s.getName()%></li>

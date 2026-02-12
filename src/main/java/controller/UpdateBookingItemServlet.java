@@ -8,8 +8,7 @@ import java.time.LocalTime;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-
-import model.BookingDAO;
+import model.Bookings.BookingDAO;
 
 @WebServlet("/UpdateBookingItemServlet")
 public class UpdateBookingItemServlet extends HttpServlet {

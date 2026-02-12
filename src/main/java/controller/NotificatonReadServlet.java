@@ -2,11 +2,10 @@ package controller;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import model.Notification.NotificationDAO;
 import jakarta.servlet.*;
 
 import java.io.IOException;
-
-import model.NotificationDAO;
 
 @WebServlet("/notifications/read")
 public class NotificatonReadServlet extends HttpServlet {

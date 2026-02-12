@@ -11,10 +11,10 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
-import model.Category;
-import model.CategoryDAO;
-import model.ServiceDAO;
-import model.Service;
+import model.Service.Service;
+import model.Service.ServiceDAO;
+import model.category.Category;
+import model.category.CategoryDAO;
 
 @WebServlet("/categories")
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, // 1MB

@@ -6,8 +6,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import model.CategoryDAO;
-import model.Category;
+
+import model.category.Category;
+import model.category.CategoryDAO;
 
 /**
  * Handles displaying a single category and all of its associated services.

@@ -3,9 +3,9 @@ package controller;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import java.io.IOException;
+import model.MedicalInfo.MedicalInfoDAO;
 
-import model.MedicalInfoDAO;
+import java.io.IOException;
 
 @WebServlet("/ClearMedicalInfoServlet")
 public class ClearMedicalInfoServlet extends HttpServlet {

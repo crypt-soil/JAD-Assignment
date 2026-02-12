@@ -7,10 +7,9 @@ import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import model.Bookings.BookingPaymentDAO;
 
 import java.io.IOException;
-
-import model.BookingPaymentDAO;
 
 @WebServlet("/stripe/create-checkout-session")
 public class StripeCreateCheckoutSessionServlet extends HttpServlet {

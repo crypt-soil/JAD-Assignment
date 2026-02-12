@@ -10,13 +10,12 @@ import java.security.MessageDigest;
 import java.util.HexFormat;
 import java.util.List;
 
-import model.Customer;
-import model.CustomerDAO;
-
-import model.MedicalInfo;
-import model.MedicalInfoDAO;
-import model.EmergencyContact;
-import model.EmergencyContactDAO;
+import model.EmergencyContact.EmergencyContact;
+import model.EmergencyContact.EmergencyContactDAO;
+import model.MedicalInfo.MedicalInfo;
+import model.MedicalInfo.MedicalInfoDAO;
+import model.customer.Customer;
+import model.customer.CustomerDAO;
 
 @WebServlet("/admin/*")
 public class AdminCustomerServlet extends HttpServlet {

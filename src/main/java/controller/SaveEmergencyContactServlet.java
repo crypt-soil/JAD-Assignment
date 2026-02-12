@@ -3,9 +3,9 @@ package controller;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import java.io.IOException;
+import model.EmergencyContact.EmergencyContactDAO;
 
-import model.EmergencyContactDAO;
+import java.io.IOException;
 
 @WebServlet("/SaveEmergencyContactServlet")
 public class SaveEmergencyContactServlet extends HttpServlet {

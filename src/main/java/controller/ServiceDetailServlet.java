@@ -5,8 +5,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
-import model.Service;
-import model.ServiceDAO;
+import model.Service.Service;
+import model.Service.ServiceDAO;
 
 /**
  * Handles displaying an individual service's details.

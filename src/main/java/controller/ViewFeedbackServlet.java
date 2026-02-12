@@ -10,9 +10,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
-import model.FeedbackDAO;
-import model.FeedbackView;
+import model.Feedback.FeedbackDAO;
+import model.Feedback.FeedbackView;
 
 @WebServlet("/viewFeedback")
 public class ViewFeedbackServlet extends HttpServlet {

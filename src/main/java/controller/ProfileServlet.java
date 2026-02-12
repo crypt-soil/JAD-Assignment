@@ -6,15 +6,14 @@ import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
-import model.ProfileDAO;
-import model.Booking;
-import model.BookingDAO;
-import model.Profile;
-
-import model.MedicalInfo;
-import model.MedicalInfoDAO;
-import model.EmergencyContact;
-import model.EmergencyContactDAO;
+import model.Bookings.Booking;
+import model.Bookings.BookingDAO;
+import model.EmergencyContact.EmergencyContact;
+import model.EmergencyContact.EmergencyContactDAO;
+import model.MedicalInfo.MedicalInfo;
+import model.MedicalInfo.MedicalInfoDAO;
+import model.Profile.Profile;
+import model.Profile.ProfileDAO;
 
 @WebServlet("/profile")
 public class ProfileServlet extends HttpServlet {

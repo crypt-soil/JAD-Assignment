@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ page import="model.Category"%>
+<%@ page import="model.category.Category"%>
 
 <%
 // Retrieve the category this service belongs to

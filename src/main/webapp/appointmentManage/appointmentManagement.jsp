@@ -2,7 +2,7 @@
 	pageEncoding="UTF-8"%>
 
 <%@ page import="java.util.List"%>
-<%@ page import="model.BookingDetailAppointment"%>
+<%@ page import="model.Bookings.BookingDetailAppointment"%>
 
 <!DOCTYPE html>
 <html>

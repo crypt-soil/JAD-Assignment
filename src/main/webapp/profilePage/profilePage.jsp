@@ -1,9 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ page import="model.Profile"%>
-<%@ page import="model.Booking, model.BookingItem"%>
-<%@ page import="model.MedicalInfo"%>
-<%@ page import="model.EmergencyContact"%>
+<%@ page import="model.Profile.Profile"%>
+<%@ page import="model.Bookings.Booking,model.Bookings.BookingItem"%>
+<%@ page import="model.MedicalInfo.MedicalInfo"%>
+<%@ page import="model.EmergencyContact.EmergencyContact"%>
 <%@ page import="java.util.List"%>
 
 

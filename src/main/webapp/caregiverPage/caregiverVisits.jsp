@@ -2,7 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.*"%>
 <%@ page import="java.time.*"%>
-<%@ page import="model.CaregiverVisit"%>
+<%@ page import="model.caregiver.CaregiverVisit"%>
 <%@ page import="java.text.SimpleDateFormat"%>
 <%
 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");

@@ -10,8 +10,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.UUID;
 
-import model.Caregiver;
-import model.CaregiverDAO;
+import model.caregiver.Caregiver;
+import model.caregiver.CaregiverDAO;
 
 @WebServlet("/caregiverProfile")
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, // 1MB

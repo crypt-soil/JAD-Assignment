@@ -6,8 +6,8 @@ import jakarta.servlet.*;
 
 import java.io.IOException;
 
-import model.BookingDetailsStatusDAO;
-import model.NotificationDAO;
+import model.Bookings.BookingDetailsStatusDAO;
+import model.Notification.NotificationDAO;
 
 @WebServlet("/caregiver/checkin")
 public class CaregiverCheckInServlet extends HttpServlet {

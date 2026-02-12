@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.List;
 
-import model.CartDAO;
-import model.CartItem;
 import model.DBConnection;
+import model.cart.CartDAO;
+import model.cart.CartItem;
 
 @WebServlet("/confirmCheckout")
 public class ConfirmCheckoutServlet extends HttpServlet {

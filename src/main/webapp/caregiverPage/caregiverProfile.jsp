@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ page import="model.Caregiver"%>
+<%@ page import="model.caregiver.Caregiver"%>
 
 <%
 Caregiver c = (Caregiver) request.getAttribute("caregiver");
