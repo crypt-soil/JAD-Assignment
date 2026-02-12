@@ -1,5 +1,4 @@
 package controller.Admin;
-
 import java.io.IOException;
 
 import jakarta.servlet.ServletException;
@@ -21,7 +20,7 @@ public class AdminDashboardServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		// ✅ ADMIN GUARD
+		// ADMIN GUARD
 		HttpSession session = request.getSession(false);
 		String role = (session != null) ? (String) session.getAttribute("role") : null;
 
@@ -30,7 +29,7 @@ public class AdminDashboardServlet extends HttpServlet {
 			return;
 		}
 
-		// ✅ filter param (sanitize)
+		// filter param (sanitize)
 		String range = request.getParameter("range");
 		if (range == null)
 			range = "year";

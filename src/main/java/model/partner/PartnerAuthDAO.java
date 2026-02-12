@@ -1,5 +1,8 @@
 package model.partner;
-
+/*
+ * Lois Poh 
+ * 2429478
+ */
 import java.sql.*;
 import java.time.LocalDateTime;
 
