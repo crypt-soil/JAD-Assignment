@@ -158,6 +158,20 @@ body {
 		<h2 class="section-title">Client Inquiry</h2>
 		<p class="subtitle">Search and filter clients by name or
 			residential area</p>
+		<!-- TITLE + CREATE BUTTON -->
+		<div class="d-flex justify-content-between align-items-center mb-2">
+			<div>
+				<h2 class="section-title mb-0">Client Inquiry</h2>
+				<p class="subtitle mb-0">Search and filter clients by name or
+					residential area</p>
+			</div>
+
+			<a href="<%=request.getContextPath()%>/admin/addCustomer.jsp"
+				class="btn btn-success"> <i class="bi bi-plus-circle me-1"></i>
+				Create
+			</a>
+		</div>
+
 
 		<!-- FILTER / INQUIRY FORM -->
 		<div class="filter-card">
