@@ -1,5 +1,8 @@
 package model.Bookings;
-
+/*
+ * Ong Jin Kai
+ * 2429465
+ */
 import java.sql.*;
 
 import model.DBConnection;

@@ -1,5 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+	<%--
+Ong Jin Kai
+2429465
+ --%>
 <%@ page
 	import="jakarta.servlet.http.HttpSession, java.util.*,model.customer.Customer"%>
 <%@ page import="model.MedicalInfo.MedicalInfo,model.EmergencyContact.EmergencyContact"%>

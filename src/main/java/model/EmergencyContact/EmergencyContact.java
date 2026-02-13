@@ -1,5 +1,8 @@
 package model.EmergencyContact;
-
+/*
+ * Ong Jin Kai
+ * 2429465
+ */
 public class EmergencyContact {
     private int contactId;
     private int customerId;

@@ -1,5 +1,8 @@
 package model.customer;
-
+/*
+ * Ong Jin Kai
+ * 2429465
+ */
 public class Customer {
 
 	private int customer_id;

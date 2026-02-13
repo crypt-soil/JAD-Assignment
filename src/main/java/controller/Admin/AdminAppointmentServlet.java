@@ -9,7 +9,10 @@ import java.util.List;
 
 import model.Bookings.BookingDetailAppointment;
 import model.Bookings.BookingDetailAppointmentDAO;
-
+/*
+ * Ong Jin Kai
+ * 2429465
+ */
 @WebServlet("/admin/appointments")
 public class AdminAppointmentServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;

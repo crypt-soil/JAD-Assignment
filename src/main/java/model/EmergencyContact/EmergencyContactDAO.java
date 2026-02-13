@@ -1,5 +1,8 @@
 package model.EmergencyContact;
-
+/*
+ * Ong Jin Kai
+ * 2429465
+ */
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

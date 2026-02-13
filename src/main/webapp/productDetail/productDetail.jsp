@@ -2,7 +2,10 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="model.category.Category"%>
 <%@ page import="model.Service.Service"%>
-
+<%--
+Ong Jin Kai
+2429465
+ --%>
 <%
 // Retrieve the selected category object passed from the servlet
 Category cat = (Category) request.getAttribute("category");

@@ -1,5 +1,8 @@
 package model.Feedback;
-
+/*
+ * Ong Jin Kai
+ * 2429465
+ */
 public class FeedbackView {
 	private int feedbackId;
 	private int bookingId;

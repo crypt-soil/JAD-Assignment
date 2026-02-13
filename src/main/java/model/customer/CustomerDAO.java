@@ -1,5 +1,8 @@
 package model.customer;
-
+/*
+ * Ong Jin Kai
+ * 2429465
+ */
 import java.sql.*;
 import java.util.*;
 

@@ -16,6 +16,10 @@ import model.MedicalInfo.MedicalInfoDAO;
 import model.customer.Customer;
 import model.customer.CustomerDAO;
 
+/*
+ * Ong Jin Kai
+ * 2429465
+ */
 @WebServlet("/admin/*")
 public class AdminCustomerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;

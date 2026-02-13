@@ -1,5 +1,4 @@
 package model.Bookings;
-
 import java.sql.Timestamp;
 
 public class BookingItem {

@@ -1,5 +1,8 @@
 package model.Service;
-
+/*
+ * Ong Jin Kai
+ * 2429465
+ */
 /**
  * Represents a single service offered under a category.
  *

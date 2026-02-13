@@ -1,6 +1,9 @@
 <%@ page language="java"%>
 <%@ page import="model.category.Category"%>
-
+<%--
+Ong Jin Kai
+2429465
+ --%>
 <%
 // Retrieve the category object passed from the servlet
 Category c = (Category) request.getAttribute("category");

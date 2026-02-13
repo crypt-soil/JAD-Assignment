@@ -1,5 +1,8 @@
 package model.MedicalInfo;
-
+/*
+ * Ong Jin Kai
+ * 2429465
+ */
 public class MedicalInfo {
 
 	private int medicalId;
