@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.*, java.sql.*, model.DBConnection"%>
+<%@ page import="java.time.*"%>
 
 <!DOCTYPE html>
 <html>
@@ -37,6 +38,7 @@ body {
 }
 </style>
 </head>
+
 <body>
 
 	<%@ include file="../common/navbar.jsp"%>
@@ -45,16 +47,23 @@ body {
 		<div class="cart-card">
 
 			<%
-			if (customerId == null) { //check for customerId 
+			// IMPORTANT:
+			// If you already declare customerId in navbar.jsp or earlier in this JSP, DO NOT redeclare it here.
+			// If you do NOT have it anywhere, uncomment the next line (ONLY ONCE in the whole JSP after includes).
+			// Integer customerId = (Integer) session.getAttribute("customer_id");
+
+			if (customerId == null) {
 			%>
+
 			<h2 class="cart-title mb-4">Your Cart</h2>
 			<p>
 				Please <a href="<%=request.getContextPath()%>/loginPage/login.jsp">login</a>
 				to view your cart.
 			</p>
+
 			<%
 			} else {
-				
+
 			Connection conn = null;
 			PreparedStatement ps = null;
 			ResultSet rs = null;
@@ -76,31 +85,33 @@ body {
 				List<Map<String, Object>> items = new ArrayList<>();
 
 				while (rs.next()) {
-					// create a hash map with each result row 
 					Map<String, Object> m = new HashMap<>();
 					m.put("itemId", rs.getInt("item_id"));
 					m.put("name", rs.getString("name"));
-					m.put("price", rs.getDouble("price"));
+					m.put("price", rs.getDouble("price")); // treat as hourly rate
 					m.put("qty", rs.getInt("quantity"));
 					m.put("start", rs.getTimestamp("start_time"));
 					m.put("end", rs.getTimestamp("end_time"));
 					items.add(m);
 				}
-				
+
 				itemCount = items.size();
 			%>
 
 			<h2 class="cart-title mb-4">
-				<!-- get the number of items in the cart based on hash map size -->
-				Your Cart (<%=itemCount%> items)
+				Your Cart (<%=itemCount%>
+				items)
 			</h2>
 
 			<%
 			if (itemCount == 0) {
 			%>
+
 			<p>
-				Your cart is empty. Browse <a href="<%=request.getContextPath()%>/categories">services</a>.
+				Your cart is empty. Browse <a
+					href="<%=request.getContextPath()%>/categories">services</a>.
 			</p>
+
 			<%
 			} else {
 			%>
@@ -111,64 +122,76 @@ body {
 						<th>Service</th>
 						<th>Date & Time</th>
 						<th>Quantity</th>
-						<th>Price</th>
+						<th>Hourly Rate</th>
 						<th>Total</th>
 						<th></th>
 					</tr>
 				</thead>
 
 				<tbody>
-
 					<%
 					for (Map<String, Object> item : items) {
 
 						int itemId = (int) item.get("itemId");
 						String name = (String) item.get("name");
-						double price = (double) item.get("price");
+						double price = (double) item.get("price"); // hourly
 						int qty = (int) item.get("qty");
 						Timestamp start = (Timestamp) item.get("start");
 						Timestamp end = (Timestamp) item.get("end");
 
-						double total = price * qty;
-						grandTotal += total;
+						String startFmt = "Not set";
+						String durationFmt = "Not set";
 
-						String startFmt = (start != null) ? start.toString().replace(".0", "") : "Not set";
-						String endFmt = (end != null) ? end.toString().replace(".0", "") : "Not set";
+						long hours = 1; // default 1 hour if not set properly
+
+						if (start != null) {
+							startFmt = start.toLocalDateTime().toString().replace("T", " ");
+						}
+
+						if (start != null && end != null) {
+							long minutes = Duration.between(start.toLocalDateTime(), end.toLocalDateTime()).toMinutes();
+
+							hours = minutes / 60;
+							if (hours < 1)
+						hours = 1;
+
+							durationFmt = hours + " hour(s)";
+						}
+
+						// ✅ total = hourly rate × duration hours × quantity
+						double total = price * hours * qty;
+						grandTotal += total;
 					%>
 
 					<tr>
-						<!-- Name -->
 						<td><strong><%=name%></strong></td>
 
-						<!-- Datetimes -->
 						<td style="min-width: 220px;">
 							<div>
 								<strong>Start:</strong>
 								<%=startFmt%></div>
 							<div>
-								<strong>End:</strong>
-								<%=endFmt%></div>
+								<strong>Duration:</strong>
+								<%=durationFmt%></div>
 						</td>
 
-						<!-- Quantity -->
 						<td><%=qty%></td>
 
-						<!-- Price -->
-						<td>S$ <%=String.format("%.2f", price)%></td>
+						<td>S$ <%=String.format("%.2f", price)%> / hr
+						</td>
 
-						<!-- Total -->
 						<td><strong>S$ <%=String.format("%.2f", total)%></strong></td>
 
-						<!-- Actions -->
 						<td><a
-							href="setItemDetails.jsp?item_id=<%=itemId%>&mode=edit"class="btn btn-sm btn-outline-primary me-2">Edit</a> 
-							<a href="deleteCartItem.jsp?item_id=<%=itemId%>" class="btn btn-sm btn-outline-danger">Remove</a></td>
+							href="setItemDetails.jsp?item_id=<%=itemId%>&mode=edit"
+							class="btn btn-sm btn-outline-primary me-2">Edit</a> <a
+							href="deleteCartItem.jsp?item_id=<%=itemId%>"
+							class="btn btn-sm btn-outline-danger">Remove</a></td>
 					</tr>
 
 					<%
-					}
+					} // end loop
 					%>
-
 				</tbody>
 			</table>
 
@@ -178,16 +201,20 @@ body {
 				<h4>
 					Grand Total: <strong>S$ <%=String.format("%.2f", grandTotal)%></strong>
 				</h4>
-				<a href="#" class="btn btn-dark mt-3">Checkout</a>
+				<a href="<%=request.getContextPath()%>/checkout"
+					class="btn btn-dark mt-3">Checkout</a>
 			</div>
 
 			<%
-			}
+			} // end itemCount else
 			} catch (Exception e) {
 			%>
+
 			<p class="text-danger">
 				Error loading cart:
-				<%=e.getMessage()%></p>
+				<%=e.getMessage()%>
+			</p>
+
 			<%
 			} finally {
 			try {
@@ -206,7 +233,7 @@ body {
 			} catch (Exception ignore) {
 			}
 			}
-			}
+			} // end customerId else
 			%>
 
 		</div>

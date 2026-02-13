@@ -1,54 +1,64 @@
 package model;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBConnection {
 
-    // Keep credentials private so they can’t be accessed directly
-    private static final String URL = "jdbc:mysql://localhost:3306/silvercare";
-    private static final String USER = "root";
-    private static final String PASSWORD = "root1234";
+	// Keep credentials private so they can’t be accessed directly
+	private static final String URL =
+		    "jdbc:mysql://silvercare-db-unique123.mysql.database.azure.com:3306/silvercare"
+		    + "?useSSL=true"
+		    + "&requireSSL=true"
+		    + "&verifyServerCertificate=false"
+		    + "&serverTimezone=UTC";
 
-    public static Connection getConnection() {
-        Connection conn = null;
+		private static final String USER =
+		    "silveradmin";
 
-        try {
-            // Load the MySQL JDBC driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
+		private static final String PASSWORD =
+		    "Jvss1234";
 
-            // Attempt to connect to the database
-            conn = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("Successfully connected to MySQL!");
-        }
+	public static Connection getConnection() {
+		Connection conn = null;
 
-        // If driver class not found
-        catch (ClassNotFoundException e) {
-            System.out.println("MySQL JDBC Driver not found!");
-            e.printStackTrace();
-        }
+		try {
+			// Load the MySQL JDBC driver
+			Class.forName("com.mysql.cj.jdbc.Driver");
 
-        // If database connection fails
-        catch (SQLException e) {
-            System.out.println("Database connection failed!");
-            System.out.println("Error Message: " + e.getMessage());
-            e.printStackTrace();
-        }
+			// Attempt to connect to the database
+			conn = DriverManager.getConnection(URL, USER, PASSWORD);
+//			System.out.println("Successfully connected to MySQL!");
+		}
 
-        // Return the connection object (null if connection failed)
-        return conn;
-    }
+		// If driver class not found
+		catch (ClassNotFoundException e) {
+			System.out.println("MySQL JDBC Driver not found!");
+			e.printStackTrace();
+		}
 
-    // 🔹 Optional: method to safely close the connection
-    public static void closeConnection(Connection conn) {
-        if (conn != null) {
-            try {
-                conn.close();
-                System.out.println("Connection closed successfully.");
-            } catch (SQLException e) {
-                System.out.println("Error closing connection.");
-                e.printStackTrace();
-            }
-        }
-    }
+		// If database connection fails
+		catch (SQLException e) {
+			System.out.println("Database connection failed!");
+			System.out.println("Error Message: " + e.getMessage());
+			e.printStackTrace();
+		}
+
+		// Return the connection object (null if connection failed)
+		return conn;
+	}
+
+	// 🔹 Optional: method to safely close the connection
+	public static void closeConnection(Connection conn) {
+		if (conn != null) {
+			try {
+				conn.close();
+				System.out.println("Connection closed successfully.");
+			} catch (SQLException e) {
+				System.out.println("Error closing connection.");
+				e.printStackTrace();
+			}
+		}
+	}
 }

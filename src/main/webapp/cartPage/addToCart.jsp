@@ -28,9 +28,13 @@
     try {
         Class.forName("com.mysql.cj.jdbc.Driver");
         conn = DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/silvercare",
-            "root", 
-            "root1234"      
+        		"jdbc:mysql://silvercare-db-unique123.mysql.database.azure.com:3306/silvercare"
+        			    + "?useSSL=true"
+        			    + "&requireSSL=true"
+        			    + "&verifyServerCertificate=false"
+        			    + "&serverTimezone=UTC",
+            "silveradmin", 
+            "Jvss1234"      
         );
 
         // get or create the cart for user

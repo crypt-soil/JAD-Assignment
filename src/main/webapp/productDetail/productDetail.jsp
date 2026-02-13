@@ -1,9 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ page import="model.Category"%>
-<%@ page import="model.Service"%>
+<%@ page import="model.category.Category"%>
+<%@ page import="model.Service.Service"%>
 
 <%
+// Retrieve the selected category object passed from the servlet
 Category cat = (Category) request.getAttribute("category");
 %>
 
@@ -12,13 +13,18 @@ Category cat = (Category) request.getAttribute("category");
 <head>
 <meta charset="UTF-8">
 <title><%=cat.getName()%> - Details</title>
+
+<!-- Bootstrap -->
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
 	rel="stylesheet">
 
 <style>
+/* ============================
+   GLOBAL STYLING
+   ============================ */
 body {
-	background: #f6f4ff; /* soft lilac */
+	background: #f6f4ff;
 }
 
 .product-wrapper {
@@ -33,6 +39,7 @@ body {
 	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
 }
 
+/* HERO IMAGE */
 .hero-img {
 	height: 380px;
 	width: 100%;
@@ -41,10 +48,10 @@ body {
 	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
+/* Category header */
 .product-title {
 	font-weight: 700;
 	font-size: 1.8rem;
-	margin-bottom: 12px;
 }
 
 .product-desc {
@@ -53,8 +60,8 @@ body {
 	line-height: 1.6;
 }
 
+/* Role badge */
 .role-tag {
-	display: inline-block;
 	padding: 4px 10px;
 	border-radius: 999px;
 	font-size: 0.75rem;
@@ -62,22 +69,27 @@ body {
 	background: #efe9ff;
 	color: #6b4cd8;
 	text-transform: uppercase;
-	letter-spacing: 0.04em;
 }
 
+/* Services section title */
 .section-title {
 	font-weight: 700;
 	font-size: 1.3rem;
-	margin-top: 32px;
-	margin-bottom: 12px;
 }
 
+/* ============================
+   SERVICE CARD
+   ============================ */
 .service-card {
 	border-radius: 12px;
-	overflow: hidden; /* prevents image sticking out */
+	overflow: hidden;
 	background: white;
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 	transition: transform .2s;
+}
+
+.service-card:hover {
+	transform: translateY(-3px);
 }
 
 .service-card img {
@@ -86,51 +98,31 @@ body {
 	object-fit: cover;
 }
 
-.service-card:hover {
-	transform: translateY(-3px);
-}
-
 .service-card .card-body {
 	padding: 20px 22px;
-	/* <-- THIS IS WHY content won’t be compact anymore */
 }
 
 .service-title {
 	font-weight: 600;
 	font-size: 1.15rem;
-	margin-bottom: 6px;
 }
 
 .service-desc {
-	color: #555;
 	font-size: 0.95rem;
-	margin-bottom: 12px;
-	line-height: 1.45;
+	color: #555;
 }
 
 .service-price {
 	font-weight: bold;
-	margin-bottom: 15px;
 	color: #333;
 }
 
-/* Buttons row spacing */
-.service-card .btn {
-	padding: 6px 14px;
-	font-size: 0.9rem;
-}
-
+/* Buttons */
 .btn-soft-primary {
-	background: #efe9ff; /* soft purple background */
-	color: #6b4cd8; /* purple text */
-	border-color: #d1c2ff; /* light purple border */
+	background: #efe9ff;
+	color: #6b4cd8;
+	border-color: #d1c2ff;
 	font-weight: 600;
-}
-
-.btn-soft-primary:hover {
-	background: #e2d6ff; /* slightly darker on hover */
-	color: #5936cf;
-	border-color: #b9a1ff;
 }
 
 .btn-soft-warning {
@@ -144,26 +136,16 @@ body {
 	color: #c62828;
 	border-color: #ffb3b3;
 }
-
-.btn-soft-warning:hover {
-	background: #ffefb0; /* slightly darker yellow on hover */
-	color: #8a6c00; /* deeper gold text */
-	border-color: #ffd35c;
-}
-
-.btn-soft-danger:hover {
-	background: #ffd4d4; /* slightly darker soft red */
-	color: #9f1f1f; /* deeper red text */
-	border-color: #ff9b9b;
-}
 </style>
 </head>
 
 <body>
 
+	<!-- Shared navbar -->
 	<%@ include file="../common/navbar.jsp"%>
 
 	<%
+	// Determine user role — default to public
 	role = (String) session.getAttribute("role");
 	if (role == null)
 		role = "public";
@@ -172,34 +154,40 @@ body {
 	<div class="product-wrapper">
 		<div class="product-card">
 
-			<!-- HERO SECTION (shared across all roles) -->
+			<!-- ============================
+                 HERO SECTION (Image + Category Info)
+                 ============================ -->
 			<div class="row align-items-center">
-				<!-- LEFT: Image -->
+
+				<!-- LEFT: category image -->
 				<div class="col-md-6 mb-4 mb-md-0">
 					<img src="<%=cat.getImageUrl()%>" class="hero-img"
 						alt="<%=cat.getName()%>">
 				</div>
 
-				<!-- RIGHT: Text + (Admin controls) -->
+				<!-- RIGHT: category details + admin buttons -->
 				<div class="col-md-6 ps-md-4">
+
+					<!-- Role tag changes depending on session -->
 					<span class="role-tag"> <%
  if ("admin".equals(role)) {
- %> Admin View <%
+ %>
+						Admin View <%
  } else if ("member".equals(role)) {
  %> Member View <%
  } else {
- %> Public View <%
+ %>
+						Public View <%
  }
  %>
 					</span>
 
 					<h3 class="product-title mt-3"><%=cat.getName()%></h3>
+					<p class="product-desc"><%=cat.getDescription()%></p>
 
-					<p class="product-desc">
-						<%=cat.getDescription()%>
-					</p>
-
-					<!-- ADMIN CATEGORY BUTTONS -->
+					<!-- ============================
+                         ADMIN — Edit/Delete Category
+                         ============================ -->
 					<%
 					if ("admin".equals(role)) {
 					%>
@@ -213,10 +201,13 @@ body {
 					<%
 					}
 					%>
+
 				</div>
 			</div>
 
-			<!-- SERVICES TITLE + Add Service (Admin Only) -->
+			<!-- ============================
+                 SERVICES HEADER + Admin Add Button
+                 ============================ -->
 			<div class="d-flex justify-content-between align-items-center mt-5">
 				<h4 class="section-title m-0"><%=cat.getName()%>
 					Services
@@ -225,9 +216,10 @@ body {
 				<%
 				if ("admin".equals(role)) {
 				%>
+				<!-- Admin can add a new service -->
 				<a
 					href="<%=request.getContextPath()%>/service?action=add&catId=<%=cat.getId()%>"
-					class="btn btn-soft-primary btn-sm me-2"> Add </a>
+					class="btn btn-soft-primary btn-sm me-2">Add</a>
 				<%
 				}
 				%>
@@ -236,20 +228,27 @@ body {
 			<p class="text-muted mb-3" style="font-size: 0.9rem;">Explore the
 				available services under this care category.</p>
 
-
-			<!-- SERVICES GRID (role-based content) -->
+			<!-- ============================
+                 SERVICES GRID
+                 Shows different actions depending on role
+                 ============================ -->
 			<div class="row g-4 mt-1">
 
 				<%
+				// Display services OR fallback message
 				if (cat.getServices() != null && !cat.getServices().isEmpty()) {
 					for (Service s : cat.getServices()) {
 				%>
+
 				<div class="col-md-4">
+					<!-- Clicking card = go to service details -->
 					<a
 						href="<%=request.getContextPath()%>/serviceDetail?id=<%=s.getId()%>"
 						class="text-decoration-none text-dark">
+
 						<div class="service-card">
 
+							<!-- Fallback image if none -->
 							<img
 								src="<%=(s.getImageUrl() != null && !s.getImageUrl().isEmpty()) ? s.getImageUrl()
 		: "https://via.placeholder.com/300x180?text=No+Image"%>"
@@ -259,19 +258,21 @@ body {
 								<h5 class="service-title"><%=s.getName()%></h5>
 								<p class="service-desc"><%=s.getDescription()%></p>
 								<p class="service-price">
-									$<%=String.format("%.2f", s.getPrice())%>
-								</p>
+									$<%=String.format("%.2f", s.getPrice())%></p>
 
-								<!-- ROLE-SPECIFIC ACTIONS -->
+								<!-- ============================
+                                     ROLE-BASED ACTION BUTTONS
+                                     ============================ -->
+
 								<%
 								if ("member".equals(role)) {
 								%>
-								<!-- Member: Add to cart only -->
+
+								<!-- Members can add to cart -->
 								<form
 									action="<%=request.getContextPath()%>/cartPage/addToCart.jsp?mode=create"
 									method="post" onClick="event.stopPropagation();"
 									style="display: inline;">
-
 
 									<input type="hidden" name="serviceId" value="<%=s.getId()%>">
 									<input type="hidden" name="serviceName"
@@ -282,44 +283,50 @@ body {
 										Add to Cart</button>
 								</form>
 
-
 								<%
 								} else if ("admin".equals(role)) {
 								%>
-								<!-- Admin: edit / delete -->
+
+								<!-- Admin: edit/delete service -->
 								<a
 									href="<%=request.getContextPath()%>/service?action=edit&id=<%=s.getId()%>"
 									class="btn btn-soft-warning btn-sm me-2">Edit</a> <a
 									href="<%=request.getContextPath()%>/service?action=confirmDelete&id=<%=s.getId()%>"
 									class="btn btn-soft-danger btn-sm me-2">Delete</a>
 
-
 								<%
-								} // public: no buttons
+								}
 								%>
-							</div>
 
+							</div>
 						</div>
 					</a>
 				</div>
+
 				<%
 				}
 				} else {
 				%>
+
+				<!-- No services message -->
 				<div class="col-12">
 					<p class="text-muted fst-italic">No services have been added
 						under this category yet.</p>
 				</div>
+
 				<%
 				}
 				%>
 
 			</div>
-
+			<!-- /services grid -->
 		</div>
 		<!-- /product-card -->
 	</div>
 	<!-- /product-wrapper -->
+
+	<!-- Shared footer -->
 	<%@ include file="../common/footer.jsp"%>
+
 </body>
 </html>
