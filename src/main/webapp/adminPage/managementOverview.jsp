@@ -154,10 +154,6 @@ body {
 
 	<div class="dashboard-wrapper">
 
-		<!-- TITLE -->
-		<h2 class="section-title">Client Inquiry</h2>
-		<p class="subtitle">Search and filter clients by name or
-			residential area</p>
 		<!-- TITLE + CREATE BUTTON -->
 		<div class="d-flex justify-content-between align-items-center mb-2">
 			<div>
@@ -166,7 +162,7 @@ body {
 					residential area</p>
 			</div>
 
-			<a href="<%=request.getContextPath()%>/admin/addCustomer.jsp"
+			<a href="<%=request.getContextPath()%>/adminPage/addCustomer.jsp"
 				class="btn btn-success"> <i class="bi bi-plus-circle me-1"></i>
 				Create
 			</a>
