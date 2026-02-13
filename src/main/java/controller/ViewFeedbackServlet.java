@@ -29,14 +29,14 @@ public class ViewFeedbackServlet extends HttpServlet {
 		HttpSession session = request.getSession(false);
 		String role = (session != null) ? (String) session.getAttribute("role") : null;
 
-		// ✅ ADMIN ONLY
+		// ADMIN ONLY
 		if (!"admin".equals(role)) {
 			response.sendRedirect(request.getContextPath() + "/loginPage/login.jsp?unauthorized=true");
 			return;
 		}
 
 		try {
-			// ✅ Admin should see ALL feedback
+			// Admin should see ALL feedback
 			List<FeedbackView> feedbackList = feedbackDAO.getAllFeedback();
 			request.setAttribute("feedbackList", feedbackList);
 			request.getRequestDispatcher("/adminPage/viewFeedback.jsp").forward(request, response);

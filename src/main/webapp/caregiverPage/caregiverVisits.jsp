@@ -4,26 +4,37 @@
 <%@ page import="java.time.*"%>
 <%@ page import="model.caregiver.CaregiverVisit"%>
 <%@ page import="java.text.SimpleDateFormat"%>
+<!-- Lois Poh 2429478 -->
 <%
+/* Declares formatter used to display start/end timestamps in a consistent yyyy-MM-dd HH:mm format */
 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 %>
 <%
 Integer cgId = (Integer) session.getAttribute("caregiver_id");
+
 if (cgId == null) {
 	response.sendRedirect(request.getContextPath() + "/loginPage/login.jsp");
 	return;
 }
 
 String caregiverName = (String) request.getAttribute("caregiverName");
+
+/* Provides fallback label when caregiver name attribute missing */
 if (caregiverName == null)
 	caregiverName = "Caregiver";
 
+/* Reads schedule filter selection from request attributes; attribute expected to be set by servlet/controller */
 String filter = (String) request.getAttribute("filter");
+
+/* Defaults filter to "today" when no filter attribute provided */
 if (filter == null)
 	filter = "today";
 
+/* Reads visits list from request attributes; list expected to contain CaregiverVisit DTOs */
 @SuppressWarnings("unchecked")
 List<CaregiverVisit> visits = (List<CaregiverVisit>) request.getAttribute("visits");
+
+/* Initializes empty list to avoid null checks during rendering */
 if (visits == null)
 	visits = new ArrayList<>();
 %>
@@ -76,6 +87,7 @@ body {
 </head>
 
 <body>
+	<%-- Includes shared navbar fragment for consistent caregiver layout and navigation --%>
 	<%@ include file="../common/navbar.jsp"%>
 
 	<div class="wrap">
@@ -90,6 +102,7 @@ body {
 					</div>
 				</div>
 
+				<%-- Filter form submits GET request to refresh table with selected filter value --%>
 				<form method="get"
 					action="<%=request.getContextPath()%>/caregiver/visits"
 					class="d-flex gap-2 align-items-center">
@@ -125,15 +138,24 @@ body {
 					</thead>
 					<tbody>
 						<%
+						/* Captures current local date to decide whether a visit is eligible for check-in/out */
 						LocalDate today = LocalDate.now();
 
+						/* Iterates each scheduled visit and renders one table row per visit */
+						/* Per-visit logic computes: appointment day match, status badge text/class, and button enablement rules */
 						for (CaregiverVisit v : visits) {
+
+							/* Extracts visit calendar date from start timestamp for "is today" comparison */
 							LocalDate visitDate = v.getStartTime().toLocalDateTime().toLocalDate();
+
+							/* Determines whether the visit occurs on the current day */
 							boolean isToday = visitDate.equals(today);
 
+							/* Initializes default badge styling and label for status display */
 							String badgeClass = "bg-secondary";
 							String badgeText = "Not Assigned";
 
+							/* Maps caregiver status code into a badge color and readable label */
 							switch (v.getCaregiverStatus()) {
 							case 1:
 								badgeClass = "bg-info text-dark";
@@ -157,7 +179,10 @@ body {
 								break;
 							}
 
+							/* Enables Check In only when appointment is today and status is Assigned */
 							boolean canCheckIn = isToday && v.getCaregiverStatus() == 1;
+
+							/* Enables Check Out only when appointment is today and status is Checked In */
 							boolean canCheckOut = isToday && v.getCaregiverStatus() == 2;
 						%>
 						<tr>
@@ -189,6 +214,7 @@ body {
 							<td>
 								<div class="d-flex flex-column gap-2">
 
+									<%-- Check-in form posts detailId to caregiver check-in servlet; button disabled when canCheckIn is false --%>
 									<form method="post"
 										action="<%=request.getContextPath()%>/caregiver/checkin"
 										class="m-0">
@@ -198,6 +224,7 @@ body {
 											<%=canCheckIn ? "" : "disabled"%>>Check In</button>
 									</form>
 
+									<%-- Check-out form posts detailId to caregiver check-out servlet; button disabled when canCheckOut is false --%>
 									<form method="post"
 										action="<%=request.getContextPath()%>/caregiver/checkout"
 										class="m-0">
@@ -208,6 +235,7 @@ body {
 									</form>
 
 									<%
+									/* Shows explanatory note when visit is not scheduled for the current day */
 									if (!isToday) {
 									%>
 									<div class="small-note text-muted">Can only check in on
@@ -221,6 +249,7 @@ body {
 						<%
 						}
 
+						/* Displays empty state when visit list contains no rows after filtering */
 						if (visits.isEmpty()) {
 						%>
 						<tr>
@@ -237,6 +266,7 @@ body {
 
 	</div>
 
+	<%-- Includes shared footer fragment --%>
 	<%@ include file="../common/footer.jsp"%>
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

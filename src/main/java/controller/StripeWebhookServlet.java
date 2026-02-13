@@ -46,7 +46,7 @@ public class StripeWebhookServlet extends HttpServlet {
 			return;
 		}
 
-		// ✅ handle only successful checkout completion
+		// handle only successful checkout completion
 		if (!"checkout.session.completed".equals(event.getType())) {
 			response.setStatus(200);
 			response.getWriter().write("ignored");

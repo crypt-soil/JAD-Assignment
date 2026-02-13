@@ -1,5 +1,8 @@
 package model.caregiver;
-
+/*
+ * Lois Poh 
+ * 2429478
+ */
 public class Caregiver {
 	private int id;
 	private String fullName;

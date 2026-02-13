@@ -1,4 +1,5 @@
 package controller.Caregiver;
+
 /*
  * Lois Poh 
  * 2429478
@@ -17,10 +18,13 @@ public class CaregiverCheckInServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private final BookingDetailsStatusDAO dao = new BookingDetailsStatusDAO();
 
+	// Processes POST requests to record a caregiver's check-in for a specific
+	// booking detail
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		// Retrieves the authenticated caregiver ID from the session
 		Integer caregiverId = (Integer) request.getSession().getAttribute("caregiver_id");
 		if (caregiverId == null) {
 			response.sendRedirect(request.getContextPath() + "/loginPage/login.jsp");
@@ -30,6 +34,8 @@ public class CaregiverCheckInServlet extends HttpServlet {
 		int detailId = Integer.parseInt(request.getParameter("detailId"));
 		boolean ok = dao.checkIn(detailId, caregiverId);
 		if (ok) {
+			// Retrieves customer information to send a notification upon successful
+			// check-in
 			Integer customerId = dao.getCustomerIdByDetailId(detailId);
 			if (customerId != null) {
 				String[] info = dao.getBookingInfoByDetailId(detailId);
@@ -52,10 +58,12 @@ public class CaregiverCheckInServlet extends HttpServlet {
 					}
 				}
 
+				// Creates a notification for the customer to inform them of the check-in
 				new NotificationDAO().create(customerId, bookingId, detailId, title, message);
 			}
 		}
 
+		// Redirects to today's visits page after processing the check-in
 		response.sendRedirect(request.getContextPath() + "/caregiver/visits?filter=today");
 	}
 }

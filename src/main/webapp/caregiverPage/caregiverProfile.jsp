@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ page import="model.caregiver.Caregiver"%>
-
+<!-- Lois Poh 2429478 -->
 <%
 Caregiver c = (Caregiver) request.getAttribute("caregiver");
 if (c == null) {

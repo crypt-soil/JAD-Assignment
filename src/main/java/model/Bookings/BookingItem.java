@@ -22,14 +22,12 @@ public class BookingItem {
 				null);
 	}
 
-	// ✅ old "new style" constructor (keeps your current DAO call working)
 	public BookingItem(int serviceId, String serviceName, int quantity, double subtotal, int caregiverStatus,
 			String caregiverName, String caregiverContact, String specialRequest) {
 		this(serviceId, serviceName, quantity, subtotal, caregiverStatus, caregiverName, caregiverContact,
 				specialRequest, null, null);
 	}
 
-	// ✅ NEW: full constructor with time fields
 	public BookingItem(int serviceId, String serviceName, int quantity, double subtotal, int caregiverStatus,
 			String caregiverName, String caregiverContact, String specialRequest, Timestamp startTime,
 			Timestamp endTime) {
@@ -78,7 +76,6 @@ public class BookingItem {
 		return specialRequest;
 	}
 
-	// ✅ NEW getters
 	public Timestamp getStartTime() {
 		return startTime;
 	}

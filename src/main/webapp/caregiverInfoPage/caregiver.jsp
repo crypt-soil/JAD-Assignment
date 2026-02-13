@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*, java.util.*, model.DBConnection"%>
-
+<!-- Lois Poh 2429478 -->
 <%
 Connection conn = null;
 PreparedStatement ps = null;

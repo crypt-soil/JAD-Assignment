@@ -1,5 +1,8 @@
 package controller;
-
+/*
+ * Lois Poh
+ * 2429478
+ */
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import model.Notification.NotificationDAO;

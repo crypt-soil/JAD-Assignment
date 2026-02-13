@@ -3,7 +3,10 @@
 <%@ page import="java.util.*"%>
 <%--
 Ong Jin Kai
-2429465
+2429465,
+
+Lois Poh 
+2429478
  --%>
 <!DOCTYPE html>
 <html lang="en">
@@ -71,6 +74,7 @@ h1 {
 
 <body>
 
+	<%-- Includes shared navbar fragment for consistent admin layout and navigation --%>
 	<%@ include file="../common/navbar.jsp"%>
 
 	<%
@@ -80,32 +84,52 @@ h1 {
 	Double revenueObj = (Double) request.getAttribute("revenue");
 	String range = (String) request.getAttribute("range");
 	String tab = request.getParameter("tab");
+
+	// Defaults to overview tab when tab parameter missing/blank
 	if (tab == null || tab.isBlank())
 		tab = "overview";
 
+	// Converts nullable Integer to primitive with safe fallback
 	int totalUsers = (totalUsersObj != null) ? totalUsersObj : 0;
+
+	// Provides fallback text when popular service not available
 	if (popularService == null)
 		popularService = "No data";
+
+	// Converts nullable Double to primitive with safe fallback
 	double revenue = (revenueObj != null) ? revenueObj : 0.0;
+
+	// Defaults to year range when servlet did not provide a range value
 	if (range == null)
 		range = "year";
 
+	// Reads top caregivers list from request attributes; each row expected to be a map of columns
 	@SuppressWarnings("unchecked")
 	List<Map<String, Object>> topCaregivers = (List<Map<String, Object>>) request.getAttribute("topCaregivers");
+
+	// Reads worst caregivers list from request attributes
 	@SuppressWarnings("unchecked")
 	List<Map<String, Object>> worstCaregivers = (List<Map<String, Object>>) request.getAttribute("worstCaregivers");
+
+	// Reads top services list from request attributes
 	@SuppressWarnings("unchecked")
 	List<Map<String, Object>> topServices = (List<Map<String, Object>>) request.getAttribute("topServices");
+
+	// Reads worst services list from request attributes
 	@SuppressWarnings("unchecked")
 	List<Map<String, Object>> worstServices = (List<Map<String, Object>>) request.getAttribute("worstServices");
 
 	// Demand + availability lists
+	// Reads list of high demand services from request attributes
 	@SuppressWarnings("unchecked")
 	List<Map<String, Object>> highDemandServices = (List<Map<String, Object>>) request.getAttribute("highDemandServices");
+
+	// Reads list of low availability services from request attributes
 	@SuppressWarnings("unchecked")
 	List<Map<String, Object>> lowAvailabilityServices = (List<Map<String, Object>>) request
 			.getAttribute("lowAvailabilityServices");
 
+	// Initializes empty lists when servlet did not supply data to avoid null checks in rendering
 	if (topCaregivers == null)
 		topCaregivers = new ArrayList<>();
 	if (worstCaregivers == null)
@@ -119,24 +143,31 @@ h1 {
 	if (lowAvailabilityServices == null)
 		lowAvailabilityServices = new ArrayList<>();
 
+	// Computes revenue heading text based on currently selected time range
 	String revenueHeading = "week".equals(range) ? "Total revenue this week"
 			: "month".equals(range) ? "Total revenue this month" : "Total revenue this year";
 
 	// ===================== SALES & REPORTS =====================
+	// Reads booking schedule rows from request attributes; each row represents a booking schedule record
 	@SuppressWarnings("unchecked")
 	List<Map<String, Object>> scheduleRows = (List<Map<String, Object>>) request.getAttribute("scheduleRows");
 
+	// Reads ranked clients by total value from request attributes
 	@SuppressWarnings("unchecked")
 	List<Map<String, Object>> topClients = (List<Map<String, Object>>) request.getAttribute("topClients");
 
+	// Reads clients grouped by selected service from request attributes
 	@SuppressWarnings("unchecked")
 	List<Map<String, Object>> clientsByService = (List<Map<String, Object>>) request.getAttribute("clientsByService");
 
+	// Reads list of services used to populate the service selector
 	@SuppressWarnings("unchecked")
 	List<Map<String, Object>> servicesList = (List<Map<String, Object>>) request.getAttribute("servicesList");
 
+	// Reads selected service identifier from request attributes; used to determine which service is active in selector
 	Integer selectedServiceId = (Integer) request.getAttribute("selectedServiceId");
 
+	// Initializes empty lists when servlet did not supply data to avoid null checks in rendering
 	if (scheduleRows == null)
 		scheduleRows = new ArrayList<>();
 	if (topClients == null)
@@ -149,14 +180,17 @@ h1 {
 
 	<div class="container mt-5">
 
+		<%-- Page header row with title and admin-only badge --%>
 		<div class="d-flex justify-content-between align-items-center mb-4">
 			<h1 class="mb-0">Analytics Dashboard</h1>
 			<span class="badge badge-soft px-3 py-2">Admin only</span>
 		</div>
 
 		<!-- ===================== TABS NAV ===================== -->
+		<%-- Bootstrap tabs navigation; active tab controlled by tab query parameter --%>
 		<ul class="nav nav-tabs mb-4" id="analyticsTabs" role="tablist">
 			<li class="nav-item" role="presentation">
+				<%-- Overview tab button; adds active class when tab == overview --%>
 				<button class="nav-link <%="overview".equals(tab) ? "active" : ""%>"
 					id="tab-overview" data-bs-toggle="tab"
 					data-bs-target="#pane-overview" type="button" role="tab">Overview
@@ -165,6 +199,7 @@ h1 {
 			</li>
 
 			<li class="nav-item" role="presentation">
+				<%-- Ratings tab button; adds active class when tab == ratings --%>
 				<button class="nav-link <%="ratings".equals(tab) ? "active" : ""%>"
 					id="tab-ratings" data-bs-toggle="tab"
 					data-bs-target="#pane-ratings" type="button" role="tab">Ratings</button>
@@ -172,6 +207,7 @@ h1 {
 			</li>
 
 			<li class="nav-item" role="presentation">
+				<%-- Demand tab button; adds active class when tab == demand --%>
 				<button class="nav-link <%="demand".equals(tab) ? "active" : ""%>"
 					id="tab-demand" data-bs-toggle="tab" data-bs-target="#pane-demand"
 					type="button" role="tab">Demand &amp; Capacity</button>
@@ -179,6 +215,7 @@ h1 {
 			</li>
 
 			<li class="nav-item" role="presentation">
+				<%-- Sales tab button; adds active class when tab == sales --%>
 				<button class="nav-link <%="sales".equals(tab) ? "active" : ""%>"
 					id="tab-sales" data-bs-toggle="tab" data-bs-target="#pane-sales"
 					type="button" role="tab">Sales &amp; Reports</button>
@@ -188,6 +225,7 @@ h1 {
 		</ul>
 
 		<!-- ===================== TABS CONTENT ===================== -->
+		<%-- Bootstrap tab panes; each pane visibility controlled by tab value --%>
 		<div class="tab-content" id="analyticsTabsContent">
 
 			<!-- ===================== OVERVIEW TAB ===================== -->
@@ -196,11 +234,14 @@ h1 {
 				class="tab-pane fade <%="overview".equals(tab) ? "show active" : ""%>"
 				id="pane-overview" role="tabpanel" aria-labelledby="tab-overview">
 
+				<%-- Displays summary metrics for quick admin overview --%>
+
 				<!-- TOP METRICS -->
 				<div class="row mb-5">
 					<div class="col-md-4">
 						<div class="metric-card">
 							<h5 class="fw-bold">Total Users</h5>
+							<%-- Renders total user count from servlet attribute --%>
 							<p class="mt-3 fs-4"><%=totalUsers%></p>
 						</div>
 					</div>
@@ -210,6 +251,7 @@ h1 {
 					<div class="col-md-4">
 						<div class="metric-card">
 							<h5 class="fw-bold">Most Popular Service</h5>
+							<%-- Renders most popular service name from servlet attribute --%>
 							<p class="mt-3 fs-5"><%=popularService%></p>
 						</div>
 					</div>
@@ -221,8 +263,10 @@ h1 {
 						<div class="revenue-card">
 
 							<div class="d-flex justify-content-between align-items-center">
+								<%-- Heading text changes based on selected range --%>
 								<h5 class="fw-bold"><%=revenueHeading%></h5>
 
+								<%-- Range filter for revenue section; submits on change --%>
 								<form method="get"
 									action="<%=request.getContextPath()%>/admin/analytics"
 									class="d-flex align-items-center gap-5">
@@ -239,6 +283,7 @@ h1 {
 								</form>
 							</div>
 
+							<%-- Renders formatted currency based on revenue value --%>
 							<p class="mt-4 fs-3">
 								$<%=String.format("%.2f", revenue)%></p>
 							<div class="muted">
@@ -260,6 +305,7 @@ h1 {
 
 
 				<!-- FEEDBACK-BASED RANKINGS -->
+				<%-- Shows caregiver and service rankings derived from feedback data --%>
 				<div class="row g-4 mb-5">
 
 					<!-- CAREGIVER TOP -->
@@ -269,6 +315,7 @@ h1 {
 							<div class="muted mb-3">Based on caregiver overall rating</div>
 
 							<%
+							// Shows empty state when no caregiver rating data exists
 							if (topCaregivers.isEmpty()) {
 							%>
 							<div class="alert alert-info mb-0">No caregiver rating data
@@ -286,6 +333,7 @@ h1 {
 									</thead>
 									<tbody>
 										<%
+										// Renders each caregiver row; expects keys "name" and "rating"
 										for (Map<String, Object> row : topCaregivers) {
 											String name = (String) row.get("name");
 											Object rObj = row.get("rating");
@@ -293,6 +341,7 @@ h1 {
 										%>
 										<tr>
 											<td><%=name%></td>
+											<%-- Displays rating as formatted 1-decimal value with success badge --%>
 											<td><span class="badge text-bg-success"><%=String.format("%.1f", r)%></span></td>
 										</tr>
 										<%
@@ -314,6 +363,7 @@ h1 {
 							<div class="muted mb-3">Based on caregiver overall rating</div>
 
 							<%
+							// Shows empty state when no caregiver rating data exists
 							if (worstCaregivers.isEmpty()) {
 							%>
 							<div class="alert alert-info mb-0">No caregiver rating data
@@ -331,6 +381,7 @@ h1 {
 									</thead>
 									<tbody>
 										<%
+										// Renders each caregiver row; expects keys "name" and "rating"
 										for (Map<String, Object> row : worstCaregivers) {
 											String name = (String) row.get("name");
 											Object rObj = row.get("rating");
@@ -338,6 +389,7 @@ h1 {
 										%>
 										<tr>
 											<td><%=name%></td>
+											<%-- Displays rating as formatted 1-decimal value with danger badge --%>
 											<td><span class="badge text-bg-danger"><%=String.format("%.1f", r)%></span></td>
 										</tr>
 										<%
@@ -360,6 +412,7 @@ h1 {
 								ratings</div>
 
 							<%
+							// Shows empty state when no service feedback data exists
 							if (topServices.isEmpty()) {
 							%>
 							<div class="alert alert-info mb-0">No service feedback data
@@ -378,6 +431,7 @@ h1 {
 									</thead>
 									<tbody>
 										<%
+										// Renders each service row; expects keys "name", "avgRating", and "count"
 										for (Map<String, Object> row : topServices) {
 											String name = (String) row.get("name");
 											Object avgObj = row.get("avgRating");
@@ -388,7 +442,9 @@ h1 {
 										%>
 										<tr>
 											<td><%=name%></td>
+											<%-- Displays average rating with success badge --%>
 											<td><span class="badge text-bg-success"><%=String.format("%.1f", avg)%></span></td>
+											<%-- Displays feedback count with neutral badge --%>
 											<td><span class="badge text-bg-secondary"><%=cnt%></span></td>
 										</tr>
 										<%
@@ -411,6 +467,7 @@ h1 {
 								ratings</div>
 
 							<%
+							// Shows empty state when no service feedback data exists
 							if (worstServices.isEmpty()) {
 							%>
 							<div class="alert alert-info mb-0">No service feedback data
@@ -429,6 +486,7 @@ h1 {
 									</thead>
 									<tbody>
 										<%
+										// Renders each service row; expects keys "name", "avgRating", and "count"
 										for (Map<String, Object> row : worstServices) {
 											String name = (String) row.get("name");
 											Object avgObj = row.get("avgRating");
@@ -439,7 +497,9 @@ h1 {
 										%>
 										<tr>
 											<td><%=name%></td>
+											<%-- Displays average rating with danger badge --%>
 											<td><span class="badge text-bg-danger"><%=String.format("%.1f", avg)%></span></td>
+											<%-- Displays feedback count with neutral badge --%>
 											<td><span class="badge text-bg-secondary"><%=cnt%></span></td>
 										</tr>
 										<%
@@ -465,6 +525,7 @@ h1 {
 
 
 				<!-- DEMAND + AVAILABILITY -->
+				<%-- Shows services with highest bookings and services with capacity issues --%>
 				<div class="row g-4 mb-5">
 
 					<!-- HIGH DEMAND -->
@@ -475,6 +536,7 @@ h1 {
 								time range</div>
 
 							<%
+							// Shows empty state when no demand data exists
 							if (highDemandServices.isEmpty()) {
 							%>
 							<div class="alert alert-info mb-0">No demand data yet.</div>
@@ -491,6 +553,7 @@ h1 {
 									</thead>
 									<tbody>
 										<%
+										// Renders each demand row; expects keys "name" and "demandCount"
 										for (Map<String, Object> row : highDemandServices) {
 											String name = (String) row.get("name");
 											Object dObj = row.get("demandCount");
@@ -498,6 +561,7 @@ h1 {
 										%>
 										<tr>
 											<td><%=name%></td>
+											<%-- Displays demand count using primary badge --%>
 											<td><span class="badge text-bg-primary"><%=demand%></span></td>
 										</tr>
 										<%
@@ -520,6 +584,7 @@ h1 {
 								many unassigned</div>
 
 							<%
+							// Shows empty state when no availability data exists
 							if (lowAvailabilityServices.isEmpty()) {
 							%>
 							<div class="alert alert-info mb-0">No availability data
@@ -540,6 +605,7 @@ h1 {
 									</thead>
 									<tbody>
 										<%
+										// Renders each availability row; expects keys "name", "demandCount", "caregiverCount", "unassignedCount", "unassignedRate"
 										for (Map<String, Object> row : lowAvailabilityServices) {
 											String name = (String) row.get("name");
 
@@ -558,9 +624,13 @@ h1 {
 										%>
 										<tr>
 											<td><%=name%></td>
+											<%-- Displays demand count for the service --%>
 											<td><span class="badge text-bg-secondary"><%=demand%></span></td>
+											<%-- Displays number of caregivers available/assigned (as defined by query) --%>
 											<td><span class="badge text-bg-info"><%=caregiverCount%></span></td>
+											<%-- Displays number of unassigned cases (as defined by query) --%>
 											<td><span class="badge text-bg-warning"><%=unassignedCount%></span></td>
+											<%-- Displays unassigned rate percentage formatted to 1 decimal place --%>
 											<td><span class="badge text-bg-danger"><%=String.format("%.1f", unassignedRate)%>%</span></td>
 										</tr>
 										<%
@@ -599,6 +669,7 @@ h1 {
 									<div class="muted">Filtered by selected time range</div>
 								</div>
 
+								<%-- Range filter for schedule section; keeps tab and service selection during submit --%>
 								<form method="get"
 									action="<%=request.getContextPath()%>/admin/analytics"
 									class="d-flex align-items-center gap-2 mb-0">
@@ -625,6 +696,7 @@ h1 {
 
 							<!-- Table / Empty State -->
 							<%
+							// Shows empty state when schedule rows are not available
 							if (scheduleRows.isEmpty()) {
 							%>
 							<div class="alert alert-info mb-0">No booking schedule data
@@ -647,6 +719,7 @@ h1 {
 									</thead>
 									<tbody>
 										<%
+										// Renders schedule rows; expects keys bookingId/startTime/endTime/customerName/serviceName/caregiverName/subtotal
 										for (Map<String, Object> row : scheduleRows) {
 											String caregiver = row.get("caregiverName") != null ? (String) row.get("caregiverName") : "Unassigned";
 
@@ -659,6 +732,7 @@ h1 {
 											<td><%=row.get("endTime")%></td>
 											<td><%=row.get("customerName")%></td>
 											<td><%=row.get("serviceName")%></td>
+											<%-- Highlights unassigned caregivers using warning badge --%>
 											<td><span
 												class="badge <%="Unassigned".equals(caregiver) ? "text-bg-warning" : "text-bg-info"%>">
 													<%=caregiver%>
@@ -685,6 +759,7 @@ h1 {
 							<div class="muted mb-3">Ranked by total spending</div>
 
 							<%
+							// Shows empty state when spending data not available
 							if (topClients.isEmpty()) {
 							%>
 							<div class="alert alert-info mb-0">No client spending data
@@ -702,11 +777,13 @@ h1 {
 								</thead>
 								<tbody>
 									<%
+									// Renders each top client row; expects keys customerName/bookingCount/totalSpent
 									for (Map<String, Object> row : topClients) {
 									%>
 									<tr>
 										<td><%=row.get("customerName")%></td>
 										<td><%=row.get("bookingCount")%></td>
+										<%-- Formats total spent as currency inside success badge --%>
 										<td><span class="badge text-bg-success"> $<%=String.format("%.2f", row.get("totalSpent"))%>
 										</span></td>
 									</tr>
@@ -729,6 +806,7 @@ h1 {
 								clients</div>
 
 							<!-- ALWAYS SHOW THE SELECTOR (so user can pick even when empty) -->
+							<%-- Service selector form; submits serviceId and preserves tab/range --%>
 							<form method="get"
 								action="<%=request.getContextPath()%>/admin/analytics"
 								class="mb-3 d-flex gap-2">
@@ -740,6 +818,7 @@ h1 {
 									onchange="this.form.submit()">
 									<option value="">-- Select Service --</option>
 									<%
+									// Populates select options from servicesList; expects keys serviceId and name
 									for (Map<String, Object> svc : servicesList) {
 										int sid = (Integer) svc.get("serviceId");
 										String sname = (String) svc.get("name");
@@ -755,11 +834,13 @@ h1 {
 							</form>
 
 							<%
+							// Shows prompt when no service has been selected
 							if (selectedServiceId == null) {
 							%>
 							<div class="alert alert-warning mb-0">Please select a
 								service to view related clients.</div>
 							<%
+							// Shows empty state when service selected but no clients match range
 							} else if (clientsByService.isEmpty()) {
 							%>
 							<div class="alert alert-info mb-0">No clients found for
@@ -777,11 +858,13 @@ h1 {
 								</thead>
 								<tbody>
 									<%
+									// Renders each client row for selected service; expects keys customerName/timesBooked/totalSpent
 									for (Map<String, Object> row : clientsByService) {
 									%>
 									<tr>
 										<td><%=row.get("customerName")%></td>
 										<td><%=row.get("timesBooked")%></td>
+										<%-- Formats total spent as currency inside primary badge --%>
 										<td><span class="badge text-bg-primary"> $<%=String.format("%.2f", row.get("totalSpent"))%>
 										</span></td>
 									</tr>
@@ -805,6 +888,7 @@ h1 {
 
 	</div>
 
+	<%-- Bootstrap JS bundle enables tab switching and other interactive components --%>
 	<!-- Bootstrap JS bundle required for tabs -->
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ page import="model.Service.ServiceInquiry"%>
+<!-- Ong Jin Kai, 2429465 -->
 <%
 // ===== ADMIN GUARD =====
 HttpSession s = request.getSession(false);

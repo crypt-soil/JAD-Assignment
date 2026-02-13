@@ -2,7 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.*"%>
 <%@ page import="model.caregiver.CaregiverVisit"%>
-
+<!-- Lois Poh 2429478 -->
 <%
 Integer cgId = (Integer) session.getAttribute("caregiver_id");
 if (cgId == null) {

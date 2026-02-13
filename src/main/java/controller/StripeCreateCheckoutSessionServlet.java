@@ -89,15 +89,15 @@ public class StripeCreateCheckoutSessionServlet extends HttpServlet {
 
 		SessionCreateParams params = SessionCreateParams.builder().setMode(SessionCreateParams.Mode.PAYMENT)
 
-				// ✅ Better tracking
+				// Better tracking
 				.setClientReferenceId("booking_" + bookingId)
 
-				// ✅ Redirect pages
+				// Redirect pages
 				.setSuccessUrl(baseUrl + "/checkoutPage/payment_success.jsp?bookingId=" + bookingId)
 				.setCancelUrl(baseUrl + "/stripe/cancel?bookingId=" + bookingId)
 
 
-				// ✅ Single line item for total
+				// Single line item for total
 				.addLineItem(SessionCreateParams.LineItem.builder().setQuantity(1L)
 						.setPriceData(SessionCreateParams.LineItem.PriceData.builder().setCurrency("sgd")
 								.setUnitAmount(totalCents)
@@ -106,7 +106,7 @@ public class StripeCreateCheckoutSessionServlet extends HttpServlet {
 								.build())
 						.build())
 
-				// ✅ Metadata for webhook
+				// Metadata for webhook
 				.putMetadata("bookingId", String.valueOf(bookingId))
 				.putMetadata("customerId", String.valueOf(customerId))
 

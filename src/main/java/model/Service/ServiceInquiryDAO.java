@@ -1,5 +1,8 @@
 package model.Service;
-
+/*
+ * Lois Poh 
+ * 2429478
+ */
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

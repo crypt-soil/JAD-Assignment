@@ -294,6 +294,7 @@ th, td {
 </head>
 
 <body>
+	<%-- Includes shared navbar fragment for consistent admin navigation --%>
 	<%@ include file="../common/navbar.jsp"%>
 	<div class="page">
 
@@ -308,8 +309,10 @@ th, td {
 		</div>
 
 		<%
+		// Reads appointment list from request scope; servlet/controller should set "items" attribute
 		List<BookingDetailAppointment> items = (List<BookingDetailAppointment>) request.getAttribute("items");
 
+		// Displays empty state when no appointment records are available
 		if (items == null || items.isEmpty()) {
 		%>
 		<div class="card">
@@ -336,13 +339,20 @@ th, td {
 
 					<tbody>
 						<%
+						// Iterates every appointment record and renders a single table row per record
+						// Each iteration derives display label and CSS badge class based on caregiver_status value
+						// Data fields are pulled from BookingDetailAppointment getters for customer/service/time/caregiver details
+						// Action forms embed the current detailId so updates target the correct booking_details row
 						for (BookingDetailAppointment item : items) {
+							// Reads caregiver status code for conditional rendering and form pre-selection
 							int st = item.getCaregiverStatus();
 
+							// Converts numeric status code into human-readable label for status column
 							String label = (st == 0) ? "Not Assigned"
 							: (st == 1) ? "Assigned"
 									: (st == 2) ? "Checked In" : (st == 3) ? "Checked Out" : (st == 4) ? "Cancelled" : "Unknown";
 
+							// Maps numeric status code into a corresponding badge CSS class for visual styling
 							String badgeClass = (st == 0) ? "badge b0"
 							: (st == 1) ? "badge b1"
 									: (st == 2) ? "badge b2" : (st == 3) ? "badge b3" : (st == 4) ? "badge b4" : "badge b0";

@@ -2,7 +2,13 @@
 	pageEncoding="UTF-8"%>
 <%@ page
 	import="jakarta.servlet.http.HttpSession, java.util.*,model.customer.Customer"%>
+<%--
+Ong Jin Kai
+2429465,
 
+Lois Poh 
+2429478
+ --%>
 <%
 if (session == null || !"admin".equals(session.getAttribute("role"))) {
 	response.sendRedirect(request.getContextPath() + "/loginPage/login.jsp?unauthorized=true");
@@ -153,7 +159,7 @@ body {
 		<p class="subtitle">Search and filter clients by name or
 			residential area</p>
 
-		<!-- 🔍 FILTER / INQUIRY FORM -->
+		<!-- FILTER / INQUIRY FORM -->
 		<div class="filter-card">
 			<form class="row g-3" method="get"
 				action="<%=request.getContextPath()%>/admin/management">
@@ -182,7 +188,7 @@ body {
 			</form>
 		</div>
 
-		<!-- 👥 CLIENT RESULTS -->
+		<!-- CLIENT RESULTS -->
 		<%
 		if (clientList != null && !clientList.isEmpty()) {
 			for (Customer c : clientList) {

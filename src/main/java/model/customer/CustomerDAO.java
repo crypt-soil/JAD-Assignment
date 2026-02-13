@@ -1,4 +1,5 @@
 package model.customer;
+
 /*
  * Ong Jin Kai
  * 2429465
@@ -9,13 +10,12 @@ import java.util.*;
 import model.DBConnection;
 
 public class CustomerDAO {
-
-	// get connection from DBConnection.java
+	// Establishes a database connection by delegating to DBConnection utility class
 	private Connection getConnection() throws Exception {
 		return DBConnection.getConnection();
 	}
 
-	// read all customers
+	// Retrieves all customer records from the database without any filtering
 	public List<Customer> getAllCustomers() {
 		List<Customer> customers = new ArrayList<>();
 		String sql = "SELECT * FROM customers";
@@ -38,7 +38,7 @@ public class CustomerDAO {
 		return customers;
 	}
 
-	// ✅ NEW: inquiry (search + filter)
+	// Performs a filtered search on customers based on text query and zipcode
 	// q searches: username / full_name / email / phone
 	// zipcode filters: exact match
 	public List<Customer> searchCustomers(String q, String zipcode) {
@@ -85,6 +85,7 @@ public class CustomerDAO {
 		return customers;
 	}
 
+	// fetches a single customer record using the primary key identifier
 	// read customer by id
 	public Customer getCustomerById(int id) {
 		String sql = "SELECT * FROM customers WHERE customer_id=?";
@@ -108,6 +109,7 @@ public class CustomerDAO {
 		return null;
 	}
 
+	// Inserts a new customer record into the database with all provided fields
 	// create new customer
 	public boolean addCustomer(Customer c) {
 		String sql = "INSERT INTO customers (username, password, full_name, email, phone, address, zipcode) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -131,6 +133,7 @@ public class CustomerDAO {
 		return false;
 	}
 
+	// Modifies existing customer information while preserving the original password
 	// update customer information (without password)
 	public boolean updateCustomer(Customer c) {
 		String sql = "UPDATE customers SET username=?, full_name=?, email=?, phone=?, address=?, zipcode=? WHERE customer_id=?";
@@ -154,7 +157,9 @@ public class CustomerDAO {
 		return false;
 	}
 
-	// ✅ OPTIONAL: update including password (use only if admin changed password)
+	// Updates all customer fields including password for administrative password
+	// changes
+	// update including password (use only if admin changed password)
 	public boolean updateCustomerWithPassword(Customer c) {
 		String sql = "UPDATE customers SET username=?, password=?, full_name=?, email=?, phone=?, address=?, zipcode=? WHERE customer_id=?";
 
@@ -178,6 +183,7 @@ public class CustomerDAO {
 		return false;
 	}
 
+	// Removes a customer record from the database using the customer ID
 	// delete customer
 	public boolean deleteCustomer(int id) {
 		String sql = "DELETE FROM customers WHERE customer_id=?";

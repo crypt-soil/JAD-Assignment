@@ -25,16 +25,16 @@ public class UpdateMedicalInfoServlet extends HttpServlet {
 
 		int customerId = (int) session.getAttribute("customer_id");
 
-		// ✅ Checkboxes (multiple values)
+		// Checkboxes (multiple values)
 		String[] conditionsArr = request.getParameterValues("conditions");
 
-		// ✅ Allergies text
+		// Allergies text
 		String allergies = request.getParameter("allergies");
 		if (allergies == null)
 			allergies = "";
 		allergies = allergies.trim();
 
-		// ✅ Convert conditions array -> CSV (store the label values)
+		// Convert conditions array -> CSV (store the label values)
 		String conditionsCsv = "";
 		if (conditionsArr != null && conditionsArr.length > 0) {
 			// keep original labels; join with comma

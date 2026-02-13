@@ -1,5 +1,8 @@
 package model.Notification;
-
+/*
+ * Lois Poh 
+ * 2429478
+ */
 import java.sql.Timestamp;
 
 public class Notification {

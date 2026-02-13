@@ -9,7 +9,10 @@ import java.net.URLEncoder;
 
 import model.Service.ServiceInquiry;
 import model.Service.ServiceInquiryDAO;
-
+/*
+ * Lois Poh
+ * 2429478
+ */
 @WebServlet("/inquiry/create")
 public class InquiryCreateServlet extends HttpServlet {
 

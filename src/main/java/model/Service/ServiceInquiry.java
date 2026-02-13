@@ -1,5 +1,8 @@
 package model.Service;
-
+/*
+ * Lois Poh
+ * 2429478
+ */
 public class ServiceInquiry {
 
 	private Integer inquiryId;

@@ -1,8 +1,4 @@
 package controller.Caregiver;
-/*
- * Lois Poh 
- * 2429478
- */
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;

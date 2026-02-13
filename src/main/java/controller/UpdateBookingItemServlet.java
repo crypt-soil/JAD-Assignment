@@ -32,7 +32,7 @@ public class UpdateBookingItemServlet extends HttpServlet {
 		int serviceId = parseIntSafe(request.getParameter("serviceId"));
 		String specialRequest = request.getParameter("specialRequest");
 
-		// ✅ Date + Hour (hour-only)
+		// Date + Hour (hour-only)
 		String serviceDateStr = request.getParameter("serviceDate"); // yyyy-MM-dd
 		int serviceHour = parseIntSafe(request.getParameter("serviceHour")); // 0..23
 

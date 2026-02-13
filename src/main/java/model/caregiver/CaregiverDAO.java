@@ -1,5 +1,9 @@
 package model.caregiver;
 
+/*
+ * Lois Poh 
+ * 2429478
+ */
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +14,8 @@ import model.DBConnection;
 
 public class CaregiverDAO {
 
+	// Retrieves a single caregiver's full name for display purposes such as
+	// navigation bar greetings
 	// ============================================================
 	// GET CAREGIVER NAME (used in navbar / greetings)
 	// ============================================================
@@ -30,6 +36,8 @@ public class CaregiverDAO {
 		return "Caregiver";
 	}
 
+	// Fetches complete caregiver data including profile details and populates a
+	// Caregiver object
 	// ============================================================
 	// GET FULL CAREGIVER PROFILE (for profile page)
 	// ============================================================
@@ -63,13 +71,14 @@ public class CaregiverDAO {
 		return c;
 	}
 
+	// Persists changes to caregiver profile fields that are editable by the user
 	// ============================================================
 	// UPDATE CAREGIVER PROFILE (editable fields only)
 	// ============================================================
 	public void updateCaregiver(Caregiver c) {
 
 		String sql = """
-									UPDATE caregiver
+				                    UPDATE caregiver
 				SET full_name = ?,
 				    email = ?,
 				    phone = ?,
@@ -79,7 +88,7 @@ public class CaregiverDAO {
 				    photo_url = ?
 				WHERE caregiver_id = ?
 
-								""";
+				                """;
 
 		try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -100,6 +109,8 @@ public class CaregiverDAO {
 	}
 
 	// New list method
+	// Queries all caregivers and returns a list containing essential profile data
+	// for directory listings
 	public List<Caregiver> getAllCaregivers() {
 		List<Caregiver> caregivers = new ArrayList<>();
 
